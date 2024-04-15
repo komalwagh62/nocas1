@@ -20,16 +20,16 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have as title 'C-Nocas_UI'`, () => {
+  it(`should have as title 'C_NOCAS-Frontend'`, () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
-    expect(app.title).toEqual('C-Nocas_UI');
+    expect(app.title).toEqual('C_NOCAS-Frontend');
   });
 
   it('should render title', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, C-Nocas_UI');
+    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, C_NOCAS-Frontend');
   });
 });

@@ -1,0 +1,8 @@
+{
+"type": "FeatureCollection",
+"name": "VABB_CCZM_Point",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "Name": "22M AMSL", "description": null, "timestamp": null, "begin": null, "end": null, "altitudeMode": null, "tessellate": -1, "extrude": 0, "visibility": -1, "drawOrder": null, "icon": null }, "geometry": { "type": "Point", "coordinates": [ 73.004666430821601, 19.003060668554401, 0.0 ] } }
+]
+}

@@ -1,0 +1,111 @@
+<div class="content">
+    <div class="container" infiniteScroll>
+        <div class="row justify-content-center">
+            <div class="col-md-12">
+                <div class="row align-items-center">
+                    <div class="col-sm-5 mb-5 mb-lg-0">
+                        <h2 class="mb-5">Top Elevation Data Form</h2>
+                        <form class="border-right pr-5 mb-5" [formGroup]="TopElevationForm" autocomplete="on"
+                            novalidate>
+                            <div class="row">
+                                <div class="row">
+                                    <div class="col-md-6 form-group">
+                                        <select id="airportICAO" class="form-control" formControlName="ICAO">
+                                            <option value="" disabled selected>Select an ICAO Code</option>
+                                            <option *ngFor="let airport of airports" [value]="airport.airport_icao">{{
+                                                airport.airport_icao }}</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 form-group">
+
+                                        <input type="text" class="form-control" name="airportIata" id="airportIata"
+                                            [value]="selectedAirportIATA" placeholder="Airport IATA Code" readonly>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 form-group">
+                                        <input type="text" class="form-control" name="airportName" id="airportName"
+                                            [value]="selectedAirportName" placeholder="Airport Name" readonly>
+                                    </div>
+                                    <div class="col-md-6 form-group">
+                                        <input type="text" class="form-control" name="airportCity" id="airportCity"
+                                            [value]="selectedAirportCity" placeholder="City Name" readonly>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group">
+                                        <input type="number" class="form-control" name="Site_Elevation"
+                                            id="Site_Elevation" formControlName="Site_Elevation"
+                                            placeholder="Site Elevation">
+                                        <div *ngIf="TopElevationForm.get('Site_Elevation').invalid && (TopElevationForm.get('Site_Elevation').dirty || TopElevationForm.get('Site_Elevation').touched)"
+                                            class="alert alert-danger mt-2">
+                                            <div *ngIf="TopElevationForm.get('Site_Elevation').errors.required">
+                                                Site Elevation is <strong>required.</strong>
+                                            </div>
+                                            <div *ngIf="TopElevationForm.get('Site_Elevation').errors.nullValidator">
+                                                Site Elevation is <strong>required.</strong>
+                                            </div>
+                                            <div *ngIf="TopElevationForm.get('Site_Elevation').errors.pattern">
+                                                Site Elevation must be at least <strong>4 characters long</strong>
+                                            </div>
+                                            <div *ngIf="TopElevationForm.get('Site_Elevation').errors.pattern">
+                                                Enter Only Number <strong>Number In Mtrs.</strong>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 form-group">
+                                        <input type="text" class="form-control" [ngModel]="lat | number:'1.2-2'"
+                                            name="Latitude" formControlName="Latitude" id="Latitude"
+                                            placeholder="Latitude">
+                                        <div *ngIf="TopElevationForm.get('Latitude').invalid && (TopElevationForm.get('Latitude').dirty || TopElevationForm.get('Latitude').touched)"
+                                            class="alert alert-danger mt-2">
+                                            <div *ngIf="TopElevationForm.get('Latitude').errors.required">
+                                                Latitude is <strong>required.</strong>
+                                            </div>
+                                            <div *ngIf="TopElevationForm.get('Latitude').errors.nullValidator">
+                                                Latitude is <strong>required.</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 form-group">
+                                        <input type="text" class="form-control" [ngModel]="long | number:'1.2-2'"
+                                            name="Longitude" formControlName="Longitude" id="Longitude"
+                                            placeholder="Longitude">
+                                        <div *ngIf="TopElevationForm.get('Longitude').invalid && (TopElevationForm.get('Longitude').dirty || TopElevationForm.get('Longitude').touched)"
+                                            class="alert alert-danger mt-2">
+                                            <div *ngIf="TopElevationForm.get('Longitude').errors.required">
+                                                Longitude is <strong>required.</strong>
+                                            </div>
+                                            <div *ngIf="TopElevationForm.get('Longitude').errors.nullValidator">
+                                                Longitude is <strong>required.</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-12 d-flex justify-content-center">
+                                        <button type="submit" class="btn btn-outline-primary rounded-5 py-2 px-4"
+                                            (click)="submitForm()">Submit</button>
+
+                                        <span class="submitting"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-lg-7 ml-auto">
+                <div id="map" #mapElement></div>
+                <div id="mapData" #mapElement></div>
+            </div>
+        </div>
+
+    </div>
+</div>

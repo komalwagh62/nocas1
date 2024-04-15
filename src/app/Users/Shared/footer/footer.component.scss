@@ -1,0 +1,96 @@
+p {
+    color: #111827;
+}
+
+footer {
+    left: 0;
+    bottom: 0;
+    /*-------*/
+    width: 100%;
+    background-color: #fff;
+    cursor: default;
+}
+
+
+.inside__footer {
+    border-top: 1px solid lightgray;
+    padding: 20px;
+    width: 100%;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.copyright {
+    text-align: left;
+    color: #a9a9a9;
+    font-size: 16px;
+    order: 1;
+    margin-bottom: 0;
+}
+
+.social {
+    order: 2;
+    margin-bottom: 0;
+}
+
+.icon {
+    display: inline-block;
+    margin-left: 20px;
+    fill: darkgray;
+    transition: fill 0.15s, filter 0.15s;
+}
+
+.icon:first-child {
+    margin-right: 0;
+}
+
+.linkedin:hover {
+    fill: blue;
+}
+
+.instagram:hover {
+    fill: red;
+}
+
+.twitter:hover {
+    fill: black;
+}
+
+.icon:active {
+    filter: brightness(70%);
+}
+a{
+    color: darkgray;
+    text-decoration:none
+}
+a:hover {
+    color: #3b5998;
+}
+
+@media only screen and (max-width: 600px) {
+
+    .inside__footer {
+        /*use flex-direction, because if you change it to Block it'll never allow Order to work*/
+        flex-direction: column;
+    }
+
+    .copyright {
+        font-size: 14px;
+        text-align: center;
+        order: 2;
+        margin-bottom: 4px;
+    }
+
+    .social {
+        order: 1;
+        margin-bottom: 4px;
+    }
+
+    .icon {
+        width: 24px;
+        height: 24px;
+        transition: fill 0s, filter 0s;
+    }
+}

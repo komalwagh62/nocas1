@@ -12,6 +12,11 @@ body {
 
 
 
+.modal-backdrop {
+    /* bug fix - no overlay */    
+    display: none;    
+  }
+
 .loader {
     text-align: center;
     width: 100%;

@@ -1,148 +1,14 @@
-<!-- <div class="content">
-    <div class="container" infiniteScroll>
-        <div class="row justify-content-center">
-            <div class="col-md-12">
-                <div class="row mt-4 align-items-center">
-                    <div class="col-sm-5 mb-5 mb-lg-0">
-                        <h2 class="mb-5">Top Elevation<br><br><small>Data Form</small></h2>
-                        <form class="border-right pr-5 mb-5" [formGroup]="TopElevationForm" autocomplete="on"
-                            novalidate>
-                            <div class="row">
-                                <div class="row">
-                                    <div class="col-md-6 form-group">
-                                        <select id="airportCITY" class="form-control" formControlName="CITY">
-                                            <option value="" disabled selected>Select an ICAO Code</option>
-                                            <option *ngFor="let airport of airports" [value]="airport.airport_city">{{
-                                                airport.airport_city }}</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6 form-group">
-                                        <input type="text" class="form-control" name="airportName" id="airportName"
-                                            [value]="selectedAirportName" placeholder="Airport Name" readonly>
-                                    </div>
-                                    
-                                </div>
-
-                                <div class="row">
-                                    
-                                    <div class="col-md-6 form-group">
-                                        <input type="text" class="form-control" name="airportIcao" id="airportIcao"
-                                            [value]="selectedAirportIcao" placeholder="ICAO Code" readonly>
-                                    </div>
-                                    <div class="col-md-6 form-group">
-
-                                        <input type="text" class="form-control" name="airportIata" id="airportIata"
-                                            [value]="selectedAirportIATA" placeholder="Airport IATA Code" readonly>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="form-group">
-                                        <input type="number" class="form-control" name="Site_Elevation"
-                                            id="Site_Elevation" formControlName="Site_Elevation"
-                                            placeholder="Site Elevation">
-                                        <div *ngIf="TopElevationForm.get('Site_Elevation').invalid && (TopElevationForm.get('Site_Elevation').dirty || TopElevationForm.get('Site_Elevation').touched)"
-                                            class="alert alert-danger mt-2">
-                                            <div *ngIf="TopElevationForm.get('Site_Elevation').errors.required">
-                                                Site Elevation is <strong>required.</strong>
-                                            </div>
-                                            <div *ngIf="TopElevationForm.get('Site_Elevation').errors.nullValidator">
-                                                Site Elevation is <strong>required.</strong>
-                                            </div>
-                                            <div *ngIf="TopElevationForm.get('Site_Elevation').errors.pattern">
-                                                Site Elevation must be at least <strong>4 characters long</strong>
-                                            </div>
-                                            <div *ngIf="TopElevationForm.get('Site_Elevation').errors.pattern">
-                                                Enter Only Number <strong>Number In Mtrs.</strong>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-6 form-group">
-                                        <input type="text" class="form-control" [ngModel]="lat | number:'1.2-2'"
-                                            name="Latitude" formControlName="Latitude" id="Latitude"
-                                            placeholder="Latitude">
-                                        <div *ngIf="TopElevationForm.get('Latitude').invalid && (TopElevationForm.get('Latitude').dirty || TopElevationForm.get('Latitude').touched)"
-                                            class="alert alert-danger mt-2">
-                                            <div *ngIf="TopElevationForm.get('Latitude').errors.required">
-                                                Latitude is <strong>required.</strong>
-                                            </div>
-                                            <div *ngIf="TopElevationForm.get('Latitude').errors.nullValidator">
-                                                Latitude is <strong>required.</strong>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 form-group">
-                                        <input type="text" class="form-control" [ngModel]="long | number:'1.2-2'"
-                                            name="Longitude" formControlName="Longitude" id="Longitude"
-                                            placeholder="Longitude">
-                                        <div *ngIf="TopElevationForm.get('Longitude').invalid && (TopElevationForm.get('Longitude').dirty || TopElevationForm.get('Longitude').touched)"
-                                            class="alert alert-danger mt-2">
-                                            <div *ngIf="TopElevationForm.get('Longitude').errors.required">
-                                                Longitude is <strong>required.</strong>
-                                            </div>
-                                            <div *ngIf="TopElevationForm.get('Longitude').errors.nullValidator">
-                                                Longitude is <strong>required.</strong>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row mt-2">
-                                    <div class="col-6 d-flex ">
-                                        <button type="submit" class="btn btn-outline-primary rounded-5 py-2 px-4"
-                                            (click)="submitForm()">Submit</button>
-
-                                        <span class="submitting"></span>
-                                    </div>
-                                    <div class="col-6" align="end">
-                                        <button type="reset" value="reset"
-                                            class="btn btn-outline-danger rounded-5 py-2 px-4"
-                                            (click)="clearMapData()">Clear</button>
-    
-                                    </div>
-                                </div>
-
-                            </div>
-                        </form>
-                    </div>
-                    <div class="col-lg-7">
-                        <div class="map-container">
-                            <div id="map"></div>
-                            <div id="mapData" class="map-data mt-2" ></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-</div> -->
-
-
-
-
 <div class="container-fluid">
     <div class="row">
-        <div class="col-sm-2 ">
-            <!-- <div class="container-fluid">
-                <a class="navbar-brand" href="https://www.cognitivenavigation.com">
-                    <img src="https://www.cognitivenavigation.com/wp-content/uploads/2021/02/cropped-C_Name.png"
-                        alt="Cognitive Navigation Pvt. Ltd" class="d-inline-block align-text-top">
-                </a>
-            </div> -->
+        <div class="col-lg-2">
             <form [formGroup]="TopElevationForm" autocomplete="on" novalidate class="d-flex-center">
                 <div class="example-container">
-
                     <!--Select Airport ICAO-->
-                    <div class="height-Top">
+                    <div class="mt-1">
                         <mat-form-field appearance="outline">
                             <mat-label>Airport City</mat-label>
                             <mat-select id="airportCITY" formControlName="CITY">
-
-                                <!-- <mat-option value="" disabled selected>Select an ICAO Code</mat-option> -->
+                                <mat-option value="" disabled selected>Select an ICAO Code</mat-option>
                                 <mat-option *ngFor="let airport of airports" [value]="airport.airport_city">{{
                                     airport.airport_city }}
                                 </mat-option>
@@ -154,7 +20,7 @@
                     </div>
 
                     <!--Select Airport Name -->
-                    <div class="height-Top">
+                    <div>
                         <mat-form-field appearance="outline">
                             <mat-label>Airport Name</mat-label>
                             <input matInput type="text" name="airportName" id="airportName"
@@ -165,7 +31,7 @@
                     </div>
 
                     <!--Select Airport City -->
-                    <div class="height-Top">
+                    <div>
                         <mat-form-field appearance="outline">
                             <mat-label>ICAO Code</mat-label>
                             <input type="text" matInput name="airportIcao" id="airportIcao"
@@ -175,30 +41,30 @@
                         </mat-form-field>
                     </div>
 
-                    <!--Select Airport Site Elevation -->
-                    <div class="height-Top">
+                    <!--Select airport Iata -->
+                    <div>
                         <mat-form-field appearance="outline">
-                            <mat-label>Site Elevation</mat-label>
-                            <input matInput type="number" class="form-control" name="Site_Elevation" id="Site_Elevation"
-                                formControlName="Site_Elevation" placeholder="Site Elevation">
+                            <mat-label>Iata Code</mat-label>
+                            <input type="text" matInput name="airportIata" id="airportIata"
+                                [value]="selectedAirportIATA" placeholder="Airport IATA Code" readonly>
                             <mat-icon matSuffix>sentiment_very_satisfied</mat-icon>
-                            <mat-hint>Enter Your Site Elevation</mat-hint>
+                            <mat-hint>Airport Iata code</mat-hint>
                         </mat-form-field>
                     </div>
 
                     <!--Select Airport Latitude  -->
-                    <div class="height-Top">
+                    <div>
                         <mat-form-field appearance="outline">
                             <mat-label>Latitude</mat-label>
-                            <input matInput type="number" [ngModel]="lat | number:'1.2-2'" name="Latitude" formControlName="Latitude"
-                                id="Latitude" placeholder="Latitude">
+                            <input matInput type="number" [ngModel]="lat | number:'1.2-2'" name="Latitude"
+                                formControlName="Latitude" id="Latitude" placeholder="Latitude">
                             <mat-icon matSuffix>sentiment_very_satisfied</mat-icon>
                             <mat-hint>Enter Your Latitude</mat-hint>
                         </mat-form-field>
                     </div>
 
                     <!--Select Airport Longitude -->
-                    <div class="height-Top">
+                    <div>
                         <mat-form-field appearance="outline">
                             <mat-label>Longitude</mat-label>
                             <input matInput type="number" [ngModel]="long | number:'1.2-2'" name="Longitude"
@@ -208,22 +74,47 @@
                         </mat-form-field>
                     </div>
 
+                    <!--Select Airport Site Elevation -->
+                    <div>
+                        <mat-form-field appearance="outline">
+                            <mat-label>Site Elevation</mat-label>
+                            <input matInput type="number" name="Site_Elevation" id="Site_Elevation"
+                                formControlName="Site_Elevation" placeholder="Site Elevation">
+                            <mat-icon matSuffix>sentiment_very_satisfied</mat-icon>
+                            <mat-hint>Enter Your Site Elevation</mat-hint>
+                        </mat-form-field>
+                    </div>
+
+                    <div class="d-grid gap-1 mx-auto">
+                        <button type="submit" class="btn btn-outline-primary rounded-5 py-2 px-4" (click)="submitForm()"
+                            data-bs-toggle="modal" data-bs-target="#exampleModal">Submit</button>
+
+                        <button type="reset" value="reset" class="btn btn-outline-danger rounded-5 py-2 px-4"
+                            (click)="clearMapData()">Clear</button>
+                    </div>
                 </div>
             </form>
-            <div class="d-grid gap-2 button-Top  mx-auto">
-                <button type="submit" class="btn btn-outline-primary rounded-5 py-2 px-4"
-                    (click)="submitForm()">Submit</button>
+        </div>
 
-                <button type="reset" value="reset" class="btn btn-outline-danger rounded-5 py-2 px-4"
-                (click)="clearMapData()">Clear</button>
+        <div class="col-lg-10">
+            <div class="map-container">
+                <div id="map" style="height: 620px; width: 100%;"></div>
             </div>
         </div>
-        <div class="col-lg-10">
-            <div class="content">
-                <div class="map-container">
-                    <div id="map" style="height: 540px; position: relative;"></div>
-                    <div id="mapData" class="map-data mt-2"></div>
-                </div>
+    </div>
+</div>
+
+<!-- Modal -->
+
+<div class="modal" id="exampleModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Modal title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="mapData" class="map-data mt-2"></div>
             </div>
         </div>
     </div>

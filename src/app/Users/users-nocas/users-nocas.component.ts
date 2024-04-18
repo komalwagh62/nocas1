@@ -9,15 +9,12 @@ import * as L from 'leaflet';
   styleUrl: './users-nocas.component.scss'
 })
 export class UsersNOCASComponent implements OnInit {
-
-
   latitude: any;
   longitude: any;
   line: any;
   popupContent: any;
   lat!: any;
   long!: any;
-
   updatedDistance!: number;
   TopElevationForm!: FormGroup | any;
   marker: any;
@@ -32,7 +29,6 @@ export class UsersNOCASComponent implements OnInit {
   selectedAirportIcao: string = '';
   selectedAirportIATA: string = '';
   airportCoordinates: [number, number] = [0, 0]; // Variable to store airport coordinates
-
   showmap: boolean = false;
   getAirportCoordinates: any;
 
@@ -40,9 +36,12 @@ export class UsersNOCASComponent implements OnInit {
 
   ngOnInit(): void {
     this.TopElevationForm = this.formbuilder.group({
-      Latitude: ['', [Validators.required]],
-      Longitude: ['', [Validators.required]],
-      CITY: ['', [Validators.required]],
+      Latitude: ['', [Validators.required, Validators.nullValidator,]],
+      Longitude: ['', [Validators.required, Validators.nullValidator,]],
+      CITY: ['', [Validators.required, Validators.nullValidator,]],
+      // airportName: ['', [Validators.required, Validators.nullValidator,]],
+      // airportIcao: ['', [Validators.required, Validators.nullValidator,]],
+      // airportIata: ['', [Validators.required, Validators.nullValidator,]],
       Site_Elevation: new FormControl('', [Validators.required, Validators.nullValidator, Validators.pattern(/^[0-5]+(?:\.[0-5]+)?$/)]),
     });
 
@@ -70,7 +69,8 @@ export class UsersNOCASComponent implements OnInit {
       this.selectedAirportIATA = selectedAirport ? selectedAirport.airport_iata : '';
       if (city === 'Coimbatore' || city === 'Mumbai' || city === 'Puri') {
         console.log("Selected airport:", city);
-        this.loadGeoJSON(this.map);
+       
+          this.loadGeoJSON(this.map);
       } else {
         console.log("Invalid airport selected");
         if (this.geojsonLayer) {
@@ -98,6 +98,7 @@ export class UsersNOCASComponent implements OnInit {
         // Update the displayed map data
         this.displayMapData(latitude, longitude, this.airportCoordinates);
         this.showMap(latitude, longitude);
+        
       } else {
         console.error("Please fill in valid airport ICAO code, latitude, and longitude.");
       }
@@ -105,7 +106,6 @@ export class UsersNOCASComponent implements OnInit {
       console.error("Form is invalid");
     }
   }
-
 
   getLocation() {
     if (navigator.geolocation) {
@@ -150,26 +150,44 @@ export class UsersNOCASComponent implements OnInit {
     return distance;
   }
 
-
   degToRad(degrees: number): number {
     return degrees * (Math.PI / 180);
   }
 
   showMap(lat: number, lng: number) {
-    this.map = L.map('map', { zoomControl: false, attributionControl: false }).setView([lat, lng], 13);
+    this.map = L.map('map', { zoomControl: false, attributionControl: false }).setView([20.5937, 78.9629], 4);
 
     const streets = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
       subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
     });
+
+    const DarkMatter = L.tileLayer('  https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {});
     const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {});
     const Navigation = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
       attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
       maxZoom: 16
     });
+    const googleHybrid = L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
+      maxZoom: 20,
+      subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+    });
+    const googleSat = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+      maxZoom: 20,
+      subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+    });
+    const googleTerrain = L.tileLayer('http://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}', {
+      maxZoom: 20,
+      subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+    });
+
     const baseMaps = {
       'Streets': streets,
       'Satellite': satellite,
-      'Navigation': Navigation
+      'Navigation': Navigation,
+      'Hybrid': googleHybrid,
+      'Satellite google': googleSat,
+      'Terrain': googleTerrain,
+      'Dark': DarkMatter
     };
 
     const overlayMaps = {
@@ -187,10 +205,6 @@ export class UsersNOCASComponent implements OnInit {
 
     this.marker = L.marker([lat, lng]).addTo(this.map);
   }
-
-
-
-
 
   loadGeoJSON(map: any) {
     if (!map) {
@@ -220,8 +234,9 @@ export class UsersNOCASComponent implements OnInit {
       this.line = null; // Reset the polyline
     }
 
+  
     const selectedAirportCITY = this.TopElevationForm.get('CITY')?.value;
-
+  
     if (selectedAirportCITY) {
       let airportGeoJSONPath: string;
 
@@ -298,8 +313,10 @@ export class UsersNOCASComponent implements OnInit {
         .catch(error => {
           console.error("Error fetching GeoJSON data:", error);
         });
+     
     }
   }
+
   clearMapData() {
     // Remove the GeoJSON layer if it exists
     if (this.geojsonLayer) {
@@ -334,7 +351,6 @@ export class UsersNOCASComponent implements OnInit {
     // Reset the form fields
     this.TopElevationForm.reset();
   }
-
 
   displayMapData(lat: number, lng: number, airportCoordinates: [number, number]) {
     // Calculate the distance
@@ -391,8 +407,6 @@ export class UsersNOCASComponent implements OnInit {
     }
   }
 
-
-
   updatePolyline(lat: number, lng: number) {
     if (this.line) {
       // Update the line's coordinates using the updated marker's position
@@ -400,27 +414,12 @@ export class UsersNOCASComponent implements OnInit {
     }
   }
 
-
-
-
   updateMarker2Position(lat: number, lng: number) {
     if (this.marker) {
       // Update the position of the second marker
       this.marker.setLatLng([lat, lng]);
     }
   }
-
-
-  // fetchAirports(): void {
-  //   this.http.get<any>('http://localhost:3001/api/airports').subscribe(
-  //     response => {
-  //       this.airports = response.airports;
-  //     },
-  //     error => {
-  //       console.error('Error fetching airports:', error);
-  //     }
-  //   );
-  // }
 
   fetchAirports() {
     this.http.get<any>('https://myprofile-ae1fc-default-rtdb.firebaseio.com/airportsData =.json')

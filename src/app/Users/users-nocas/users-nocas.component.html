@@ -86,8 +86,7 @@
                     </div>
 
                     <div class="d-grid gap-1 mx-auto">
-                        <button type="submit" class="btn btn-outline-primary rounded-5 py-2 px-4" (click)="submitForm()"
-                            data-bs-toggle="modal" data-bs-target="#exampleModal">Submit</button>
+                        <button type="submit" class="btn btn-outline-primary rounded-5 py-2 px-4" (click)="submitForm()">Submit</button>
 
                         <button type="reset" value="reset" class="btn btn-outline-danger rounded-5 py-2 px-4"
                             (click)="clearMapData()">Clear</button>
@@ -110,8 +109,8 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Modal title</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h2 class="modal-title">Elevation</h2>
+                <button type="button" class="btn-close" (click)="closeModal()" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div id="mapData" class="map-data mt-2"></div>

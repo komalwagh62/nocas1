@@ -69,8 +69,9 @@ export class UsersNOCASComponent implements OnInit {
       this.selectedAirportIATA = selectedAirport ? selectedAirport.airport_iata : '';
       if (city === 'Coimbatore' || city === 'Mumbai' || city === 'Puri') {
         console.log("Selected airport:", city);
-       
-          this.loadGeoJSON(this.map);
+
+        this.loadGeoJSON(this.map);
+
       } else {
         console.log("Invalid airport selected");
         if (this.geojsonLayer) {
@@ -89,10 +90,11 @@ export class UsersNOCASComponent implements OnInit {
       const confirmation = confirm("Please check if the information is correct.");
       if (confirmation) {
         console.log('Form submitted successfully');
+        this.showModal();
+
         const airportCITY = this.TopElevationForm.get('CITY')?.value;
         const latitude = parseFloat(this.TopElevationForm.get('Latitude')?.value);
         const longitude = parseFloat(this.TopElevationForm.get('Longitude')?.value);
- 
         if (airportCITY && !isNaN(latitude) && !isNaN(longitude)) {
           // Update the markers and line
           console.log('Latitude:', latitude);
@@ -102,12 +104,15 @@ export class UsersNOCASComponent implements OnInit {
           // Update the displayed map data
           this.displayMapData(latitude, longitude, this.airportCoordinates);
           this.showMap(latitude, longitude);
+
         }
       } else {
         // User clicked "Cancel" - do nothing or handle accordingly
         console.log('Form submission cancelled');
       }
+
     }
+
   }
 
   getLocation() {
@@ -195,18 +200,31 @@ export class UsersNOCASComponent implements OnInit {
 
     const overlayMaps = {
     };
-
     L.control.layers(baseMaps, overlayMaps).addTo(this.map);
-
     streets.addTo(this.map);
-    // Add scale Control
     L.control.scale().addTo(this.map);
-    // Add Zoom Control
     L.control.zoom().addTo(this.map);
 
-    this.line = L.polyline([[lat, lng], [lat, lng]], { color: 'blue' }).addTo(this.map);
+    const popupContent = `Latitude: ${lat.toFixed(4)}, Longitude: ${lng.toFixed(4)}`;
+    this.marker = L.marker([lat, lng]).bindPopup(popupContent).addTo(this.map);
+    this.line = L.polyline([[lat, lng], [lat, lng]], { color: 'black' }).addTo(this.map);
 
-    this.marker = L.marker([lat, lng]).addTo(this.map);
+  }
+
+  showModal(): void {
+    // Code to show the modal
+    const modal = document.getElementById('exampleModal');
+    if (modal) {
+      modal.classList.add('show');
+      modal.style.display = 'block';
+    }
+  }
+  closeModal(): void {
+    const modal = document.getElementById('exampleModal');
+    if (modal) {
+      modal.classList.remove('show');
+      modal.style.display = 'none';
+    }
   }
 
   loadGeoJSON(map: any) {
@@ -214,19 +232,19 @@ export class UsersNOCASComponent implements OnInit {
       console.error("Map object is required to load GeoJSON.");
       return;
     }
- 
+
     // Remove the existing GeoJSON layer if it exists
     if (this.geojsonLayer) {
       map.removeLayer(this.geojsonLayer);
       this.geojsonLayer = null; // Reset the GeoJSON layer
     }
- 
+
     // Remove the existing marker2 if it exists
     if (this.marker2) {
       map.removeLayer(this.marker2);
       this.marker2 = null; // Reset the airport marker
     }
- 
+
     // Remove the existing marker and line if they exist
     if (this.marker) {
       map.removeLayer(this.marker);
@@ -236,91 +254,94 @@ export class UsersNOCASComponent implements OnInit {
       map.removeLayer(this.line);
       this.line = null; // Reset the polyline
     }
- 
+
     const selectedAirportCITY = this.TopElevationForm.get('CITY')?.value;
- 
+
     if (selectedAirportCITY) {
       let airportGeoJSONPath: string;
- 
+
+
       // Determine the GeoJSON file path based on the selected airport ICAO
       if (selectedAirportCITY === 'Coimbatore') {
         airportGeoJSONPath = 'assets/Coimbatore.geojson';
         this.airportCoordinates = [11.03, 77.04]; // Coordinates of VOCB
       } else if (selectedAirportCITY === 'Mumbai') {
         airportGeoJSONPath = 'assets/Mumbai.geojson';
-        this.airportCoordinates = [19.08, 72.86]; // Coordinates of VABB
+        this.airportCoordinates = [19.088611, 72.868056]; // Coordinates of VABB
       } else if (selectedAirportCITY === 'Puri') {
         airportGeoJSONPath = 'assets/Puri.geojson';
-        this.airportCoordinates = [19.79, 85.82]; // Coordinates of VEJH
+        this.airportCoordinates = [19.794444, 85.751111]; // Coordinates of VEJH
       } else {
         console.error("Invalid airport ICAO code.");
         return;
       }
- 
+
       // Fetch the corresponding GeoJSON file
       fetch(airportGeoJSONPath)
         .then(response => response.json())
         .then(geojsonData => {
           // const geojsonLayer = L.geoJSON(geojsonData);
-         
+
           const features = geojsonData.features;
- 
+
           // Style function to set colors based on properties from JSON
           const style = (feature: any) => {
             const color = feature.properties.Color; // Extract color from JSON
             return { fillColor: color, color: 'black', weight: 1 }; // Define style properties
           };
- 
+
           // Create GeoJSON layer with custom style function
           const geojsonLayer = L.geoJSON(features, { style: style });
           geojsonLayer.addTo(map);
           this.geojsonLayer = geojsonLayer;
- 
+
           // Fit the map bounds to the GeoJSON layer
           map.fitBounds(geojsonLayer.getBounds());
- 
+
           // Define the custom icon for marker2 with an offset
           let customIcon = L.icon({
-            iconUrl: 'assets/marker.png', // Specify the path to your marker image
-            iconSize: [40, 40], // Set the size of the icon [width, height]
-            iconAnchor: [20, 40], // Set the offset [horizontal, vertical] (half of iconWidth, iconHeight)
-            // You can also specify other options like popupAnchor, etc. if needed
+            iconUrl: 'https://opentopomap.org/leaflet/images/marker-icon-2x.png',
+            shadowUrl: 'https://opentopomap.org/leaflet/images/marker-shadow.png',
+            iconSize: [25, 41], // Set the size of the icon [width, height]
+            shadowSize: [25, 41], // size of the shadow
+            iconAnchor: [12, 40], // point of the icon which will correspond to marker's location
+
           });
- 
- 
+
+
           // Draw a marker for the selected airport with the custom icon
           this.marker2 = L.marker(this.airportCoordinates, { icon: customIcon }).addTo(map);
- 
+
           // Draw a line from the selected airport to the current location
           if (this.lat && this.long) {
             this.marker = L.marker([this.lat, this.long]).addTo(map);
             this.line = L.polyline([this.airportCoordinates, [this.lat, this.long]], { color: 'black' }).addTo(map);
           }
- 
+
           // Fit the map bounds to the GeoJSON layer and the markers
           const bounds = L.latLngBounds([this.airportCoordinates, [this.lat, this.long]]);
           map.fitBounds(bounds);
- 
+
           // Event listener for the click event on the map
           map.on('click', (e: any) => {
             const { lat, lng } = e.latlng;
- 
+
             // Update latitude and longitude form fields
             this.TopElevationForm.patchValue({
               Latitude: lat.toFixed(2),
               Longitude: lng.toFixed(2)
             });
- 
+
             // Update the marker position
             if (this.marker) {
               this.marker.setLatLng([lat, lng]);
             }
- 
+
             // Remove the previous line if it exists
             if (this.line) {
               map.removeLayer(this.line);
             }
- 
+
             // Draw a new line from the clicked point to the airport
             const selectedAirportCITY = this.TopElevationForm.get('CITY')?.value;
             if (selectedAirportCITY) {
@@ -331,7 +352,7 @@ export class UsersNOCASComponent implements OnInit {
               }
             }
           });
- 
+
           // this.displayMapData(this.lat, this.long, this.airportCoordinates);
         })
         .catch(error => {
@@ -339,7 +360,7 @@ export class UsersNOCASComponent implements OnInit {
         });
     }
   }
-  
+
   clearMapData() {
     // Remove the GeoJSON layer if it exists
     if (this.geojsonLayer) {
@@ -423,7 +444,6 @@ export class UsersNOCASComponent implements OnInit {
             Distance: ${newDistance.toFixed(2)} km
           </div>`;
       }
-
       // Make map data visible
       mapData.style.display = 'block';
 

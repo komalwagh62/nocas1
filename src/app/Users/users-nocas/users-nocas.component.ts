@@ -261,9 +261,23 @@ export class UsersNOCASComponent implements OnInit {
       fetch(airportGeoJSONPath)
         .then(response => response.json())
         .then(geojsonData => {
-          const geojsonLayer = L.geoJSON(geojsonData);
+          // const geojsonLayer = L.geoJSON(geojsonData);
+         
+          const features = geojsonData.features;
+ 
+          // Style function to set colors based on properties from JSON
+          const style = (feature: any) => {
+            const color = feature.properties.Color; // Extract color from JSON
+            return { fillColor: color, color: 'black', weight: 1 }; // Define style properties
+          };
+ 
+          // Create GeoJSON layer with custom style function
+          const geojsonLayer = L.geoJSON(features, { style: style });
           geojsonLayer.addTo(map);
           this.geojsonLayer = geojsonLayer;
+ 
+          // Fit the map bounds to the GeoJSON layer
+          map.fitBounds(geojsonLayer.getBounds());
  
           // Define the custom icon for marker2 with an offset
           let customIcon = L.icon({
@@ -280,7 +294,7 @@ export class UsersNOCASComponent implements OnInit {
           // Draw a line from the selected airport to the current location
           if (this.lat && this.long) {
             this.marker = L.marker([this.lat, this.long]).addTo(map);
-            this.line = L.polyline([this.airportCoordinates, [this.lat, this.long]], { color: 'blue' }).addTo(map);
+            this.line = L.polyline([this.airportCoordinates, [this.lat, this.long]], { color: 'black' }).addTo(map);
           }
  
           // Fit the map bounds to the GeoJSON layer and the markers
@@ -325,7 +339,7 @@ export class UsersNOCASComponent implements OnInit {
         });
     }
   }
-
+  
   clearMapData() {
     // Remove the GeoJSON layer if it exists
     if (this.geojsonLayer) {

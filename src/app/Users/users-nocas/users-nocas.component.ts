@@ -478,7 +478,7 @@ export class UsersNOCASComponent implements OnInit {
   }
 
   fetchAirports() {
-    this.http.get<any>('https://myprofile-ae1fc-default-rtdb.firebaseio.com/airportsData =.json')
+    this.http.get<any>('https://nocas-3ab54-default-rtdb.europe-west1.firebasedatabase.app/airportsData.json')
       .subscribe({
         next: (res) => {
           this.airports = res;

@@ -1,50 +1,32 @@
-<main id="main" class="main">
 
-    <div class="pagetitle" >
-      <h1>Profile</h1>
-      <nav>
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-          <li class="breadcrumb-item">Users</li>
-          <li class="breadcrumb-item active">Profile</li>
-        </ol>
-      </nav>
-    </div><!-- End Page Title -->
-
-    <section class="section profile">
-      <div class="container mt-4">
+  <section class="section profile">
+    <div class="container mt-4">
       <div class="row">
-        <div class="col-xl-4">
+        <div class="col-2">
 
-          <div class="card">
-            <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
-
-              <!-- <img src="assets/img/profile-img.jpg" alt="Profile" class="rounded-circle"> -->
-
-              <div class="container">
-                <img *ngIf="imageUrl" [src]="imageUrl" alt="Profile" class="rounded-circle profile-image">
-              </div>
-              
-              <input type="file" (change)="onFileSelected($event)">
-              <!-- <p *ngIf="selectedFileName">Selected File: {{ selectedFileName }}</p> -->
-              
-              <h2>{{this.user.uname}}</h2>
+          <div class="text-center mb-3">
+         
+              <label class="hoverable " for="fileInput">
+                <img [src]="imageUrl ? imageUrl: 'https://assets.codepen.io/1480814/av+1.png'" alt="Profile"
+                  class="rounded-circle">
+                <div class="hover-text">
+                 <button type="button" class="btn btn-outline-primary  btn-lg"><i class="bi bi-pencil-square"></i></button>
+                  <h4 class="success-message" *ngIf="imageUrl"> Uploaded Successfully </h4>
+                </div>
+                <div class="background"></div>
+              </label>
+              <h5 class="">{{this.user.uname}}</h5>
               <h3>Web Designer</h3>
-              <div class="social-links mt-2">
-                <a href="https://twitter.com/" class="twitter"><i class="bi bi-twitter"></i></a>
-                <a href="https://facebook.com/" class="facebook"><i class="bi bi-facebook"></i></a>
-                <a href="https://instagram.com/" class="instagram"><i class="bi bi-instagram"></i></a>
-                <a href="https://linkdin.com/" class="linkedin"><i class="bi bi-linkedin"></i></a>
-              </div>
-            </div>
+              <input id="fileInput" type='file' accept=".png, .jpg, .jpeg" #fileInput (change)="onFileSelected($event)">
+        
           </div>
 
-        </div>
 
-        <div class="col-xl-8">
+        </div>
+        <div class="col-xl-10">
 
           <div class="card">
-            <div class="card-body pt-3"> 
+            <div class="card-body pt-3">
               <!-- Bordered Tabs -->
               <ul class="nav nav-tabs nav-tabs-bordered">
 
@@ -82,21 +64,6 @@
                     <div class="col-lg-9 col-md-8">{{this.user.uname}}</div>
                   </div>
 
-                  <!-- <div class="row">
-                    <div class="col-lg-3 col-md-4 label">Company</div>
-                    <div class="col-lg-9 col-md-8">Lueilwitz, Wisoky and Leuschke</div>
-                  </div> 
-
-                  <div class="row">
-                    <div class="col-lg-3 col-md-4 label">Job</div>
-                    <div class="col-lg-9 col-md-8">Web Designer</div>
-                  </div>
-
-                  <div class="row">
-                    <div class="col-lg-3 col-md-4 label">Country</div>
-                    <div class="col-lg-9 col-md-8">USA</div>
-                  </div> -->
-
                   <div class="row">
                     <div class="col-lg-3 col-md-4 label">Address</div>
                     <div class="col-lg-9 col-md-8">{{this.user.address}}</div>
@@ -116,14 +83,15 @@
 
                 <div class="tab-pane fade profile-edit pt-3" id="profile-edit">
 
-                  
+
                   <!-- profile-edit.component.html -->
 
                   <form (ngSubmit)="saveChanges()">
                     <div class="row mb-3">
                       <label for="uname" class="col-md-4 col-lg-3 col-form-label">Name</label>
                       <div class="col-md-8 col-lg-9">
-                        <input name="uname" type="text" class="form-control" id="uname" [(ngModel)]="this.updatedUser.uname">
+                        <input name="uname" type="text" class="form-control" id="uname"
+                          [(ngModel)]="this.updatedUser.uname">
                       </div>
                     </div>
 
@@ -131,7 +99,7 @@
                       <label for="address" class="col-md-4 col-lg-3 col-form-label">Address</label>
                       <div class="col-md-8 col-lg-9">
                         <input name="address" type="text" class="form-control" id="address"
-                         [(ngModel)]="this.updatedUser.address" required>
+                          [(ngModel)]="this.updatedUser.address" required>
                       </div>
                     </div>
 
@@ -148,39 +116,6 @@
                       <div class="col-md-8 col-lg-9">
                         <input name="email" type="email" class="form-control" id="email"
                           [(ngModel)]="this.updatedUser.email">
-                      </div>
-                    </div>
-
-
-                    <div class="row mb-3">
-                      <label for="Twitter" class="col-md-4 col-lg-3 col-form-label">Twitter Profile</label>
-                      <div class="col-md-8 col-lg-9">
-                        <input name="twitter" type="text" class="form-control" id="Twitter"
-                          value="https://twitter.com/">
-                      </div>
-                    </div>
-
-                    <div class="row mb-3">
-                      <label for="Facebook" class="col-md-4 col-lg-3 col-form-label">Facebook Profile</label>
-                      <div class="col-md-8 col-lg-9">
-                        <input name="facebook" type="text" class="form-control" id="Facebook"
-                          value="https://facebook.com/#">
-                      </div>
-                    </div>
-
-                    <div class="row mb-3">
-                      <label for="Instagram" class="col-md-4 col-lg-3 col-form-label">Instagram Profile</label>
-                      <div class="col-md-8 col-lg-9">
-                        <input name="instagram" type="text" class="form-control" id="Instagram"
-                          value="https://instagram.com/#">
-                      </div>
-                    </div>
-
-                    <div class="row mb-3">
-                      <label for="Linkedin" class="col-md-4 col-lg-3 col-form-label">Linkedin Profile</label>
-                      <div class="col-md-8 col-lg-9">
-                        <input name="linkedin" type="text" class="form-control" id="Linkedin"
-                          value="https://linkedin.com/#">
                       </div>
                     </div>
 
@@ -242,26 +177,31 @@
                     <div class="row mb-3">
                       <label for="currentPassword" class="col-md-4 col-lg-3 col-form-label">Current Password</label>
                       <div class="col-md-8 col-lg-9">
-                        <input name="currentPassword" type="text" class="form-control"  [(ngModel)]="currentPassword "id="currentPassword">
+                        <input name="currentPassword" type="text" class="form-control" [(ngModel)]="currentPassword "
+                          id="currentPassword">
                       </div>
                     </div>
 
                     <div class="row mb-3">
                       <label for="newPassword" class="col-md-4 col-lg-3 col-form-label">New Password</label>
                       <div class="col-md-8 col-lg-9">
-                        <input name="newpassword" type="password" class="form-control" required [(ngModel)]="newPassword" id="newPassword">
+                        <input name="newpassword" type="password" class="form-control" required
+                          [(ngModel)]="newPassword" id="newPassword">
                       </div>
                     </div>
 
                     <div class="row mb-3">
-                      <label for="confirmPassword" class="col-md-4 col-lg-3 col-form-label">Re-enter New Password</label>
+                      <label for="confirmPassword" class="col-md-4 col-lg-3 col-form-label">Re-enter New
+                        Password</label>
                       <div class="col-md-8 col-lg-9">
-                        <input name="confirmPassword" type="text" class="form-control"  [(ngModel)]="confirmPassword" (input)="validatePassword()" id="confirmPassword">
+                        <input name="confirmPassword" type="text" class="form-control" [(ngModel)]="confirmPassword"
+                          (input)="validatePassword()" id="confirmPassword">
                       </div>
                     </div>
 
                     <div class="text-center">
-                      <button type="submit" [disabled]="!passwordsMatch"  class="btn btn-primary">Change Password</button>
+                      <button type="submit" [disabled]="!passwordsMatch" class="btn btn-primary">Change
+                        Password</button>
                     </div>
                   </form><!-- End Change Password Form -->
 
@@ -274,11 +214,5 @@
 
         </div>
       </div>
-      </div>
-    </section>
-<!-- users-profile.component.html -->
-
-
-
-
-  </main><!-- End #main -->
+    </div>
+  </section>

@@ -311,6 +311,14 @@ export class UsersNOCASComponent implements OnInit {
 
           // Draw a marker for the selected airport with the custom icon
           this.marker2 = L.marker(this.airportCoordinates, { icon: customIcon }).addTo(map);
+          const popupContent = `
+    <b>${selectedAirportCITY}</b>
+    Latitude: ${this.airportCoordinates[0].toFixed(2)}
+    Longitude: ${this.airportCoordinates[1].toFixed(2)}
+`;
+ 
+          // Bind the popup content to the marker2
+          this.marker2.bindPopup(popupContent);
 
           // Draw a line from the selected airport to the current location
           if (this.lat && this.long) {
@@ -334,9 +342,14 @@ export class UsersNOCASComponent implements OnInit {
 
             // Update the marker position
             if (this.marker) {
-              this.marker.setLatLng([lat, lng]);
+              this.marker.setLatLng([lat, lng]); // Update the marker position
+ 
+              // Construct the popup content with latitude and longitude data
+              const popupContent = `Latitude: ${lat.toFixed(2)}, Longitude: ${lng.toFixed(2)}`;
+ 
+              // Bind the popup content to the marker
+              this.marker.bindPopup(popupContent).openPopup();
             }
-
             // Remove the previous line if it exists
             if (this.line) {
               map.removeLayer(this.line);

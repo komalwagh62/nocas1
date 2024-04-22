@@ -91,7 +91,6 @@ export class UsersNOCASComponent implements OnInit {
       if (confirmation) {
         console.log('Form submitted successfully');
         this.showModal();
-
         const airportCITY = this.TopElevationForm.get('CITY')?.value;
         const latitude = parseFloat(this.TopElevationForm.get('Latitude')?.value);
         const longitude = parseFloat(this.TopElevationForm.get('Longitude')?.value);
@@ -110,9 +109,7 @@ export class UsersNOCASComponent implements OnInit {
         // User clicked "Cancel" - do nothing or handle accordingly
         console.log('Form submission cancelled');
       }
-
     }
-
   }
 
   getLocation() {

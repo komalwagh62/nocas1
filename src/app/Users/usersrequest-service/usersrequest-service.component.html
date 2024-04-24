@@ -1,0 +1,29 @@
+<section>
+    <div class="container">
+        <div class="row">
+            <h2 for="service">Select a Service</h2>
+            <div class="col ">
+                <form [formGroup]="requestForm" (ngSubmit)="createRequest()">
+                  
+                    <input type="checkbox" id="nocApplication" name="service"
+                        value="NOC Application & Associated Service" formControlName="service">
+                    <label for="nocApplication">NOC Application & Associated Service</label><br>
+
+                    <input type="checkbox" id="preAeronauticalStudy" name="service" value="Pre-aeronautical Study"
+                        formControlName="service">
+                    <label for="preAeronauticalStudy">Pre-aeronautical Study</label><br>
+
+                    <input type="checkbox" id="aeronauticalStudy" name="service"
+                        value="Aeronautical Study / Shielding Benefits Study" formControlName="service">
+                    <label for="aeronauticalStudy">Aeronautical Study / Shielding Benefits Study</label><br>
+
+                    <input type="checkbox" id="documentsManagement" name="service"
+                        value="Documents & Process Management" formControlName="service">
+                    <label for="documentsManagement">Documents & Process Management</label><br>
+
+                    <button type="submit" class="btn btn-outline-primary mt-2" >Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,18 +1,25 @@
 <div class="container-fluid">
     <nav class="navbar navbar-expand-lg  ">
+        
         <button type="button" aria-label="Toggle sidenav" mat-icon-button (click)="drawer.toggle()" color="primary">
             <mat-icon aria-label="Side nav toggle icon">menu</mat-icon></button>
+            <a class="navbar-brand" href="#">Cognitive Navigation</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDarkDropdown" aria-controls="navbarNavDarkDropdown" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
         <span class="example-spacer"></span>
         <button mat-button routerLink="/">Home</button>
 
-        <!-- Example single danger button -->
-        <button mat-button [matMenuTriggerFor]="menu">Hi There,</button>
+        <!-- Button to display user's name -->
+        <button mat-button [matMenuTriggerFor]="menu">{{apiService.userData?.uname || 'Hi There,'}}</button>
+        <!-- <span class="d-none d-md-block dropdown-toggle ps-2" style="font-size: 25px;">{{apiservice.userData?.uname}}</span> -->
+ 
+        <!-- MatMenu to display options -->
         <mat-menu #menu="matMenu">
-          <button mat-menu-item>Item 1</button>
-          <button mat-menu-item>Join Us</button>
+            <button mat-menu-item routerLink="/UsersRegister">Join Us</button>
+            <button mat-menu-item (click)="navigateToProfile()">My Profile</button>
+            <button mat-menu-item (click)="logout()">Log Out</button>
         </mat-menu>
-        
-        
     </nav>
 </div>
 <mat-sidenav-container class="example-container">
@@ -24,6 +31,8 @@
             <!-- <a mat-list-item routerLink="/permissible-height"><mat-icon matListItemIcon>launch</mat-icon>NOCAS</a> -->
             <a mat-list-item routerLink="/C_NOCAS-MAP"><mat-icon matListItemIcon>airplanemode_active</mat-icon>NOCAS</a>
             <a mat-list-item routerLink="/PricingPlans"><mat-icon matListItemIcon>launch</mat-icon>Subscription</a>
+            <a mat-list-item routerLink="/request-Service"><mat-icon matListItemIcon>launch</mat-icon>Other Products</a>
+        
         </mat-nav-list>
     </mat-sidenav>
     <mat-sidenav-content class="example-sidenav-content" (click)="drawer.close()">

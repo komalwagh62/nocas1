@@ -4,7 +4,7 @@
             <form [formGroup]="TopElevationForm" autocomplete="on" novalidate class="d-flex-center">
                 <div class="example-container">
                     <!--Select Airport ICAO-->
-                    <div  class="height-Top">
+                    <div class="height-Top">
                         <mat-form-field appearance="outline">
                             <mat-label>Airport City</mat-label>
                             <mat-select id="airportCITY" formControlName="CITY">
@@ -20,7 +20,7 @@
                     </div>
 
                     <!--Select Airport Name -->
-                    <div  class="height-Top">
+                    <div class="height-Top">
                         <mat-form-field appearance="outline">
                             <mat-label>Airport Name</mat-label>
                             <input matInput type="text" name="airportName" id="airportName"
@@ -31,34 +31,14 @@
                         </mat-form-field>
                     </div>
 
-                    <!-- <div>
-                        <mat-form-field appearance="outline">
-                            <mat-label>ICAO Code</mat-label>
-                            <input type="text" matInput name="airportIcao" id="airportIcao"
-                                [value]="selectedAirportIcao" placeholder="City Name" readonly>
-                            <mat-icon matSuffix>sentiment_very_satisfied</mat-icon>
-                            <mat-hint>Airport ICAO code</mat-hint>
-                        </mat-form-field>
-                    </div>
-
-                    <div>
-                        <mat-form-field appearance="outline">
-                            <mat-label>Iata Code</mat-label>
-                            <input type="text" matInput name="airportIata" id="airportIata"
-                                [value]="selectedAirportIATA" placeholder="Airport IATA Code" readonly>
-                            <mat-icon matSuffix>sentiment_very_satisfied</mat-icon>
-                            <mat-hint>Airport Iata code</mat-hint>
-                        </mat-form-field>
-                    </div> -->
-
                     <!--Select Airport Latitude  -->
-                    <div  class="height-Top">
+                    <div class="height-Top">
                         <mat-form-field appearance="outline">
                             <mat-label>Latitude</mat-label>
                             <input matInput type="number" [ngModel]="lat | number:'1.2-2'" name="Latitude"
-                                formControlName="Latitude" id="Latitude" placeholder="Latitude">
+                                formControlName="Latitude" id="Latitude" placeholder="Latitude" >
                             <mat-icon matSuffix> location_on</mat-icon>
-                            <mat-hint>Enter Your Latitude</mat-hint>
+                            <mat-hint>{{ usingLiveLocation ? 'Your live location Latitude' : 'Default Latitude' }}</mat-hint>
                         </mat-form-field>
                     </div>
 
@@ -69,12 +49,12 @@
                             <input matInput type="number" [ngModel]="long | number:'1.2-2'" name="Longitude"
                                 formControlName="Longitude" id="Longitude" placeholder="Longitude">
                             <mat-icon matSuffix>location_on</mat-icon>
-                            <mat-hint>Enter Your Longitude</mat-hint>
+                            <mat-hint>{{ usingLiveLocation ? 'Your live location Longitude' : 'Default Longitude' }}</mat-hint>
                         </mat-form-field>
                     </div>
 
                     <!--Select Airport Site Elevation -->
-                    <div  class="height-Top">
+                    <div class="height-Top">
                         <mat-form-field appearance="outline">
                             <mat-label>Site Elevation</mat-label>
                             <input matInput type="number" name="Site_Elevation" id="Site_Elevation"
@@ -115,6 +95,13 @@
             </div>
             <div class="modal-body">
                 <div id="mapData" class="map-data mt-2"></div>
+                <a href="" routerLink="/request-Service">
+                    <p>
+                        Ensure your project takes flight with confidence Our comprehensive services offer
+                        WGS84 Survey
+                        Pre-Aeronautical Study
+                    </p>
+                </a>
             </div>
         </div>
     </div>

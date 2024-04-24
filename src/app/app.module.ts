@@ -34,6 +34,8 @@ import { UsersPricingPlansComponent } from './Users/users-pricing-plans/users-pr
 import { UsersEditUpdateComponent } from './Users/users-edit-update/users-edit-update.component';
 import { UsersNOCASComponent } from './Users/users-nocas/users-nocas.component';
 import { ForgotPasswordComponent } from './Users/forgot-password/forgot-password.component';
+import { UsersrequestServiceComponent } from './Users/usersrequest-service/usersrequest-service.component';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -48,7 +50,9 @@ import { ForgotPasswordComponent } from './Users/forgot-password/forgot-password
     // PermissibleHeight,
     UsersEditUpdateComponent,
     UsersNOCASComponent,
-    ForgotPasswordComponent
+    ForgotPasswordComponent,
+    UsersrequestServiceComponent,
+   
   ],
   imports: [
     BrowserModule,

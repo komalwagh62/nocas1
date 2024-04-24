@@ -9,8 +9,8 @@ import * as L from 'leaflet';
   styleUrl: './users-nocas.component.scss'
 })
 export class UsersNOCASComponent implements OnInit {
-  latitude: any;
-  longitude: any;
+  // latitude: any;
+  // longitude: any;
   line: any;
   popupContent: any;
   lat!: any;
@@ -31,7 +31,7 @@ export class UsersNOCASComponent implements OnInit {
   airportCoordinates: [number, number] = [0, 0]; // Variable to store airport coordinates
   showmap: boolean = false;
   getAirportCoordinates: any;
-
+  usingLiveLocation: boolean = false;
   constructor(private formbuilder: FormBuilder, private http: HttpClient) { }
 
   ngOnInit(): void {
@@ -112,17 +112,35 @@ export class UsersNOCASComponent implements OnInit {
     }
   }
 
-  getLocation() {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition((position) => {
-        this.lat = position.coords.latitude;
-        this.long = position.coords.longitude;
-        this.showMap(this.lat, this.long);
-      });
-    } else {
-      console.log('Geolocation is not supported by this browser.');
-    }
+getLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition((position) => {
+      this.lat = position.coords.latitude;
+      this.long = position.coords.longitude;
+      this.showMap(this.lat, this.long);
+      this.usingLiveLocation = true; // Show map with user's location
+    }, (error) => {
+      console.error('Error getting user location:', error);
+      // Provide fallback behavior - e.g., display map with default location
+      this.showDefaultMap();
+      this.usingLiveLocation = false;
+    });
+  } else {
+    console.log('Geolocation is not supported by this browser.');
+    // Provide fallback behavior - e.g., display map with default location
+    this.showDefaultMap();
+    this.usingLiveLocation = false;
   }
+}
+
+showDefaultMap() {
+  const defaultLat = 19.0748; // Default latitude
+  const defaultLong = 72.8856; // Default longitude
+  this.lat = defaultLat;
+  this.long = defaultLong;
+  this.showMap(this.lat, this.long); // Show map with user's location
+}
+
 
   calculateDistance(latitude1: number, longitude1: number, latitude2: number, longitude2: number): number {
     console.log('Calculating distance with inputs:');
@@ -308,11 +326,10 @@ export class UsersNOCASComponent implements OnInit {
 
           // Draw a marker for the selected airport with the custom icon
           this.marker2 = L.marker(this.airportCoordinates, { icon: customIcon }).addTo(map);
-          const popupContent = `
-    <b>${selectedAirportCITY}</b>
-    Latitude: ${this.airportCoordinates[0].toFixed(2)}
-    Longitude: ${this.airportCoordinates[1].toFixed(2)}
-`;
+          const popupContent = `Airport:
+          <b>${selectedAirportCITY}</b> <br>
+          Latitude: ${this.airportCoordinates[0].toFixed(2)}
+          Longitude: ${this.airportCoordinates[1].toFixed(2)}`;
  
           // Bind the popup content to the marker2
           this.marker2.bindPopup(popupContent);
@@ -442,7 +459,7 @@ export class UsersNOCASComponent implements OnInit {
         mapData.innerHTML = `
           <div>
             Permissible Elevation: ${elevation}<br>
-            Permissible Height: ${permissibleHeight < 0 ? '-' : ''}${Math.abs(permissibleHeight).toFixed(3)}M <br>
+            Permissible Height: ${permissibleHeight < 0 ? '-' : ''}${Math.abs(permissibleHeight).toFixed(2)}M <br>
             Latitude: ${lat.toFixed(2)}, Longitude: ${lng.toFixed(2)}<br>
             Distance: ${newDistance.toFixed(2)} km
           </div>`;

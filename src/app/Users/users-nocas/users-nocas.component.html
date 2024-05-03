@@ -6,61 +6,55 @@
                     <!--Select Airport ICAO-->
                     <div class="height-Top">
                         <mat-form-field appearance="outline">
-                            <mat-label>Airport City</mat-label>
+                            <mat-label>Indian City</mat-label>
                             <mat-select id="airportCITY" formControlName="CITY">
                                 <mat-option value="" disabled selected>Select an ICAO Code</mat-option>
                                 <mat-option *ngFor="let airport of airports" [value]="airport.airport_city">{{
                                     airport.airport_city }}
                                 </mat-option>
                             </mat-select>
-                            <mat-icon matSuffix class="position">location_city</mat-icon>
-
-                            <mat-hint>Select Airport City</mat-hint>
+                            <mat-icon matSuffix color="primary" class="position">location_city</mat-icon>
                         </mat-form-field>
                     </div>
 
                     <!--Select Airport Name -->
-                    <div class="height-Top">
+                    <div>
                         <mat-form-field appearance="outline">
                             <mat-label>Airport Name</mat-label>
                             <input matInput type="text" name="airportName" id="airportName"
                                 [value]="selectedAirportName" placeholder="Airport Name" readonly>
-                            <mat-icon matSuffix><img
-                                    src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAAB4UlEQVR4nO2WuUpDQRSGv6gExQVUiHHDTm3EzhcwhQj6BFYivoBgQPERLCxtVOy0EGsFRUJeQMWlcKm00UJFG9GRCxMYLtebuUtyF+aDA2Fy5tzzzzmzgCEdCGmJR4QgpJ2UCMkBO8Ai0ErCWysHXAJvwCYwToL3SB64VmKWgDmg2WVOB9AVx83eC9wocS17AdaBEcVvTFbuE3gGMrofKNuC65i1on7oA24d4v0CJ8CpMvYDbHkJ7lVE0ErlgSuXuJW9NOo1sNfEdP27Xf6bkStuF3EU5HSrlZAl4A7YAApAixRw7FKNab8i1MSyGr5ZD0KsTXpo6/nK71dg2ybiEWgMIuRcBipq+BalrzVHh07gXkn2AliQ1Rm0CVkjIAUZyDruhlz8BoAP6TvlIf6ynPMuL8cKPYqIb6CfENiXAfcC+jgxK+et2sa7FCEHhES11Z7UrJoTw8CTw2nUpgjxUuHILsQmYN7l4HgAGsIQUo8LMfPPmABWCIla3SM6fMlnS+KF7BIiUQqZICVCQsUIiRvCtFbMEKYiMUOYikRMOcBDsZ5WqiYk6gRFWC/s2D4xFIyQ1FRE+Ohbv70uNPaCESJMRYhXa9UTYYTYMBWJa2uJBJgrpRgkKDTszF2GwWDAxh9CvUCVxRLBQQAAAABJRU5ErkJggg=="></mat-icon>
-                            <mat-hint>Select Airport Name</mat-hint>
+                            <mat-icon matSuffix color="primary">local_airport</mat-icon>
                         </mat-form-field>
                     </div>
 
                     <!--Select Airport Latitude  -->
-                    <div class="height-Top">
+                    <div>
                         <mat-form-field appearance="outline">
-                            <mat-label>Latitude</mat-label>
+                            <mat-label>Site Location Latitude</mat-label>
                             <input matInput type="number" [ngModel]="lat | number:'1.2-2'" name="Latitude"
-                                formControlName="Latitude" id="Latitude" placeholder="Latitude" >
-                            <mat-icon matSuffix> location_on</mat-icon>
-                            <mat-hint>{{ usingLiveLocation ? 'Your live location Latitude' : 'Default Latitude' }}</mat-hint>
+                                formControlName="Latitude" id="Latitude" placeholder="Latitude">
+                            <button matSuffix mat-icon-button color="primary" (click)="getLocation()"> <mat-icon matSuffix>location_searching</mat-icon></button>
                         </mat-form-field>
                     </div>
 
                     <!--Select Airport Longitude -->
-                    <div class="height-Top">
+                    <div>
                         <mat-form-field appearance="outline">
-                            <mat-label>Longitude</mat-label>
+                            <mat-label>Site Location Longitude</mat-label>
                             <input matInput type="number" [ngModel]="long | number:'1.2-2'" name="Longitude"
                                 formControlName="Longitude" id="Longitude" placeholder="Longitude">
-                            <mat-icon matSuffix>location_on</mat-icon>
-                            <mat-hint>{{ usingLiveLocation ? 'Your live location Longitude' : 'Default Longitude' }}</mat-hint>
+                            <button matSuffix mat-icon-button color="primary" (click)="getLocation()"> <mat-icon matSuffix>location_searching</mat-icon></button>
                         </mat-form-field>
                     </div>
 
+
                     <!--Select Airport Site Elevation -->
-                    <div class="height-Top">
+                    <div>
                         <mat-form-field appearance="outline">
                             <mat-label>Site Elevation</mat-label>
                             <input matInput type="number" name="Site_Elevation" id="Site_Elevation"
                                 formControlName="Site_Elevation" placeholder="Site Elevation">
-                            <mat-icon matSuffix>edit</mat-icon>
-                            <mat-hint>Enter Your Site Elevation</mat-hint>
+                            <mat-icon matSuffix color="primary">edit</mat-icon>
                         </mat-form-field>
                     </div>
 
@@ -89,19 +83,21 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title">Elevation</h2>
+                <h2 class="modal-title">Site Location details</h2>
                 <button type="button" class="btn-close" (click)="closeModal()" data-bs-dismiss="modal"
                     aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div id="mapData" class="map-data mt-2"></div>
-                <a href="" routerLink="/request-Service">
-                    <p>
+                <div>
+                    <b>
                         Ensure your project takes flight with confidence Our comprehensive services offer
                         WGS84 Survey
                         Pre-Aeronautical Study
-                    </p>
-                </a>
+                    </b>
+                    <button type="button" class="btn btn-outline-primary rounded-5 "
+                        routerLink="/request-Service">Check-Out Now</button>
+                </div>
             </div>
         </div>
     </div>

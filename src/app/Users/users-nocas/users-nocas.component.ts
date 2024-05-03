@@ -36,12 +36,9 @@ export class UsersNOCASComponent implements OnInit {
 
   ngOnInit(): void {
     this.TopElevationForm = this.formbuilder.group({
-      Latitude: ['', [Validators.required, Validators.nullValidator,]],
-      Longitude: ['', [Validators.required, Validators.nullValidator,]],
+      Latitude: ["", [Validators.required, Validators.nullValidator,]],
+      Longitude: ["", [Validators.required, Validators.nullValidator,]],
       CITY: ['', [Validators.required, Validators.nullValidator,]],
-      // airportName: ['', [Validators.required, Validators.nullValidator,]],
-      // airportIcao: ['', [Validators.required, Validators.nullValidator,]],
-      // airportIata: ['', [Validators.required, Validators.nullValidator,]],
       Site_Elevation: new FormControl('', [Validators.required, Validators.nullValidator, Validators.pattern(/^[0-5]+(?:\.[0-5]+)?$/)]),
     });
 
@@ -67,6 +64,16 @@ export class UsersNOCASComponent implements OnInit {
       this.selectedAirportName = selectedAirport ? selectedAirport.airport_name : '';
       this.selectedAirportIcao = selectedAirport ? selectedAirport.airport_icao : '';
       this.selectedAirportIATA = selectedAirport ? selectedAirport.airport_iata : '';
+      // Set default value for Site_Elevation based on selected city
+      let defaultElevation = null;
+      if (city === 'Coimbatore') {
+        defaultElevation = 10;
+      } else if (city === 'Mumbai') {
+        defaultElevation = 22;
+      } else if (city === 'Puri') {
+        defaultElevation = 22;
+      }
+      this.TopElevationForm.patchValue({ Site_Elevation: defaultElevation });
       if (city === 'Coimbatore' || city === 'Mumbai' || city === 'Puri') {
         console.log("Selected airport:", city);
 
@@ -80,14 +87,14 @@ export class UsersNOCASComponent implements OnInit {
       }
     });
 
-    this.getLocation();
     this.fetchAirports();
+    this.showDefaultMap();
   }
 
   submitForm() {
     if (this.TopElevationForm.valid) {
       // Show alert and options
-      const confirmation = confirm("Please check if the information is correct.");
+      const confirmation = confirm("Kindly confirmed the entered site information correct or verify");
       if (confirmation) {
         console.log('Form submitted successfully');
         this.showModal();
@@ -112,35 +119,35 @@ export class UsersNOCASComponent implements OnInit {
     }
   }
 
-getLocation() {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition((position) => {
-      this.lat = position.coords.latitude;
-      this.long = position.coords.longitude;
-      this.showMap(this.lat, this.long);
-      this.usingLiveLocation = true; // Show map with user's location
-    }, (error) => {
-      console.error('Error getting user location:', error);
-      // Provide fallback behavior - e.g., display map with default location
+  getLocation() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          this.lat = position.coords.latitude;
+          this.long = position.coords.longitude;
+          this.showMap(this.lat, this.long);
+        },
+        (error) => {
+          console.error('Error getting user location:', error);
+          // Provide fallback behavior or error handling
+          this.showDefaultMap();
+        },
+        { enableHighAccuracy: true }
+      );
+    } else {
+      console.log('Geolocation is not supported by this browser.');
       this.showDefaultMap();
-      this.usingLiveLocation = false;
-    });
-  } else {
-    console.log('Geolocation is not supported by this browser.');
-    // Provide fallback behavior - e.g., display map with default location
-    this.showDefaultMap();
-    this.usingLiveLocation = false;
+    }
   }
-}
 
-showDefaultMap() {
-  const defaultLat = 19.0748; // Default latitude
-  const defaultLong = 72.8856; // Default longitude
-  this.lat = defaultLat;
-  this.long = defaultLong;
-  this.showMap(this.lat, this.long); // Show map with user's location
-}
 
+  showDefaultMap() {
+    const defaultLat = null;
+    const defaultLong = null;
+    this.lat = defaultLat;
+    this.long = defaultLong;
+    this.showMap(this.lat, this.long);
+  }
 
   calculateDistance(latitude1: number, longitude1: number, latitude2: number, longitude2: number): number {
     console.log('Calculating distance with inputs:');
@@ -220,7 +227,7 @@ showDefaultMap() {
     L.control.scale().addTo(this.map);
     L.control.zoom().addTo(this.map);
 
-    const popupContent = `Latitude: ${lat.toFixed(4)}, Longitude: ${lng.toFixed(4)}`;
+    const popupContent = `Your location : <br>  Latitude: ${lat.toFixed(4)}, Longitude: ${lng.toFixed(4)}`;
     this.marker = L.marker([lat, lng]).bindPopup(popupContent).addTo(this.map);
     this.line = L.polyline([[lat, lng], [lat, lng]], { color: 'black' }).addTo(this.map);
 
@@ -248,16 +255,14 @@ showDefaultMap() {
       return;
     }
 
-    // Remove the existing GeoJSON layer if it exists
     if (this.geojsonLayer) {
       map.removeLayer(this.geojsonLayer);
       this.geojsonLayer = null; // Reset the GeoJSON layer
     }
 
-    // Remove the existing marker2 if it exists
     if (this.marker2) {
       map.removeLayer(this.marker2);
-      this.marker2 = null; // Reset the airport marker
+      this.marker2 = null;
     }
 
     // Remove the existing marker and line if they exist
@@ -274,7 +279,6 @@ showDefaultMap() {
 
     if (selectedAirportCITY) {
       let airportGeoJSONPath: string;
-
 
       // Determine the GeoJSON file path based on the selected airport ICAO
       if (selectedAirportCITY === 'Coimbatore') {
@@ -302,7 +306,7 @@ showDefaultMap() {
           // Style function to set colors based on properties from JSON
           const style = (feature: any) => {
             const color = feature.properties.Color; // Extract color from JSON
-            return { fillColor: color, color: 'black', weight: 1 }; // Define style properties
+            return { fillColor: color, color: 'blue', weight: 1 }; // Define style properties
           };
 
           // Create GeoJSON layer with custom style function
@@ -323,14 +327,14 @@ showDefaultMap() {
 
           });
 
-
           // Draw a marker for the selected airport with the custom icon
           this.marker2 = L.marker(this.airportCoordinates, { icon: customIcon }).addTo(map);
-          const popupContent = `Airport:
-          <b>${selectedAirportCITY}</b> <br>
+
+          const popupContent = `ARP:
+          <p>${selectedAirportCITY} Airport</p><br>
           Latitude: ${this.airportCoordinates[0].toFixed(2)}
           Longitude: ${this.airportCoordinates[1].toFixed(2)}`;
- 
+
           // Bind the popup content to the marker2
           this.marker2.bindPopup(popupContent);
 
@@ -347,20 +351,20 @@ showDefaultMap() {
           // Event listener for the click event on the map
           map.on('click', (e: any) => {
             const { lat, lng } = e.latlng;
-
             // Update latitude and longitude form fields
             this.TopElevationForm.patchValue({
               Latitude: lat.toFixed(2),
               Longitude: lng.toFixed(2)
             });
 
+
             // Update the marker position
             if (this.marker) {
               this.marker.setLatLng([lat, lng]); // Update the marker position
- 
+
               // Construct the popup content with latitude and longitude data
-              const popupContent = `Latitude: ${lat.toFixed(2)}, Longitude: ${lng.toFixed(2)}`;
- 
+              const popupContent = `Your location : <br> Latitude: ${lat.toFixed(2)}, Longitude: ${lng.toFixed(2)}`;
+
               // Bind the popup content to the marker
               this.marker.bindPopup(popupContent).openPopup();
             }
@@ -379,8 +383,6 @@ showDefaultMap() {
               }
             }
           });
-
-          // this.displayMapData(this.lat, this.long, this.airportCoordinates);
         })
         .catch(error => {
           console.error("Error fetching GeoJSON data:", error);
@@ -424,56 +426,36 @@ showDefaultMap() {
   }
 
   displayMapData(lat: number, lng: number, airportCoordinates: [number, number]) {
-    // Calculate the distance
     const newDistance = this.calculateDistance(lat, lng, airportCoordinates[0], airportCoordinates[1]);
-    console.log(newDistance, airportCoordinates)
-
-    // Check if the clicked point is inside the GeoJSON data
     const clickedFeature = this.geojsonLayer.getLayers().find((layer: any) => {
       return layer.getBounds().contains([lat, lng]);
     });
-
-    console.log('Clicked Feature:', clickedFeature);
-
-    // Display latitude, longitude, and distance
     const mapData = document.getElementById('mapData');
     if (mapData !== null) {
-      // Clear existing content and hide the container
       mapData.innerHTML = '';
       mapData.style.display = 'none';
-
-      // Retrieve site elevation value
       const siteElevationInput = this.TopElevationForm.get('Site_Elevation');
       const siteElevation = siteElevationInput ? siteElevationInput.value : 0;
-
       if (clickedFeature) {
-        // Extract properties of the clicked feature
         const properties = clickedFeature.feature.properties;
         const elevation = (properties.Name);
-
-        // Calculate permissible height
         const permissibleHeight = parseFloat(properties.Name) - siteElevation;
-        // console.log(permissibleHeight)
-
-        // Update HTML content
         mapData.innerHTML = `
           <div>
-            Permissible Elevation: ${elevation}<br>
-            Permissible Height: ${permissibleHeight < 0 ? '-' : ''}${Math.abs(permissibleHeight).toFixed(2)}M <br>
-            Latitude: ${lat.toFixed(2)}, Longitude: ${lng.toFixed(2)}<br>
-            Distance: ${newDistance.toFixed(2)} km
-          </div>`;
+          Permissible Elevation (AMSL): ${elevation}M (ASML Above Mean Sea Level) <br> <br> 
+          Permissible Height (AGL): ${permissibleHeight < 0 ? '-' : ''}${Math.abs(permissibleHeight).toFixed(2)}M (AGL Above ground level)<br><br> 
+          Site Location : Latitude: ${lat.toFixed(2)} N, Longitude: ${lng.toFixed(2)} E<br><br> 
+           Distance (Site Location from Airport): ${newDistance.toFixed(2)} km
+          </div> <br> `;
       } else {
-        // Update HTML content for non-feature clicks
         mapData.innerHTML = `
           <div>
-            Latitude: ${lat.toFixed(2)}, Longitude: ${lng.toFixed(2)}<br>
-            Distance: ${newDistance.toFixed(2)} km
-          </div>`;
+         <b>The site location selected by user it is outside CCZM boundary publish by airport authority of India thus permissive elevation & height could not be calculated. Kindly contact with us for clarification</b><br> <br>
+          Site Location : Latitude: ${lat.toFixed(2)} N, Longitude: ${lng.toFixed(2)} E<br><br>
+          Distance (Site Location from Airport): ${newDistance.toFixed(2)} km
+          </div> <br>`;
       }
-      // Make map data visible
       mapData.style.display = 'block';
-
     }
   }
 

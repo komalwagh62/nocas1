@@ -140,7 +140,6 @@ export class UsersNOCASComponent implements OnInit {
     }
   }
 
-
   showDefaultMap() {
     const defaultLat = null;
     const defaultLong = null;
@@ -441,18 +440,47 @@ export class UsersNOCASComponent implements OnInit {
         const elevation = (properties.Name);
         const permissibleHeight = parseFloat(properties.Name) - siteElevation;
         mapData.innerHTML = `
-          <div>
-          Permissible Elevation (AMSL): ${elevation}M (ASML Above Mean Sea Level) <br> <br> 
-          Permissible Height (AGL): ${permissibleHeight < 0 ? '-' : ''}${Math.abs(permissibleHeight).toFixed(2)}M (AGL Above ground level)<br><br> 
-          Site Location : Latitude: ${lat.toFixed(2)} N, Longitude: ${lng.toFixed(2)} E<br><br> 
-           Distance (Site Location from Airport): ${newDistance.toFixed(2)} km
-          </div> <br> `;
+        <table class="table table-hover">
+  <tbody>
+  <tr>
+      <th scope="row"> Permissible Elevation (AMSL)</th>
+      <td>${elevation}M (ASML Above Mean Sea Level)</td>
+      
+    </tr>
+    <tr>
+      <th scope="row"> Permissible Height (AGL)</th>
+      <td> ${permissibleHeight < 0 ? '-' : ''}${Math.abs(permissibleHeight).toFixed(2)}M (AGL Above ground level)</td>
+     
+    </tr>
+    <tr>
+      <th scope="row">Site Location </th>
+      <td colspan="2" >Latitude: ${lat.toFixed(2)} N <br> Longitude: ${lng.toFixed(2)} E</td>
+     
+    </tr>
+    <tr>
+      <th scope="row">Distance (Site Location from Airport)</th>
+      <td colspan="2"> ${newDistance.toFixed(2)} km</td>
+     
+    </tr>
+  </tbody>
+</table> `;
       } else {
         mapData.innerHTML = `
           <div>
          <b>The site location selected by user it is outside CCZM boundary publish by airport authority of India thus permissive elevation & height could not be calculated. Kindly contact with us for clarification</b><br> <br>
-          Site Location : Latitude: ${lat.toFixed(2)} N, Longitude: ${lng.toFixed(2)} E<br><br>
-          Distance (Site Location from Airport): ${newDistance.toFixed(2)} km
+          
+         <table class="table table-hover">
+         <tbody>
+           <tr>
+             <th scope="row">Site Location</th>
+             <td colspan="2" >Latitude: ${lat.toFixed(2)} N <br> Longitude: ${lng.toFixed(2)} E</td>
+           </tr>
+           <tr>
+             <th scope="row">Distance (Site Location from Airport)</th>
+             <td colspan="2">${newDistance.toFixed(2)} km</td>
+           </tr>
+         </tbody>
+       </table> 
           </div> <br>`;
       }
       mapData.style.display = 'block';

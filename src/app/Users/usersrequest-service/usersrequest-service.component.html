@@ -1,28 +1,107 @@
 <section>
     <div class="container">
+        <h1>Our Services</h1>
         <div class="row">
-            <h2 for="service">Select a Service</h2>
-            <div class="col ">
-                <form [formGroup]="requestForm" (ngSubmit)="createRequest()">
-                  
-                    <input type="checkbox" id="nocApplication" name="service"
-                        value="NOC Application & Associated Service" formControlName="service">
-                    <label for="nocApplication">NOC Application & Associated Service</label><br>
+            <div class="col-lg">
+                <div class="service">
+                    <i class="bi bi-airplane-engines"></i>
+                    <h2>NOC Application & Associated Service</h2>
+                    <p>
+                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi,
+                        quae?
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg">
+                <div class="service">
+                    <i class="bi bi-airplane-engines"></i>
+                    <h2>Pre-aeronautical Study</h2>
+                    <p>
+                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi,
+                        quae?
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg">
+                <div class="service">
+                    <i class="bi bi-airplane-engines"></i>
+                    <h2>Aeronautical Study / Shielding Benefits Study</h2>
+                    <p>
+                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi,
+                        quae?
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-lg">
+                <div class="service">
+                    <i class="bi bi-airplane-engines"></i>
+                    <h2>Documents & Process Management</h2>
+                    <p>
+                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi,
+                        quae?
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg">
+                <div class="service">
+                    <i class="bi bi-airplane-engines"></i>
+                    <h2>Web/App Development</h2>
+                    <p>
+                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi,
+                        quae?
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class=" flex-r container1">
+            <div class="flex-r login-wrapper">
+                <div class="login-text">
+                    <h1>Select a Service</h1>
+                    <p>It's not long before you embark on this journey! </p>
+                    <form class="flex-c">
+                        <div class="input-box">
+                            <span class="label">Full Name</span>
+                            <div class=" flex-r input">
+                                <input type="text" placeholder="Your Name" name="FullName" formControlName="FullName"
+                                    autocomplete="FullName" id="FullName" required>
+                                    <i class="bi bi-person-circle"></i>
+                            </div>
+                        </div>
+                        <div class="input-box">
+                            <span class="label">E-mail</span>
+                            <div class=" flex-r input">
+                                <input type="email" placeholder="name@abc.com" name="email" formControlName="email"
+                                    autocomplete="email" id="email" required>
+                                <i class="bi bi-envelope-at-fill"></i>
+                            </div>
+                        </div>
+                        <div class="input-box">
+                            <input type="checkbox" id="nocApplication" name="service"
+                                value="NOC Application & Associated Service" formControlName="service">
+                            <label for="nocApplication">NOC Application & Associated Service</label><br>
 
-                    <input type="checkbox" id="preAeronauticalStudy" name="service" value="Pre-aeronautical Study"
-                        formControlName="service">
-                    <label for="preAeronauticalStudy">Pre-aeronautical Study</label><br>
+                            <input type="checkbox" id="preAeronauticalStudy" name="service"
+                                value="Pre-aeronautical Study" formControlName="service">
+                            <label for="preAeronauticalStudy">Pre-aeronautical Study</label><br>
 
-                    <input type="checkbox" id="aeronauticalStudy" name="service"
-                        value="Aeronautical Study / Shielding Benefits Study" formControlName="service">
-                    <label for="aeronauticalStudy">Aeronautical Study / Shielding Benefits Study</label><br>
+                            <input type="checkbox" id="aeronauticalStudy" name="service"
+                                value="Aeronautical Study / Shielding Benefits Study" formControlName="service">
+                            <label for="aeronauticalStudy">Aeronautical Study / Shielding Benefits Study</label><br>
 
-                    <input type="checkbox" id="documentsManagement" name="service"
-                        value="Documents & Process Management" formControlName="service">
-                    <label for="documentsManagement">Documents & Process Management</label><br>
-
-                    <button type="submit" class="btn btn-outline-primary mt-2" >Submit</button>
-                </form>
+                            <input type="checkbox" id="documentsManagement" name="service"
+                                value="Documents & Process Management" formControlName="service">
+                            <label for="documentsManagement">Documents & Process Management</label><br>
+                        </div>
+                        <button class=" btn  btn-outline-primary rounded-5 py-2 px-4" type="submit">
+                            Submit
+                        </button>
+                       
+                    </form>
+                </div>
             </div>
         </div>
     </div>

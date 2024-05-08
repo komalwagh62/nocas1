@@ -35,6 +35,9 @@ import { UsersEditUpdateComponent } from './Users/users-edit-update/users-edit-u
 import { UsersNOCASComponent } from './Users/users-nocas/users-nocas.component';
 import { ForgotPasswordComponent } from './Users/forgot-password/forgot-password.component';
 import { UsersrequestServiceComponent } from './Users/usersrequest-service/usersrequest-service.component';
+import { MatRadioModule } from '@angular/material/radio';
+import { MatGridListModule } from '@angular/material/grid-list';
+
 
 @NgModule({
   declarations: [
@@ -77,7 +80,9 @@ import { UsersrequestServiceComponent } from './Users/usersrequest-service/users
     MatSelectModule,
     HttpClientModule,
     MatFormFieldModule,
-    MatDividerModule
+    MatDividerModule,
+    MatRadioModule,
+    MatGridListModule,
   ],
   providers: [
     provideAnimationsAsync()

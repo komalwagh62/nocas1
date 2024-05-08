@@ -1,61 +1,95 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-lg-2">
-            <form [formGroup]="TopElevationForm" autocomplete="on" novalidate class="d-flex-center">
-                <div class="example-container">
-                    <!--Select Airport ICAO-->
-                    <div class="height-Top">
-                        <mat-form-field appearance="outline">
-                            <mat-label>Indian City</mat-label>
-                            <mat-select id="airportCITY" formControlName="CITY">
-                                <mat-option value="" disabled selected>Select an ICAO Code</mat-option>
-                                <mat-option *ngFor="let airport of airports" [value]="airport.airport_city">{{
-                                    airport.airport_city }}
-                                </mat-option>
-                            </mat-select>
-                            <mat-icon matSuffix color="primary" class="position">location_city</mat-icon>
-                        </mat-form-field>
-                    </div>
+            <form [formGroup]="TopElevationForm" autocomplete="on" novalidate>
+                <div class="form-group">
+                    <label for="airportCITY">Indian City</label>
+                    <mat-form-field appearance="outline">
+                        <mat-select id="airportCITY" formControlName="CITY">
+                            <mat-option value="" disabled selected>Select an Indian City</mat-option>
+                            <mat-option *ngFor="let airport of airports" [value]="airport.airport_city">{{
+                                airport.airport_city }}</mat-option>
+                        </mat-select>
+                        <mat-icon matSuffix color="primary">location_city</mat-icon>
+                    </mat-form-field>
+                </div>
 
-                    <!--Select Airport Name -->
-                    <div>
-                        <mat-form-field appearance="outline">
-                            <mat-label>Airport Name</mat-label>
-                            <input matInput type="text" name="airportName" id="airportName"
-                                [value]="selectedAirportName" placeholder="Airport Name" readonly>
-                            <mat-icon matSuffix color="primary">local_airport</mat-icon>
-                        </mat-form-field>
-                    </div>
+                <div class="form-group">
+                    <label for="airportName">Airport Name</label>
+                    <mat-form-field appearance="outline">
+                        <input matInput type="text" name="airportName" id="airportName" [value]="selectedAirportName"
+                            placeholder="Airport Name" readonly>
+                        <mat-icon matSuffix color="primary">local_airport</mat-icon>
+                    </mat-form-field>
+                </div>
 
-                    <!--Select Airport Latitude  -->
-                    <div>
-                        <mat-form-field appearance="outline">
-                            <mat-label>Site Location Latitude</mat-label>
-                            <input matInput type="number" [ngModel]="lat | number:'1.2-2'" name="Latitude"
-                                formControlName="Latitude" id="Latitude" placeholder="Latitude">
-                            <button matSuffix mat-icon-button color="primary" (click)="getLocation()"> <mat-icon matSuffix>location_searching</mat-icon></button>
-                        </mat-form-field>
-                    </div>
+                <div class="form-group">
+                    <label>Site Location Selection</label>
+                    <mat-radio-group formControlName="location">
+                        <mat-radio-button value="manual">Enter manual site lat long</mat-radio-button>
+                        <mat-radio-button value="currentLocation">Use current location
+                            <!-- Button to trigger current location retrieval -->
+                            <button mat-icon-button color="primary" (click)="getLocation()">
+                                <mat-icon>location_searching</mat-icon>
+                            </button>
+                        </mat-radio-button>
+                    </mat-radio-group>
+                </div>
 
-                    <!--Select Airport Longitude -->
-                    <div>
+                <div *ngIf="TopElevationForm.get('location').value === 'manual'" class="form-group">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Site Latitude</mat-label>
+                        <input matInput type="number" [ngModel]="lat | number:'1.2-2'" name="Latitude"
+                            formControlName="Latitude" id="Latitude" placeholder="Latitude, Longitude">
+
+                    </mat-form-field>
+
+                    <div *ngIf="TopElevationForm.get('location').value === 'manual'" class="form-group">
                         <mat-form-field appearance="outline">
-                            <mat-label>Site Location Longitude</mat-label>
+                            <mat-label>Site Longitude</mat-label>
                             <input matInput type="number" [ngModel]="long | number:'1.2-2'" name="Longitude"
-                                formControlName="Longitude" id="Longitude" placeholder="Longitude">
-                            <button matSuffix mat-icon-button color="primary" (click)="getLocation()"> <mat-icon matSuffix>location_searching</mat-icon></button>
+                                formControlName="Longitude" id="Longitude">
                         </mat-form-field>
                     </div>
+                    </div>
 
+                    <!-- <div class="form-group">
+                    <label for="Site_Elevation">Site Elevation</label>
+                    <mat-form-field appearance="outline">
+                        <input matInput type="number" name="Site_Elevation" id="Site_Elevation" formControlName="Site_Elevation" placeholder="Site Elevation">
+                        <mat-icon matSuffix color="primary">edit</mat-icon>
+                    </mat-form-field>
+                </div> -->
+                    <!-- <div class="form-group">
+                    <label>Site Elevation</label>
+                    <mat-radio-group formControlName="elevationOption">
+                        <mat-radio-button value="known">I know the site elevation</mat-radio-button>
+                        <mat-radio-button value="unknown">I don't know the site elevation (default)</mat-radio-button>
+                    </mat-radio-group>
+                </div> -->
 
-                    <!--Select Airport Site Elevation -->
-                    <div>
+                    <div class="form-group">
+                        <label>Site Elevation Selection</label>
+                        <mat-radio-group formControlName="elevationOption">
+                            <mat-radio-button value="known">I have the site elevation</mat-radio-button>
+                            <mat-radio-button value="unknown">I need the default site elevation</mat-radio-button>
+                        </mat-radio-group>
+                    </div>
+
+                    <!-- Conditionally show elevation input field based on selection -->
+                    <div *ngIf="TopElevationForm.get('elevationOption').value === 'known'" class="form-group">
+                        <label for="Site_Elevation">Site Elevation</label>
                         <mat-form-field appearance="outline">
-                            <mat-label>Site Elevation</mat-label>
                             <input matInput type="number" name="Site_Elevation" id="Site_Elevation"
                                 formControlName="Site_Elevation" placeholder="Site Elevation">
                             <mat-icon matSuffix color="primary">edit</mat-icon>
                         </mat-form-field>
+                    </div>
+
+
+                    <!-- Confirmation Message -->
+                    <div *ngIf="locationFetched" class="alert alert-success mt-2" role="alert">
+                        Current location retrieved successfully!
                     </div>
 
                     <div class="d-grid gap-2 button-Top">
@@ -65,7 +99,6 @@
                         <button type="reset" value="reset" class="btn btn-outline-danger rounded-5 py-2 px-4"
                             (click)="clearMapData()">Clear</button>
                     </div>
-                </div>
             </form>
         </div>
 
@@ -91,10 +124,11 @@
                 <div id="mapData" class="map-data mt-2"></div>
                 <div>
                     <b>
-                        Ensure your project takes flight with confidence Our comprehensive services offer
-                        WGS84 Survey
-                        Pre-Aeronautical Study
-                    </b>
+                        We wish you success in your project.<br>
+                        Our range of services will assist you in WGS-84 Survey, NOC process support, Aeronautical study
+                        & Assessment. Please connect for details.
+
+                    </b><br>
                     <button type="button" class="btn btn-outline-primary rounded-5 "
                         routerLink="/request-Service">Check-Out Now</button>
                 </div>

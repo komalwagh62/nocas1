@@ -13,11 +13,11 @@ export class UsersNOCASComponent implements OnInit {
   // longitude: any;
   line: any;
   popupContent: any;
-  lat!: any;
-  long!: any;
+  lat: number = 0.0;
+  long: number = 0.0;
   updatedDistance!: number;
   TopElevationForm!: FormGroup | any;
-  marker: any;
+  marker!: any;
   selectedAirportName: string = '';
   selectedAirport: any;
   @ViewChild('map') mapElement!: ElementRef;
@@ -32,26 +32,37 @@ export class UsersNOCASComponent implements OnInit {
   showmap: boolean = false;
   getAirportCoordinates: any;
   usingLiveLocation: boolean = false;
+  locationFetched: boolean = false;
+  
+
   constructor(private formbuilder: FormBuilder, private http: HttpClient) { }
 
   ngOnInit(): void {
     this.TopElevationForm = this.formbuilder.group({
-      Latitude: ["", [Validators.required, Validators.nullValidator,]],
-      Longitude: ["", [Validators.required, Validators.nullValidator,]],
+      Latitude: ['', [Validators.required]],
+      Longitude: ['', [Validators.required]],
       CITY: ['', [Validators.required, Validators.nullValidator,]],
+      location: ['manual'], 
       Site_Elevation: new FormControl('', [Validators.required, Validators.nullValidator, Validators.pattern(/^[0-5]+(?:\.[0-5]+)?$/)]),
+      
+      elevationOption: ['unknown']
+      
     });
-
+    
     this.TopElevationForm.get('Latitude').valueChanges.subscribe((lat: number) => {
+      this.lat = lat;
       console.log('Latitude changed:', lat);
-      this.updateMarker2Position(lat, this.TopElevationForm.get('Longitude').value);
+      this.updateMarkerPosition();
+      // this.updateMarker2Position(lat, this.TopElevationForm.get('Longitude').value);
       this.updatePolyline(lat, this.TopElevationForm.get('Longitude').value);
       this.displayMapData(lat, this.TopElevationForm.get('Longitude').value, this.marker.getLatLng());
     });
 
     this.TopElevationForm.get('Longitude').valueChanges.subscribe((lng: number) => {
+      this.long = lng;
       console.log('Longitude changed:', lng);
-      this.updateMarker2Position(this.TopElevationForm.get('Latitude').value, lng);
+      this.updateMarkerPosition();
+      // this.updateMarker2Position(this.TopElevationForm.get('Latitude').value, lng);
       this.updatePolyline(this.TopElevationForm.get('Latitude').value, lng);
       this.displayMapData(this.TopElevationForm.get('Latitude').value, lng, this.marker.getLatLng());
     });
@@ -86,15 +97,43 @@ export class UsersNOCASComponent implements OnInit {
         }
       }
     });
+    
 
     this.fetchAirports();
     this.showDefaultMap();
+    this.updateMarkerPositionOnClick();
+    
   }
+
+  updateMarkerPositionOnClick(): void {
+    this.map.on('click', (e: any) => {
+        const { lat, lng } = e.latlng;
+
+        // Update latitude and longitude form fields
+        this.TopElevationForm.patchValue({
+            Latitude: lat.toFixed(2),
+            Longitude: lng.toFixed(2)
+        });
+
+        // Update the marker's position
+        if (this.marker) {
+            this.marker.setLatLng([lat, lng]);
+
+            // Construct the popup content with latitude and longitude data
+            const popupContent = `Your location : <br> Latitude: ${lat.toFixed(2)}, Longitude: ${lng.toFixed(2)}`;
+
+            // Bind the popup content to the marker
+            this.marker.bindPopup(popupContent).openPopup();
+        }
+    });
+}
+
 
   submitForm() {
     if (this.TopElevationForm.valid) {
       // Show alert and options
       const confirmation = confirm("Kindly confirmed the entered site information correct or verify");
+      
       if (confirmation) {
         console.log('Form submitted successfully');
         this.showModal();
@@ -105,7 +144,7 @@ export class UsersNOCASComponent implements OnInit {
           // Update the markers and line
           console.log('Latitude:', latitude);
           console.log('Longitude:', longitude);
-          this.updateMarker2Position(latitude, longitude);
+          this.updateMarkerPosition();
           this.updatePolyline(latitude, longitude);
           // Update the displayed map data
           this.displayMapData(latitude, longitude, this.airportCoordinates);
@@ -118,31 +157,60 @@ export class UsersNOCASComponent implements OnInit {
       }
     }
   }
-
+  
   getLocation() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
+          // Location successfully retrieved
           this.lat = position.coords.latitude;
           this.long = position.coords.longitude;
+          
+          // Update the markers and line with the new location
+          this.updateMarkerPosition();
+          this.updatePolyline(this.lat, this.long);
+    
+          // Now that you have the location, you can display the popup
+          const popupContent = `Your location : <br>  Latitude: ${this.lat.toFixed(2)}, Longitude: ${this.long.toFixed(2)}`;
+    
+          // Add the marker to the map before setting the popup content
+          this.marker.addTo(this.map).bindPopup(popupContent).openPopup();
+    
+          // Update the displayed map data
+          this.displayMapData(this.lat, this.long, this.airportCoordinates);
           this.showMap(this.lat, this.long);
         },
         (error) => {
+          // Error occurred while retrieving location
           console.error('Error getting user location:', error);
-          // Provide fallback behavior or error handling
-          this.showDefaultMap();
+          // Notify user about the error or handle it gracefully
+          alert('Error getting user location. Please make sure location services are enabled and try again.');
         },
         { enableHighAccuracy: true }
       );
     } else {
+      // Geolocation is not supported by the browser
       console.log('Geolocation is not supported by this browser.');
-      this.showDefaultMap();
+      // Notify user or handle it gracefully
+      alert('Geolocation is not supported by this browser.');
     }
+    
   }
+  
+  
+
+
+  updateMarkerPosition() {
+  if (this.marker) {
+    this.marker.setLatLng([this.lat, this.long]);
+    
+  }
+}
+
 
   showDefaultMap() {
-    const defaultLat = null;
-    const defaultLong = null;
+    const defaultLat = 0.0;
+    const defaultLong = 0.0;
     this.lat = defaultLat;
     this.long = defaultLong;
     this.showMap(this.lat, this.long);
@@ -226,11 +294,13 @@ export class UsersNOCASComponent implements OnInit {
     L.control.scale().addTo(this.map);
     L.control.zoom().addTo(this.map);
 
-    const popupContent = `Your location : <br>  Latitude: ${lat.toFixed(4)}, Longitude: ${lng.toFixed(4)}`;
+    const popupContent = `Your location : <br>  Latitude: ${lat.toFixed(2)}, Longitude: ${lng.toFixed(2)}`;
     this.marker = L.marker([lat, lng]).bindPopup(popupContent).addTo(this.map);
-    this.line = L.polyline([[lat, lng], [lat, lng]], { color: 'black' }).addTo(this.map);
+    // this.marker.addTo(this.map).bindPopup(popupContent).openPopup();
+    // this.line = L.polyline([[lat, lng], [lat, lng]], { color: 'black' }).addTo(this.map);
 
   }
+
 
   showModal(): void {
     // Code to show the modal
@@ -264,10 +334,10 @@ export class UsersNOCASComponent implements OnInit {
       this.marker2 = null;
     }
 
-    // Remove the existing marker and line if they exist
+    // // Remove the existing marker and line if they exist
     if (this.marker) {
       map.removeLayer(this.marker);
-      this.marker = null; // Reset the current location marker
+      // this.marker = null; // Reset the current location marker
     }
     if (this.line) {
       map.removeLayer(this.line);
@@ -285,10 +355,10 @@ export class UsersNOCASComponent implements OnInit {
         this.airportCoordinates = [11.03, 77.04]; // Coordinates of VOCB
       } else if (selectedAirportCITY === 'Mumbai') {
         airportGeoJSONPath = 'assets/Mumbai.geojson';
-        this.airportCoordinates = [19.088611, 72.868056]; // Coordinates of VABB
+        this.airportCoordinates = [19.08, 72.86]; // Coordinates of VABB
       } else if (selectedAirportCITY === 'Puri') {
         airportGeoJSONPath = 'assets/Puri.geojson';
-        this.airportCoordinates = [19.794444, 85.751111]; // Coordinates of VEJH
+        this.airportCoordinates = [19.79, 85.75]; // Coordinates of VEJH
       } else {
         console.error("Invalid airport ICAO code.");
         return;
@@ -337,52 +407,52 @@ export class UsersNOCASComponent implements OnInit {
           // Bind the popup content to the marker2
           this.marker2.bindPopup(popupContent);
 
-          // Draw a line from the selected airport to the current location
-          if (this.lat && this.long) {
-            this.marker = L.marker([this.lat, this.long]).addTo(map);
-            this.line = L.polyline([this.airportCoordinates, [this.lat, this.long]], { color: 'black' }).addTo(map);
-          }
+          // // Draw a line from the selected airport to the current location
+          // if (this.lat !=0.0 && this.long!=0.0) {
+          //   this.marker = L.marker([this.lat, this.long]).addTo(map);
+          //   this.line = L.polyline([this.airportCoordinates, [this.lat, this.long]], { color: 'black' }).addTo(map);
+          // }
+          this.marker = L.marker([this.lat, this.long]).addTo(map);
+          this.line = L.polyline([this.airportCoordinates, [this.lat, this.long]], { color: 'black' }).addTo(map);
 
           // Fit the map bounds to the GeoJSON layer and the markers
           const bounds = L.latLngBounds([this.airportCoordinates, [this.lat, this.long]]);
           map.fitBounds(bounds);
 
-          // Event listener for the click event on the map
           map.on('click', (e: any) => {
             const { lat, lng } = e.latlng;
+            
             // Update latitude and longitude form fields
             this.TopElevationForm.patchValue({
               Latitude: lat.toFixed(2),
               Longitude: lng.toFixed(2)
             });
-
-
+          
             // Update the marker position
             if (this.marker) {
               this.marker.setLatLng([lat, lng]); // Update the marker position
-
+              
               // Construct the popup content with latitude and longitude data
               const popupContent = `Your location : <br> Latitude: ${lat.toFixed(2)}, Longitude: ${lng.toFixed(2)}`;
-
+              
               // Bind the popup content to the marker
               this.marker.bindPopup(popupContent).openPopup();
             }
+          
             // Remove the previous line if it exists
             if (this.line) {
               map.removeLayer(this.line);
             }
-
+          
             // Draw a new line from the clicked point to the airport
             const selectedAirportCITY = this.TopElevationForm.get('CITY')?.value;
             if (selectedAirportCITY) {
               if (this.airportCoordinates) {
                 this.line = L.polyline([[lat, lng], this.airportCoordinates], { color: 'blue' }).addTo(map);
-                // Display map data
-                // this.displayMapData(lat, lng, this.airportCoordinates);
               }
             }
           });
-        })
+                  })
         .catch(error => {
           console.error("Error fetching GeoJSON data:", error);
         });
@@ -443,13 +513,16 @@ export class UsersNOCASComponent implements OnInit {
         <table class="table table-hover">
   <tbody>
   <tr>
-      <th scope="row"> Permissible Elevation (AMSL)</th>
-      <td>${elevation}M (ASML Above Mean Sea Level)</td>
+      <th scope="row"> Permissible Elevation<br>
+      (AMSL Above Mean Sea Level)</th>
+      <td>${elevation}M</td>
       
     </tr>
     <tr>
-      <th scope="row"> Permissible Height (AGL)</th>
-      <td> ${permissibleHeight < 0 ? '-' : ''}${Math.abs(permissibleHeight).toFixed(2)}M (AGL Above ground level)</td>
+      <th scope="row"> Permissible Height<br>
+      (AGL- Above ground level)
+      </th>
+      <td> ${permissibleHeight < 0 ? '-' : ''}${Math.abs(permissibleHeight).toFixed(2)}M</td>
      
     </tr>
     <tr>
@@ -458,7 +531,8 @@ export class UsersNOCASComponent implements OnInit {
      
     </tr>
     <tr>
-      <th scope="row">Distance (Site Location from Airport)</th>
+      <th scope="row">Distance<br>
+      (Site Location from ARP)</th>
       <td colspan="2"> ${newDistance.toFixed(2)} km</td>
      
     </tr>
@@ -467,7 +541,7 @@ export class UsersNOCASComponent implements OnInit {
       } else {
         mapData.innerHTML = `
           <div>
-         <b>The site location selected by user it is outside CCZM boundary publish by airport authority of India thus permissive elevation & height could not be calculated. Kindly contact with us for clarification</b><br> <br>
+         <b>Site location selected by User is outside CCZM boundary published by AAI. Permissible Elevation calculation could not be processed. Please contact us for further details</b><br> <br>
           
          <table class="table table-hover">
          <tbody>
@@ -476,7 +550,8 @@ export class UsersNOCASComponent implements OnInit {
              <td colspan="2" >Latitude: ${lat.toFixed(2)} N <br> Longitude: ${lng.toFixed(2)} E</td>
            </tr>
            <tr>
-             <th scope="row">Distance (Site Location from Airport)</th>
+             <th scope="row">Distance<br>
+             (Site Location from ARP)</th>
              <td colspan="2">${newDistance.toFixed(2)} km</td>
            </tr>
          </tbody>
@@ -494,12 +569,6 @@ export class UsersNOCASComponent implements OnInit {
     }
   }
 
-  updateMarker2Position(lat: number, lng: number) {
-    if (this.marker) {
-      // Update the position of the second marker
-      this.marker.setLatLng([lat, lng]);
-    }
-  }
 
   fetchAirports() {
     this.http.get<any>('https://nocas-3ab54-default-rtdb.europe-west1.firebasedatabase.app/airportsData.json')

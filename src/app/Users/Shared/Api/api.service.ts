@@ -15,6 +15,7 @@ export class ApiService {
   public userData!: User;
   public token: string = "";
   public airportData!: Airport;
+  static token: any;
 
 
 

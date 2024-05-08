@@ -10,7 +10,7 @@ import { ApiService } from '../Shared/Api/api.service';
 })
 export class UsersrequestServiceComponent {
   requestForm!: FormGroup;
- 
+  // services!: {service1:'NOC Application & Associated Service',service2:'Pre-aeronautical Study',services3:'Aeronautical Study / Shielding Benefits Study',service4:'Documents & Process Management'};
   constructor(
     private http: HttpClient,
     private formBuilder: FormBuilder,
@@ -19,16 +19,21 @@ export class UsersrequestServiceComponent {
  
   ngOnInit(): void {
     this.requestForm = this.formBuilder.group({
-      service: ['', Validators.required]
+      service1: [false],
+      service2: [false],
+      service3: [false],
+      service4: [false]
     });
   }
  
   createRequest() {
     if (this.requestForm.valid) {
       const requestData = {
-        service_name: this.requestForm.value.service,
+        services: JSON.stringify(this.requestForm.value),
         user_id: this.apiService.userData.id
       };
+
+      console.log(this.requestForm.value,"dgtrf")
  
       this.http.post<any>('http://localhost:3001/api/request/createRequest', requestData)
         .subscribe(

@@ -35,4 +35,5 @@ export class UsersPricingPlansComponent {
     rzp.open();
 
   }
+  
 }

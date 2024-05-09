@@ -185,3 +185,43 @@ input {
 img{
     width: 15%;
 }
+
+.container {
+  padding: 20px;
+}
+
+.login-text {
+  max-width: 400px;
+  border-radius: 10px;
+  padding: 20px;
+  background-color: #f9f9f9;
+}
+
+.user-info {
+  margin-bottom: 20px;
+}
+
+.user-info .input {
+  align-items: center;
+}
+
+.user-info .input i {
+  margin-right: 10px;
+}
+
+.checkbox-item {
+  margin-bottom: 10px;
+}
+
+.checkbox-item input[type="checkbox"] {
+  margin-right: 10px;
+}
+
+.checkbox-label {
+  font-size: 16px;
+}
+
+.btn {
+  margin-top: 20px;
+}
+

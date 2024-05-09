@@ -1,21 +1,25 @@
-import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ApiService } from '../Shared/Api/api.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-usersrequest-service',
   templateUrl: './usersrequest-service.component.html',
   styleUrl: './usersrequest-service.component.scss'
 })
-export class UsersrequestServiceComponent {
+export class UsersrequestServiceComponent implements OnInit {
   requestForm!: FormGroup;
-  // services!: {service1:'NOC Application & Associated Service',service2:'Pre-aeronautical Study',services3:'Aeronautical Study / Shielding Benefits Study',service4:'Documents & Process Management'};
+  user: any = {};
+  updatedUser: any = {};
+  
   constructor(
-    private http: HttpClient,
     private formBuilder: FormBuilder,
-    private apiService: ApiService // Corrected injection of ApiService
-  ) { }
+    private http: HttpClient,
+    private apiService: ApiService,
+    private router: Router
+  ) {}
  
   ngOnInit(): void {
     this.requestForm = this.formBuilder.group({
@@ -24,6 +28,8 @@ export class UsersrequestServiceComponent {
       service3: [false],
       service4: [false]
     });
+
+    this.getUserDetails();
   }
  
   createRequest() {
@@ -51,4 +57,21 @@ export class UsersrequestServiceComponent {
     }
   }
 
+  getUserDetails(): void {
+    const headers = new HttpHeaders().set("Authorization", `Bearer ${this.apiService.token}`);
+    this.http.post<any>('http://localhost:3001/api/user/myProfile', {}, { headers })
+      .subscribe(
+        response => {
+          this.apiService.userData = response;
+          this.updatedUser = response;
+          this.user = response;
+        },
+        error => {
+          console.error("Failed to fetch user details:", error);
+          alert("Failed to fetch user details. Please log in again.");
+          this.router.navigate(['UserLogin']);
+        }
+      );
+  }
 }
+

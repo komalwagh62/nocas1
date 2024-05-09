@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 
 import { User } from '../Model/users/users';
 import { Airport } from '../Model/users/airport';
+import { Subscription } from '../Model/subscription';
 
 @Injectable({
   providedIn: 'root'
@@ -16,6 +17,7 @@ export class ApiService {
   public token: string = "";
   public airportData!: Airport;
   static token: any;
+  public subscriptionData!: Subscription;
 
 
 

@@ -111,6 +111,7 @@ export class UsersProfileComponent implements OnInit {
   //     );
   // }
 
+  
   getUserDetails(): void {
 
     const headers = new HttpHeaders().set("Authorization", `Bearer ${this.apiservice.token}`);

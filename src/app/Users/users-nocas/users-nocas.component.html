@@ -26,8 +26,8 @@
                 <div class="form-group">
                     <label>Site Location Selection</label>
                     <mat-radio-group formControlName="location">
-                        <mat-radio-button value="manual">Enter manual site lat long</mat-radio-button>
-                        <mat-radio-button value="currentLocation">Use current location
+                        <mat-radio-button value="manual" class="red-radio">Enter manual site lat long</mat-radio-button>
+                        <mat-radio-button value="currentLocation" class="red-radio">Use current location
                             <!-- Button to trigger current location retrieval -->
                             <button mat-icon-button color="primary" (click)="getLocation()">
                                 <mat-icon>location_searching</mat-icon>
@@ -69,10 +69,10 @@
                 </div> -->
 
                     <div class="form-group">
-                        <label>Site Elevation Selection</label>
+                        <label>Site Elevation Selection</label><br>
                         <mat-radio-group formControlName="elevationOption">
-                            <mat-radio-button value="known">I have the site elevation</mat-radio-button>
-                            <mat-radio-button value="unknown">I need the default site elevation</mat-radio-button>
+                            <mat-radio-button value="known" class="red-radio">I have the site elevation</mat-radio-button>
+                            <mat-radio-button value="unknown" class="red-radio">I need the default site elevation</mat-radio-button>
                         </mat-radio-group>
                     </div>
 

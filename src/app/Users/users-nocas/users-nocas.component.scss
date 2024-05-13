@@ -140,3 +140,23 @@ img {
 }
 
 
+
+
+.mdc-radio__native-control:checked+.mdc-radio::before {
+  background-color: black; /* Change to your desired color */
+}
+.mat-mdc-radio-button.mat-accent {
+  --mdc-radio-disabled-selected-icon-color: #C3B828;
+  --mdc-radio-disabled-unselected-icon-color: #C3B828;
+  --mdc-radio-unselected-hover-icon-color: #C3B828;
+  --mdc-radio-unselected-icon-color: #C3B828;
+  --mdc-radio-unselected-pressed-icon-color: #C3B828;
+  --mdc-radio-selected-focus-icon-color: #C3B828;
+  --mdc-radio-selected-hover-icon-color:#C3B828;
+  --mdc-radio-selected-icon-color: #C3B828;
+  --mdc-radio-selected-pressed-icon-color: #C3B828;
+  --mat-radio-ripple-color: #C3B828;
+  --mat-radio-checked-ripple-color: #C3B828;
+  --mat-radio-disabled-label-color: ;
+}
+

@@ -2,9 +2,7 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { UsersProfileComponent } from './Users/users-profile/users-profile.component';
-import { UsersLoginComponent } from './Users/users-login/users-login.component';
-import { UsersRegisterComponent } from './Users/users-register/users-register.component';
+
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { UsersSideNavComponent } from './Users/users-side-nav/users-side-nav.component';
 import { MatSidenavModule } from '@angular/material/sidenav';
@@ -37,6 +35,10 @@ import { ForgotPasswordComponent } from './Users/forgot-password/forgot-password
 import { UsersrequestServiceComponent } from './Users/usersrequest-service/usersrequest-service.component';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatGridListModule } from '@angular/material/grid-list';
+import { UsersLoginComponent } from './Users/users-login/users-login.component';
+import { UsersProfileComponent } from './Users/users-profile/users-profile.component';
+import { UsersRegisterComponent } from './Users/users-register/users-register.component';
+import { PaymentReceiptComponent } from './payment-receipt/payment-receipt.component';
 
 
 @NgModule({
@@ -55,6 +57,7 @@ import { MatGridListModule } from '@angular/material/grid-list';
     UsersNOCASComponent,
     ForgotPasswordComponent,
     UsersrequestServiceComponent,
+    PaymentReceiptComponent,
    
   ],
   imports: [

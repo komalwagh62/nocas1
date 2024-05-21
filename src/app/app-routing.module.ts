@@ -9,6 +9,7 @@ import { UsersPricingPlansComponent } from './Users/users-pricing-plans/users-pr
 import { UsersNOCASComponent } from './Users/users-nocas/users-nocas.component';
 import { ForgotPasswordComponent } from './Users/forgot-password/forgot-password.component';
 import { UsersrequestServiceComponent } from './Users/usersrequest-service/usersrequest-service.component';
+import { PaymentReceiptComponent } from './payment-receipt/payment-receipt.component';
 
 
 const routes: Routes = [
@@ -22,6 +23,7 @@ const routes: Routes = [
   { path: 'C_NOCAS-MAP', component: UsersNOCASComponent },
   { path: 'forgot-pass', component: ForgotPasswordComponent },
   { path: 'request-Service', component: UsersrequestServiceComponent },
+  { path: 'PaymentReceipt', component: PaymentReceiptComponent },
 ];
 
 @NgModule({

@@ -1,4 +1,5 @@
 export class Subscription {
+    
     constructor(
         public subscription_id: string,
         public user_id: string,

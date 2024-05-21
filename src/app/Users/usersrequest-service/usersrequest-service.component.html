@@ -82,26 +82,33 @@
                         <form [formGroup]="requestForm" (ngSubmit)="createRequest()">
                             <div class="input-box">
                                 <div class="checkbox-item">
-                                    <input type="checkbox" id="nocApplication" name="service1"
-                                        value="NOC Application & Associated Service" formControlName="service1">
+                                    <input type="checkbox" id="WGSSurvey" name="service1"
+                                        value="WGS-84 Survey" formControlName="service1">
+                                    <label for="WGSSurvey" class="checkbox-label">WGS-84 Survey</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="nocApplication" name="service2"
+                                        value="NOC Application & Associated Service" formControlName="service2">
                                     <label for="nocApplication" class="checkbox-label">NOC Application & Associated
                                         Service</label>
                                 </div>
                                 <div class="checkbox-item">
-                                    <input type="checkbox" id="preAeronauticalStudy" name="service2"
-                                        value="Pre-aeronautical Study" formControlName="service2">
+                                    <input type="checkbox" id="preAeronauticalStudy" name="service3"
+                                        value="Pre-aeronautical Study" formControlName="service3">
                                     <label for="preAeronauticalStudy" class="checkbox-label">Pre-aeronautical Study</label>
                                 </div>
                                 <div class="checkbox-item">
-                                    <input type="checkbox" id="aeronauticalStudy" name="service3"
-                                        value="Aeronautical Study / Shielding Benefits Study" formControlName="service3">
+                                    <input type="checkbox" id="aeronauticalStudy" name="service4"
+                                        value="Aeronautical Study / Shielding Benefits Study" formControlName="service4">
                                     <label for="aeronauticalStudy" class="checkbox-label">Aeronautical Study / Shielding Benefits Study</label>
                                 </div>
                                 <div class="checkbox-item">
-                                    <input type="checkbox" id="documentsManagement" name="service4"
-                                        value="Documents & Process Management" formControlName="service4">
+                                    <input type="checkbox" id="documentsManagement" name="service5"
+                                        value="Documents & Process Management" formControlName="service5">
                                     <label for="documentsManagement" class="checkbox-label">Documents & Process Management</label>
                                 </div>
+
+                                
                             </div>
                             <button class="btn btn-outline-primary rounded-5 py-2 px-4" type="submit">Submit</button>
                         </form>

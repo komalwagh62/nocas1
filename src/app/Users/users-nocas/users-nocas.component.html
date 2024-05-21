@@ -3,10 +3,10 @@
         <div class="col-lg-2">
             <form [formGroup]="TopElevationForm" autocomplete="on" novalidate>
                 <div class="form-group">
-                    <label for="airportCITY">Indian City</label>
+                    <label for="airportCITY">City</label>
                     <mat-form-field appearance="outline">
                         <mat-select id="airportCITY" formControlName="CITY">
-                            <mat-option value="" disabled selected>Select an Indian City</mat-option>
+                            <mat-option value="" disabled selected>Select a City</mat-option>
                             <mat-option *ngFor="let airport of airports" [value]="airport.airport_city">{{
                                 airport.airport_city }}</mat-option>
                         </mat-select>
@@ -24,34 +24,35 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Site Location Selection</label>
+                    <label>Select Site Location</label><br>
                     <mat-radio-group formControlName="location">
-                        <mat-radio-button value="manual" class="red-radio">Enter manual site lat long</mat-radio-button>
-                        <mat-radio-button value="currentLocation" class="red-radio">Use current location
-                            <!-- Button to trigger current location retrieval -->
-                            <button mat-icon-button color="primary" (click)="getLocation()">
-                                <mat-icon>location_searching</mat-icon>
-                            </button>
+                        <mat-radio-button value="currentLocation" class="red-radio" (click)="getLocation()">Use current location
                         </mat-radio-button>
+                        <!-- Option for entering manual site lat long -->
+                        <mat-radio-button value="manual" class="red-radio">Enter location coordinate manually
+                        </mat-radio-button>
+                        
                     </mat-radio-group>
                 </div>
-
-                <div *ngIf="TopElevationForm.get('location').value === 'manual'" class="form-group">
+                <br>
+                <div  class="form-group">
+                    <label for="Site_latitude">Site Latitude</label>
                     <mat-form-field appearance="outline">
-                        <mat-label>Site Latitude</mat-label>
                         <input matInput type="number" [ngModel]="lat | number:'1.2-2'" name="Latitude"
                             formControlName="Latitude" id="Latitude" placeholder="Latitude, Longitude">
 
                     </mat-form-field>
 
-                    <div *ngIf="TopElevationForm.get('location').value === 'manual'" class="form-group">
+                    <div  class="form-group">
+                        <label for="Site_longitude">Site Longitude</label>
                         <mat-form-field appearance="outline">
-                            <mat-label>Site Longitude</mat-label>
+                            
                             <input matInput type="number" [ngModel]="long | number:'1.2-2'" name="Longitude"
                                 formControlName="Longitude" id="Longitude">
                         </mat-form-field>
                     </div>
                     </div>
+                    
 
                     <!-- <div class="form-group">
                     <label for="Site_Elevation">Site Elevation</label>
@@ -68,16 +69,17 @@
                     </mat-radio-group>
                 </div> -->
 
-                    <div class="form-group">
-                        <label>Site Elevation Selection</label><br>
-                        <mat-radio-group formControlName="elevationOption">
-                            <mat-radio-button value="known" class="red-radio">I have the site elevation</mat-radio-button>
-                            <mat-radio-button value="unknown" class="red-radio">I need the default site elevation</mat-radio-button>
-                        </mat-radio-group>
-                    </div>
+                <div class="form-group">
+                    <label>Select Site Elevation</label><br>
+                    <mat-radio-group formControlName="elevationOption" (change)="onElevationOptionChange()">
+                        <mat-radio-button value="unknown" class="red-radio">Use airport elevation</mat-radio-button>
+                        <mat-radio-button value="known" class="red-radio">Enter site elevation manually</mat-radio-button>
+                        
+                    </mat-radio-group>
+                </div>
 
                     <!-- Conditionally show elevation input field based on selection -->
-                    <div *ngIf="TopElevationForm.get('elevationOption').value === 'known'" class="form-group">
+                    <div class="form-group">
                         <label for="Site_Elevation">Site Elevation</label>
                         <mat-form-field appearance="outline">
                             <input matInput type="number" name="Site_Elevation" id="Site_Elevation"
@@ -88,16 +90,17 @@
 
 
                     <!-- Confirmation Message -->
-                    <div *ngIf="locationFetched" class="alert alert-success mt-2" role="alert">
-                        Current location retrieved successfully!
-                    </div>
+                    
 
                     <div class="d-grid gap-2 button-Top">
                         <button type="submit" class="btn btn-outline-primary rounded-5 py-2 px-4"
                             (click)="submitForm()">Submit</button>
 
-                        <button type="reset" value="reset" class="btn btn-outline-danger rounded-5 py-2 px-4"
-                            (click)="clearMapData()">Clear</button>
+                        <!-- <button type="reset" value="reset" class="btn btn-outline-danger rounded-5 py-2 px-4"
+                            (click)="clearMapData()">Clear</button> -->
+                            <!-- <div *ngIf="locationFetched" class="alert alert-success mt-2" role="alert">
+                                Current location retrieved successfully!
+                            </div> -->
                     </div>
             </form>
         </div>
@@ -112,7 +115,7 @@
 
 <!-- Modal -->
 
-<div class="modal" id="exampleModal" tabindex="-1">
+<div class="modal" id="exampleModal" tabindex="-1"  >
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -120,7 +123,7 @@
                 <button type="button" class="btn-close" (click)="closeModal()" data-bs-dismiss="modal"
                     aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body" >
                 <div id="mapData" class="map-data mt-2"></div>
                 <div>
                     <b>
@@ -129,7 +132,7 @@
                         & Assessment. Please connect for details.
 
                     </b><br>
-                    <button type="button" class="btn btn-outline-primary rounded-5 "
+                    <button type="button" value="currentLocation" class="btn btn-outline-primary rounded-5 "
                         routerLink="/request-Service">Check-Out Now</button>
                 </div>
             </div>

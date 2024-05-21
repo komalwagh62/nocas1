@@ -5,14 +5,16 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import * as L from 'leaflet';
 import { ApiService } from '../Shared/Api/api.service';
 import { Router } from '@angular/router';
+import html2canvas from 'html2canvas';
 
-
+declare var Razorpay: any;
 @Component({
   selector: 'app-users-nocas',
   templateUrl: './users-nocas.component.html',
   styleUrl: './users-nocas.component.scss'
 })
 export class UsersNOCASComponent implements OnInit {
+  [x: string]: any;
   // latitude: any;
   // longitude: any;
   line: any;
@@ -37,7 +39,9 @@ export class UsersNOCASComponent implements OnInit {
   getAirportCoordinates: any;
   usingLiveLocation: boolean = false;
   locationFetched: boolean = false;
-
+  showAlert: boolean = false;
+  freeTrialCount!: number;
+  isSubscribed: boolean = false;
 
   constructor(
     public apiservice: ApiService,
@@ -54,8 +58,8 @@ export class UsersNOCASComponent implements OnInit {
       CITY: ['', [Validators.required, Validators.nullValidator,]],
       location: ['manual'],
       Site_Elevation: new FormControl('', [Validators.required, Validators.nullValidator, Validators.pattern(/^[0-5]+(?:\.[0-5]+)?$/)]),
-
-      elevationOption: ['unknown']
+      elevationOption: ['known', Validators.required],
+      imageData: new FormControl(['']),
 
     });
 
@@ -85,21 +89,21 @@ export class UsersNOCASComponent implements OnInit {
       this.selectedAirportName = selectedAirport ? selectedAirport.airport_name : '';
       this.selectedAirportIcao = selectedAirport ? selectedAirport.airport_icao : '';
       this.selectedAirportIATA = selectedAirport ? selectedAirport.airport_iata : '';
-      
-    
-      // Set default value for Site_Elevation based on selected city
-      let defaultElevation = null;
-      if (city === 'Coimbatore') {
-        defaultElevation = 10;
-      } else if (city === 'Mumbai') {
-        defaultElevation = 22;
-      } else if (city === 'Puri') {
-        defaultElevation = 22;
-      }
-      this.TopElevationForm.patchValue({ Site_Elevation: defaultElevation });
+
+
+      // // Set default value for Site_Elevation based on selected city
+      // let defaultElevation = null;
+      // if (city === 'Coimbatore') {
+      //   defaultElevation = 10;
+      // } else if (city === 'Mumbai') {
+      //   defaultElevation = 22;
+      // } else if (city === 'Puri') {
+      //   defaultElevation = 22;
+      // }
+      // this.TopElevationForm.patchValue({ Site_Elevation: defaultElevation });
       if (city === 'Coimbatore' || city === 'Mumbai' || city === 'Puri') {
         console.log("Selected airport:", city);
-        
+
         this.loadGeoJSON(this.map);
 
       } else {
@@ -113,9 +117,334 @@ export class UsersNOCASComponent implements OnInit {
 
     this.fetchAirports();
     this.showDefaultMap();
+    this.captureScreenshot();
     this.updateMarkerPositionOnClick();
 
   }
+
+
+
+  // createNocas() {
+  //   if (this.TopElevationForm.valid) {
+  //     const requestBody = {
+  //       user_id: this.apiservice.userData.id,
+  //       city: this.TopElevationForm.value.CITY,
+  //       latitude: this.TopElevationForm.value.Latitude,
+  //       longitude: this.TopElevationForm.value.Longitude,
+  //       airport_name: this.selectedAirportName,
+  //       site_elevation: this.TopElevationForm.value.Site_Elevation,
+  //       snapshot:this.TopElevationForm.imageData
+  //     };
+
+  //     this.http.post("http://localhost:3001/api/nocas/createNocas", requestBody)
+  //       .subscribe(
+  //         (resultData: any) => {
+  //           console.log("Nocas entry created successfully:", resultData);
+  //           alert("Nocas entry created successfully");
+  //         },
+  //         (error: any) => {
+  //           console.error("Error creating Nocas entry:", error);
+  //           alert("Failed to create Nocas entry. Please try again.");
+  //         }
+  //       );
+  //   } else {
+  //     alert("Please fill out all required fields in the form.");
+  //   }
+  // }
+  hideData() {
+    this.showModal();
+    const airportCITY = this.TopElevationForm.get('CITY')?.value;
+    const latitude = parseFloat(this.TopElevationForm.get('Latitude')?.value);
+    const longitude = parseFloat(this.TopElevationForm.get('Longitude')?.value);
+    if (airportCITY && !isNaN(latitude) && !isNaN(longitude)) {
+      // Update the markers and line
+      console.log('Latitude:', latitude);
+      console.log('Longitude:', longitude);
+      this.updateMarkerPosition();
+      this.updatePolyline(latitude, longitude);
+
+      // Update the displayed map data
+      this.displayModelData(latitude, longitude, this.airportCoordinates);
+      this.showMap(latitude, longitude);
+    }
+
+  }
+  showData() {
+    this.showModal(); // Display the modal after successful creation
+
+    const airportCITY = this.TopElevationForm.get('CITY')?.value;
+    const latitude = parseFloat(this.TopElevationForm.get('Latitude')?.value);
+    const longitude = parseFloat(this.TopElevationForm.get('Longitude')?.value);
+    if (airportCITY && !isNaN(latitude) && !isNaN(longitude)) {
+      // Update the markers and line
+      console.log('Latitude:', latitude);
+      console.log('Longitude:', longitude);
+      this.updateMarkerPosition();
+      this.updatePolyline(latitude, longitude);
+
+      // Update the displayed map data
+      this.displayMapData(latitude, longitude, this.airportCoordinates);
+      this.showMap(latitude, longitude);
+    }
+  }
+
+  createNocas(subscription_id: string = "") {
+    if (this.TopElevationForm.valid) {
+      const requestBody = {
+        user_id: this.apiservice.userData.id,
+        city: this.TopElevationForm.value.CITY,
+        latitude: this.TopElevationForm.value.Latitude,
+        longitude: this.TopElevationForm.value.Longitude,
+        airport_name: this.selectedAirportName,
+        site_elevation: this.TopElevationForm.value.Site_Elevation,
+        snapshot: this.TopElevationForm.imageData,
+        subscription_id: subscription_id
+      };
+      this.apiservice.setNocasRequestBody(requestBody);
+      const headers = new HttpHeaders().set("Authorization", `Bearer ${this.apiservice.token}`);
+      this.http.post("http://localhost:3001/api/nocas/createNocas", requestBody, { headers: headers })
+        .subscribe(
+          (resultData: any) => {
+            // Show alert for free trial count
+
+            console.log(resultData, "Resu")
+            if(resultData.isSubscribed || resultData.freeTrialCount > 0 || resultData.isOneTimeSubscription){
+              this.showData();
+            }
+            else  {
+              this.hideData();
+              alert("Your Free trial expired. Please Subscribe Package")
+              this.router.navigate(['PricingPlans']);
+            }
+            
+
+          },
+          (error: any) => {
+            console.error("Error creating Nocas entry:", error);
+            alert("Failed to create Nocas entry. Please try again.");
+          }
+        );
+    } else {
+      alert("Please fill out all required fields in the form.");
+    }
+  }
+
+  displayModelData(lat: number, lng: number, airportCoordinates: [number, number]) {
+    const newDistance = this.calculateDistance(lat, lng, airportCoordinates[0], airportCoordinates[1]);
+    console.log(newDistance);
+    const clickedFeature = this.geojsonLayer.getLayers().find((layer: any) => {
+      return layer.getBounds().contains([lat, lng]);
+    });
+    const mapData = document.getElementById('mapData');
+    if (mapData !== null) {
+      mapData.innerHTML = '';
+      mapData.style.display = 'none';
+      const siteElevationInput = this.TopElevationForm.get('Site_Elevation');
+      const siteElevation = siteElevationInput ? siteElevationInput.value : 0;
+      if (clickedFeature) {
+        const properties = clickedFeature.feature.properties;
+        const elevation = properties.Name;
+        const permissibleHeight = parseFloat(properties.Name) - siteElevation;
+        mapData.innerHTML = `
+                <table class="table table-hover">
+                    <tbody>
+                        <tr>
+                            <th scope="row">Permissible Elevation<br>(AMSL Above Mean Sea Level)</th>
+                            <td>*****</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Permissible Height<br>(AGL- Above ground level)</th>
+                            <td>******</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Site Location</th>
+                            <td colspan="2">Latitude: **** <br> Longitude: ****</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Distance<br>(Site Location from ARP)</th>
+                            <td colspan="2">*****</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h3>To get the Complete Result Upgrade your Account with our Subscription Plans. If you not prefrred to subscribe You can make one time payment to get the result.</h3>
+                <button type="button" class="btn btn-outline-primary rounded-5 " id="subscribeButton">Subscribe</button>
+                <button type="button" class="btn btn-outline-primary rounded-5 " id="paymentButton">To Make Payment</button>
+            `;
+      } else {
+        mapData.innerHTML = `
+                <div>
+                    <b>Site location selected by User is outside CCZM boundary published by AAI. Permissible Elevation calculation could not be processed. Please contact us for further details</b><br><br>
+                    <table class="table table-hover">
+                        <tbody>
+                            <tr>
+                                <th scope="row">Site Location</th>
+                                <td colspan="2">Latitude: ${lat.toFixed(2)} N <br> Longitude: ${lng.toFixed(2)} E</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Distance<br>(Site Location from ARP)</th>
+                                <td colspan="2">*****</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div> <br>
+                <h3>To get the Complete Result Upgrade your Account with our Subscription Plans. If you not prefrred to subscribe You can make one time payment to get the result. </h3>
+                <button type="button" class="btn btn-outline-primary rounded-5 " id="subscribeButton">Subscribe</button>
+                <button type="button" class="btn btn-outline-primary rounded-5 " id="paymentButton">To Make Payment</button>
+            `;
+      }
+      mapData.style.display = 'block';
+
+      // Add event listener for the subscribe button
+      const subscribeButton = document.getElementById('subscribeButton');
+      if (subscribeButton) {
+        subscribeButton.addEventListener('click', this.subscribe.bind(this));
+      }
+      const paymentButton = document.getElementById('paymentButton');
+      if (paymentButton) {
+        paymentButton.addEventListener('click', this.MakePayment.bind(this));
+      }
+    }
+  }
+
+
+  subscribe() {
+    this.router.navigate(['PricingPlans']);
+  }
+  MakePayment() {
+    this.handlePayment()
+  }
+  handlePayment() {
+    const RozarpayOptions = {
+      key: 'rzp_test_IScA4BP8ntHVNp',
+      amount: 50 * 100,
+      currency: 'INR',
+      name: 'Cognitive Navigation Pvt. Ltd',
+      description: ` Plan Subscription`,
+      image: 'https://imgur.com/a/J4UAMhv',
+      handler: (response: any) => {
+        console.log('Payment successful:', response);
+        const paymentDetails = {
+          user_id: this.apiservice.userData.id,
+          subscription_type: 'OneTime', // Replace with actual subscription type
+          price: 50, // Replace with actual amount
+          razorpay_payment_id: response.razorpay_payment_id,
+          expiry_date: new Date().toISOString(),  // Assuming response contains payment ID
+          // Add any other relevant payment details here
+        };
+        console.log(paymentDetails)
+        const headers = new HttpHeaders().set("Authorization", `Bearer ${this.apiservice.token}`);
+
+        // Make API call to your backend to store payment details
+        this.http.post('http://localhost:3001/api/subscription/addSubscription', paymentDetails, { headers: headers })
+          .subscribe(
+            (result: any) => {
+              this.createNocas(result.subscription_id)
+              console.log('Payment details stored successfully:', result);
+              // Handle success response
+            },
+            (error: any) => {
+              console.error('Error storing payment details:', error);
+              // Handle error
+            }
+          );
+        alert("Payment Succesfully Done")
+        // this.createNocas(subscription_id);
+        this.router.navigate(['C_NOCAS-MAP']);
+        this.showModal(); // Display the modal after successful creation
+
+        const airportCITY = this.TopElevationForm.get('CITY')?.value;
+        const latitude = parseFloat(this.TopElevationForm.get('Latitude')?.value);
+        const longitude = parseFloat(this.TopElevationForm.get('Longitude')?.value);
+        if (airportCITY && !isNaN(latitude) && !isNaN(longitude)) {
+          // Update the markers and line
+          console.log('Latitude:', latitude);
+          console.log('Longitude:', longitude);
+          this.updateMarkerPosition();
+          this.updatePolyline(latitude, longitude);
+
+          // Update the displayed map data
+
+          this.displayMapData(latitude, longitude, this.airportCoordinates);
+
+        }
+      },
+
+      prefill: {
+        name: 'Vikas',
+        email: 'user@example.com',
+        contact: '9999999999'
+      },
+      theme: {
+        color: '#528FF0'
+      },
+      payment_method: {
+        external: ['upi']
+      }
+    };
+    const rzp = new Razorpay(RozarpayOptions);
+    // Open Razorpay payment modal
+    rzp.open();
+
+    rzp.on('payment.success', (response: any) => {
+      // Make API call to store payment details
+
+    });
+
+    rzp.on('payment.error', (error: any) => {
+      console.error('Payment error:', error);
+      // Handle payment error
+    });
+  }
+
+  captureScreenshot() {
+    if (this.mapElement) {
+      const mapContainer = this.mapElement.nativeElement;
+
+      // Wait for the map to be fully loaded
+      setTimeout(() => {
+        html2canvas(mapContainer).then(canvas => {
+          // `canvas` now contains the screenshot of the map
+          const imageData = canvas.toDataURL('image/png');
+
+          // Update the form control 'imageData'
+          this.TopElevationForm.get('imageData').setValue(imageData);
+        }).catch(error => {
+          console.error('🚨 Error capturing screenshot:', error);
+        });
+      }, 1000); // Adjust the timeout as needed
+    } else {
+      console.error('mapElement is undefined 🚨');
+    }
+  }
+
+
+
+  onElevationOptionChange() {
+    const elevationOptionControl = this.TopElevationForm.get('elevationOption');
+    let defaultElevation = null;
+    if (elevationOptionControl && elevationOptionControl.value === 'unknown') {
+      // Show the alert message if the option "I need the default site elevation" is selected
+      this.showAlert = true;
+      // Set default value for Site_Elevation based on selected city
+
+      if (this.city === 'Coimbatore') {
+        defaultElevation = 10;
+      } else if (this.city === 'Mumbai') {
+        defaultElevation = 22;
+      } else if (this.city === 'Puri') {
+        defaultElevation = 22;
+      }
+      this.TopElevationForm.patchValue({ Site_Elevation: defaultElevation });
+      alert("Users shall enter site elevation value received from WGS-84 survey report. Permissible height will be calculated based on site elevation entered by user. In absense of site elevation value from user, ARP (Airport) elevation value will be used as default.")
+    }
+    else {
+      // Hide the alert message otherwise
+
+      this.showAlert = false;
+
+    }
+  }
+
 
   updateMarkerPositionOnClick(): void {
     this.map.on('click', (e: any) => {
@@ -141,71 +470,151 @@ export class UsersNOCASComponent implements OnInit {
   }
 
 
+  // submitForm() {
+  //   // Check if the token exists
+  //   if (!this.apiservice.token) {
+  //     alert('Please Login First');
+  //     // Redirect the user to the login page or take appropriate action
+  //     this.router.navigate(['UsersLogin']);
+  //     return; // Exit the function if the token does not exist
+  //   }
+
+
+  //   if (!this.TopElevationForm.valid) {
+  //     return; // Exit if the form is not valid
+  //   }
+  //   const confirmation = confirm("Kindly confirm that the entered site information is correct or verify");
+  //   if (!confirmation) {
+  //     console.log('Form submission cancelled');
+  //     return; // Exit if the user cancels the confirmation
+  //   }
+  //   // fetch('http://localhost:3001/api/subscription/checkSubscriptions', {
+  //   //   method: 'GET',
+  //   //   headers: {
+  //   //     'Content-Type': 'application/json',
+  //   //     'Authorization': `Bearer ${this.apiservice.token}`
+  //   //   }
+  //   // })
+  //   //   .then(response => {
+  //   //     if (response.ok) {
+  //   //       return response.json();
+  //   //     } else {
+  //   //       // console.error('User is not subscribed.');
+  //   //       // Handle user not subscribed
+  //   //       alert('You have not subscribed to any package. For more information, please click OK.');
+  //   //       this.router.navigate(['PricingPlans']);
+  //   //       return null; // Ensure a value is returned
+  //   //     }
+  //   //   })
+  //   //   .then(data => {
+
+  //   //   })
+  //   // if (data && data.isSubscribed) {
+  //   // User is subscribed, proceed with form submission
+
+  //   this.createNocas();
+  //   console.log('Form submitted successfully');
+
+
+  // }
+
   submitForm() {
     // Check if the token exists
     if (!this.apiservice.token) {
-      alert('Please log in first.');
+      alert('Please Login First');
       // Redirect the user to the login page or take appropriate action
       this.router.navigate(['UsersLogin']);
       return; // Exit the function if the token does not exist
     }
-  
-    
+
     if (!this.TopElevationForm.valid) {
       return; // Exit if the form is not valid
     }
-  
+
     const confirmation = confirm("Kindly confirm that the entered site information is correct or verify");
-  
     if (!confirmation) {
       console.log('Form submission cancelled');
       return; // Exit if the user cancels the confirmation
     }
-  
-    fetch('http://localhost:3001/api/subscription/checkSubscriptions', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${this.apiservice.token}`
-      }
-    })
-    .then(response => {
-      if (response.ok) {
-        return response.json();
-      } else {
-        // console.error('User is not subscribed.');
-        // Handle user not subscribed
-        alert('You have not subscribed to any package. For more information, please click OK.');
-        this.router.navigate(['PricingPlans']);
-        return null; // Ensure a value is returned
-      }
-    })
-    .then(data => {
-      if (data && data.isSubscribed) {
-        // User is subscribed, proceed with form submission
-        alert('User is subscribed. Proceeding with form submission...');
-        console.log('Form submitted successfully');
-        this.showModal();
-        const airportCITY = this.TopElevationForm.get('CITY')?.value;
-        const latitude = parseFloat(this.TopElevationForm.get('Latitude')?.value);
-        const longitude = parseFloat(this.TopElevationForm.get('Longitude')?.value);
-        if (airportCITY && !isNaN(latitude) && !isNaN(longitude)) {
-          // Update the markers and line
-          console.log('Latitude:', latitude);
-          console.log('Longitude:', longitude);
-          this.updateMarkerPosition();
-          this.updatePolyline(latitude, longitude);
-          // Update the displayed map data
-          this.displayMapData(latitude, longitude, this.airportCoordinates);
-          this.showMap(latitude, longitude);
-        }
-      } 
-    })
 
+
+    // Call the API to create Nocas entry
+    this.createNocas();
   }
-  
-  
-  
+
+  displayMapData(lat: number, lng: number, airportCoordinates: [number, number]) {
+    const newDistance = this.calculateDistance(lat, lng, airportCoordinates[0], airportCoordinates[1]);
+    console.log(newDistance)
+    const clickedFeature = this.geojsonLayer.getLayers().find((layer: any) => {
+      return layer.getBounds().contains([lat, lng]);
+    });
+    const mapData = document.getElementById('mapData');
+    if (mapData !== null) {
+      mapData.innerHTML = '';
+      mapData.style.display = 'none';
+      const siteElevationInput = this.TopElevationForm.get('Site_Elevation');
+      const siteElevation = siteElevationInput ? siteElevationInput.value : 0;
+      if (clickedFeature) {
+        const properties = clickedFeature.feature.properties;
+        const elevation = (properties.Name);
+        const permissibleHeight = parseFloat(properties.Name) - siteElevation;
+        mapData.innerHTML = `
+        <table class="table table-hover">
+  <tbody>
+  <tr>
+      <th scope="row"> Permissible Elevation<br>
+      (AMSL Above Mean Sea Level)</th>
+      <td>${elevation}M</td>
+      
+    </tr>
+    <tr>
+      <th scope="row"> Permissible Height<br>
+      (AGL- Above ground level)
+      </th>
+      <td> ${permissibleHeight < 0 ? '-' : ''}${Math.abs(permissibleHeight).toFixed(2)}M</td>
+     
+    </tr>
+    <tr>
+      <th scope="row">Site Location </th>
+      <td colspan="2" >Latitude: ${lat.toFixed(2)} N <br> Longitude: ${lng.toFixed(2)} E</td>
+     
+    </tr>
+    <tr>
+      <th scope="row">Distance<br>
+      (Site Location from ARP)</th>
+      <td colspan="2"> ${newDistance.toFixed(2)} km</td>
+     
+    </tr>
+  </tbody>
+</table> `;
+      } else {
+        mapData.innerHTML = `
+          <div>
+         <b>Site location selected by User is outside CCZM boundary published by AAI. Permissible Elevation calculation could not be processed. Please contact us for further details</b><br> <br>
+          
+         <table class="table table-hover">
+         <tbody>
+           <tr>
+             <th scope="row">Site Location</th>
+             <td colspan="2" >Latitude: ${lat.toFixed(2)} N <br> Longitude: ${lng.toFixed(2)} E</td>
+           </tr>
+           <tr>
+             <th scope="row">Distance<br>
+             (Site Location from ARP)</th>
+             <td colspan="2">${newDistance.toFixed(2)} km</td>
+           </tr>
+         </tbody>
+       </table> 
+          </div> <br>`;
+      }
+      mapData.style.display = 'block';
+    }
+  }
+
+
+
+
+
 
 
   getLocation() {
@@ -217,17 +626,17 @@ export class UsersNOCASComponent implements OnInit {
           this.long = position.coords.longitude;
           console.log(this.lat)
           console.log(this.long)
-  
-          
-  
+
+
+
           // Now that you have the location, you can display the popup
           const popupContent = `Your location : <br>  Latitude: ${this.lat.toFixed(2)}, Longitude: ${this.long.toFixed(2)}`;
           this.marker.addTo(this.map).bindPopup(popupContent).openPopup();
           // Update the markers and line with the new location
           this.updateMarkerPosition();
           this.updatePolyline(this.lat, this.long);
-  
-  
+
+
           // Add the code here that relies on the location data, if any
           // For example, you can call a method or perform additional operations
           // this.methodThatUsesLocationData(this.lat, this.long);
@@ -247,8 +656,8 @@ export class UsersNOCASComponent implements OnInit {
       alert('Geolocation is not supported by this browser.');
     }
   }
-  
-  
+
+
 
 
 
@@ -260,7 +669,7 @@ export class UsersNOCASComponent implements OnInit {
 
     }
   }
-  
+
 
   showDefaultMap() {
     const defaultLat = 0.0;
@@ -306,7 +715,7 @@ export class UsersNOCASComponent implements OnInit {
   }
 
   showMap(lat: number, lng: number) {
-    this.map = L.map('map', { zoomControl: false, attributionControl: false }).setView([20.5937, 78.9629], 4);
+    this.map = L.map('map', { zoomControl: false, attributionControl: false }).setView([20.5937, 78.9629], 5);
 
     const streets = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
       subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
@@ -548,73 +957,73 @@ export class UsersNOCASComponent implements OnInit {
     // this.TopElevationForm.reset();
   }
 
-  displayMapData(lat: number, lng: number, airportCoordinates: [number, number]) {
-    const newDistance = this.calculateDistance(lat, lng, airportCoordinates[0], airportCoordinates[1]);
-    const clickedFeature = this.geojsonLayer.getLayers().find((layer: any) => {
-      return layer.getBounds().contains([lat, lng]);
-    });
-    const mapData = document.getElementById('mapData');
-    if (mapData !== null) {
-      mapData.innerHTML = '';
-      mapData.style.display = 'none';
-      const siteElevationInput = this.TopElevationForm.get('Site_Elevation');
-      const siteElevation = siteElevationInput ? siteElevationInput.value : 0;
-      if (clickedFeature) {
-        const properties = clickedFeature.feature.properties;
-        const elevation = (properties.Name);
-        const permissibleHeight = parseFloat(properties.Name) - siteElevation;
-        mapData.innerHTML = `
-        <table class="table table-hover">
-  <tbody>
-  <tr>
-      <th scope="row"> Permissible Elevation<br>
-      (AMSL Above Mean Sea Level)</th>
-      <td>${elevation}M</td>
-      
-    </tr>
-    <tr>
-      <th scope="row"> Permissible Height<br>
-      (AGL- Above ground level)
-      </th>
-      <td> ${permissibleHeight < 0 ? '-' : ''}${Math.abs(permissibleHeight).toFixed(2)}M</td>
-     
-    </tr>
-    <tr>
-      <th scope="row">Site Location </th>
-      <td colspan="2" >Latitude: ${lat.toFixed(2)} N <br> Longitude: ${lng.toFixed(2)} E</td>
-     
-    </tr>
-    <tr>
-      <th scope="row">Distance<br>
-      (Site Location from ARP)</th>
-      <td colspan="2"> ${newDistance.toFixed(2)} km</td>
-     
-    </tr>
-  </tbody>
-</table> `;
-      } else {
-        mapData.innerHTML = `
-          <div>
-         <b>Site location selected by User is outside CCZM boundary published by AAI. Permissible Elevation calculation could not be processed. Please contact us for further details</b><br> <br>
-          
-         <table class="table table-hover">
-         <tbody>
-           <tr>
-             <th scope="row">Site Location</th>
-             <td colspan="2" >Latitude: ${lat.toFixed(2)} N <br> Longitude: ${lng.toFixed(2)} E</td>
-           </tr>
-           <tr>
-             <th scope="row">Distance<br>
-             (Site Location from ARP)</th>
-             <td colspan="2">${newDistance.toFixed(2)} km</td>
-           </tr>
-         </tbody>
-       </table> 
-          </div> <br>`;
-      }
-      mapData.style.display = 'block';
-    }
-  }
+  //   displayMapData(lat: number, lng: number, airportCoordinates: [number, number]) {
+  //     const newDistance = this.calculateDistance(lat, lng, airportCoordinates[0], airportCoordinates[1]);
+  //     const clickedFeature = this.geojsonLayer.getLayers().find((layer: any) => {
+  //       return layer.getBounds().contains([lat, lng]);
+  //     });
+  //     const mapData = document.getElementById('mapData');
+  //     if (mapData !== null) {
+  //       mapData.innerHTML = '';
+  //       mapData.style.display = 'none';
+  //       const siteElevationInput = this.TopElevationForm.get('Site_Elevation');
+  //       const siteElevation = siteElevationInput ? siteElevationInput.value : 0;
+  //       if (clickedFeature) {
+  //         const properties = clickedFeature.feature.properties;
+  //         const elevation = (properties.Name);
+  //         const permissibleHeight = parseFloat(properties.Name) - siteElevation;
+  //         mapData.innerHTML = `
+  //         <table class="table table-hover">
+  //   <tbody>
+  //   <tr>
+  //       <th scope="row"> Permissible Elevation<br>
+  //       (AMSL Above Mean Sea Level)</th>
+  //       <td>${elevation}M</td>
+
+  //     </tr>
+  //     <tr>
+  //       <th scope="row"> Permissible Height<br>
+  //       (AGL- Above ground level)
+  //       </th>
+  //       <td> ${permissibleHeight < 0 ? '-' : ''}${Math.abs(permissibleHeight).toFixed(2)}M</td>
+
+  //     </tr>
+  //     <tr>
+  //       <th scope="row">Site Location </th>
+  //       <td colspan="2" >Latitude: ${lat.toFixed(2)} N <br> Longitude: ${lng.toFixed(2)} E</td>
+
+  //     </tr>
+  //     <tr>
+  //       <th scope="row">Distance<br>
+  //       (Site Location from ARP)</th>
+  //       <td colspan="2"> ${newDistance.toFixed(2)} km</td>
+
+  //     </tr>
+  //   </tbody>
+  // </table> `;
+  //       } else {
+  //         mapData.innerHTML = `
+  //           <div>
+  //          <b>Site location selected by User is outside CCZM boundary published by AAI. Permissible Elevation calculation could not be processed. Please contact us for further details</b><br> <br>
+
+  //          <table class="table table-hover">
+  //          <tbody>
+  //            <tr>
+  //              <th scope="row">Site Location</th>
+  //              <td colspan="2" >Latitude: ${lat.toFixed(2)} N <br> Longitude: ${lng.toFixed(2)} E</td>
+  //            </tr>
+  //            <tr>
+  //              <th scope="row">Distance<br>
+  //              (Site Location from ARP)</th>
+  //              <td colspan="2">${newDistance.toFixed(2)} km</td>
+  //            </tr>
+  //          </tbody>
+  //        </table> 
+  //           </div> <br>`;
+  //       }
+  //       mapData.style.display = 'block';
+  //     }
+  //   }
 
   updatePolyline(lat: number, lng: number) {
     if (this.line) {

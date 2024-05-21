@@ -18,7 +18,7 @@ export class UsersRegisterComponent {
     private http: HttpClient,
     private formBuilder: FormBuilder,
     // private toastr: ToastrService,
-    // private router: Router
+    private router: Router
   ) { }
   public showPassword: boolean = false;
   generatedOTP: string | undefined;
@@ -79,6 +79,7 @@ export class UsersRegisterComponent {
         (resultData: any) => {
           console.log("User registration response:", resultData);
           alert("User registered successfully");
+          this.router.navigate(['UsersLogin']);
         },
         (error: any) => {
           console.error("Error registering user:", error);

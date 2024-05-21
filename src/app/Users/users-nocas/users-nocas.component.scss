@@ -7,9 +7,9 @@ input::-webkit-inner-spin-button {
 }
 
 .example-container {
-  // background: red;
+  /* overflow: hidden; */
+  overflow: auto; /* Enable scrolling when necessary */
   height: 100%;
-  overflow: hidden;
 }
 
 
@@ -116,9 +116,7 @@ mat-form-field {
   margin-top: 5%;
 }
 
-.button-Top {
-  margin-top: 59%;
-}
+
 
 img {
   width: 100%;

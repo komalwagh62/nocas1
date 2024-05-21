@@ -14,6 +14,7 @@ export class UsersLoginComponent {
   password: string = '';
   loginError: string = '';
   isAuthenticated: boolean = false;
+  user: any = {};
 
 
   constructor(private formbuilder: FormBuilder, private router: Router, private apiservice: ApiService) { }
@@ -27,23 +28,21 @@ export class UsersLoginComponent {
   }
 
   login() {
-    // Check if the form is valid
     if (this.LogInForm.valid) {
-      // Form is valid, proceed with login
       const credentials = { email: this.LogInForm.value.email, password: this.LogInForm.value.password };
       let url = this.apiservice.baseUrl + '/user/userLogin';
-  
+
       this.apiservice.http.post<any>(url, credentials)
         .subscribe(
           response => {
-            console.log(response)
             if (response.success) {
-              // let {id,uname,address,phone_number,email,password} = response.user
-              // this.apiservice.userData = new User(id,uname,address,phone_number,email,password)
-              this.apiservice.token = response.jwttoken
-              console.log(response.jwttoken)
+              // Store token in local storage
+              localStorage.setItem('token', response.jwttoken);
+              
+              
+              this.apiservice.token = response.jwttoken;
+              
               this.router.navigate(['UsersProfile']);
-              // this.isAuthenticated = true;
             } else {
               alert('Invalid email or password. Please try again.');
             } 
@@ -54,10 +53,10 @@ export class UsersLoginComponent {
           }
         );
     } else {
-      // Form is invalid, display error message or take appropriate action
       alert('Please fill in all required fields and ensure they are valid.');
     }
   }
+  
   
 
 

@@ -32,6 +32,7 @@ export class UsersProfileComponent implements OnInit {
     // Copy user data to updatedUser object for editing
     // this.updatedUser = { ...this.user };
     // console.log(this.updatedUser)
+   
     this.getUserDetails();
 
   
@@ -112,25 +113,26 @@ export class UsersProfileComponent implements OnInit {
   // }
 
   
-  getUserDetails(): void {
+ // Inside the getUserDetails function in UsersProfileComponent
+getUserDetails(): void {
+  const headers = new HttpHeaders().set("Authorization", `Bearer ${this.apiservice.token}`);
+  this.http.post<any>('http://localhost:3001/api/user/myProfile', {}, { headers: headers })
+    .subscribe(
+      response => {
+        this.apiservice.parseUserData(response); // Parse user data here
 
-    const headers = new HttpHeaders().set("Authorization", `Bearer ${this.apiservice.token}`);
-    this.http.post<any>('http://localhost:3001/api/user/myProfile', {}, { headers: headers })
-      .subscribe(
-        response => {
-          this.apiservice.userData = JSON.parse(JSON.stringify(response))
-          // console.log(response)
-          this.updatedUser = JSON.parse(JSON.stringify(response))
-          this.user = JSON.parse(JSON.stringify(response))
+        this.updatedUser = JSON.parse(JSON.stringify(response));
+        this.user = JSON.parse(JSON.stringify(response));
+        console.log(this.user);
+        localStorage.setItem('this.user', JSON.stringify(response.apiservice.userData));
+      },
+      error => {
+        alert("Failed Login");
+        this.router.navigate(['UserLogin']);
+      }
+    );
+}
 
-        },
-        error => {
-          alert("Failed Login")
-          this.router.navigate(['UserLogin']);
-        }
-      )
-
-  }
 
   validatePassword() {
     // Check if the paswords match

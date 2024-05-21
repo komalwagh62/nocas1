@@ -26,7 +26,8 @@ export class UsersrequestServiceComponent implements OnInit {
       service1: [false],
       service2: [false],
       service3: [false],
-      service4: [false]
+      service4: [false],
+      service5: [false]
     });
 
     this.getUserDetails();
@@ -62,14 +63,15 @@ export class UsersrequestServiceComponent implements OnInit {
     this.http.post<any>('http://localhost:3001/api/user/myProfile', {}, { headers })
       .subscribe(
         response => {
-          this.apiService.userData = response;
-          this.updatedUser = response;
-          this.user = response;
+          this.apiService.userData = JSON.parse(JSON.stringify(response))
+          this.updatedUser = JSON.parse(JSON.stringify(response))
+          this.user = JSON.parse(JSON.stringify(response))
+          localStorage.setItem('this.user', JSON.stringify(response.apiservice.userData));
         },
         error => {
           console.error("Failed to fetch user details:", error);
           alert("Failed to fetch user details. Please log in again.");
-          this.router.navigate(['UserLogin']);
+          this.router.navigate(['UsersLogin']);
         }
       );
   }

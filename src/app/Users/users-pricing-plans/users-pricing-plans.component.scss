@@ -29,10 +29,10 @@
   }
 } .background::after {
   content: '';
-  background: #60a9ff;
-  background: -moz-linear-gradient(top, #60a9ff 0%, #4394f4 100%);
-  background: -webkit-linear-gradient(top, #60a9ff 0%,#4394f4 100%);
-  background: linear-gradient(to bottom, #60a9ff 0%,#4394f4 100%);
+  background: #4682B4 ;
+  background: -moz-linear-gradient(top, #4682B4  0%, #4682B4  100%);
+  background: -webkit-linear-gradient(top, #4682B4  0%,#4682B4 100%);
+  background: linear-gradient(to bottom, #4682B4  0%,#4682B4  100%);
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#60a9ff', endColorstr='#4394f4',GradientType=0 );
   height: 350px;
   left: 0;
@@ -183,7 +183,7 @@
     content: "\2713"; /* Unicode checkmark symbol */
     position: absolute;
     left: 0;
-    font-size: 17px; 
+    font-size: 20px; 
   }
 
   .pricing-features-items {
@@ -198,4 +198,9 @@
   left: 0;
   color: red; /* Change color to red for the wrong symbol */
   font-size: 17px; /* Adjust the font size as needed */
+}
+.pricing-button[_ngcontent-ng-c2223092857] {
+  
+  padding: 12px 32px;
+ 
 }

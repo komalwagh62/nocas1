@@ -7,7 +7,8 @@ export class Subscription {
         public expiry_date: string,
         public subscription_type: string,
         public price: string,
-       public razorpay_payment_id:string
+       public razorpay_payment_id:string,
+       public createdAt:string
       
     ) {
     }

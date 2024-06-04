@@ -19,7 +19,7 @@ export class ApiService {
   public subscriptionData!: Subscription;
   public nocasData!: Nocas;
   public handlePayment!: UsersPricingPlansComponent;
-  nocasRequestBody: any;
+  
 
   constructor(public http: HttpClient) {
     const token = localStorage.getItem('token');
@@ -30,15 +30,12 @@ export class ApiService {
     if (userData) {
       this.userData = JSON.parse(userData);
     }
-   
+    
   }
 
   // Function to parse user data
   parseUserData(userData: any): void {
     this.userData = userData;
     localStorage.setItem('userData', JSON.stringify(userData));
-  }
-  setNocasRequestBody(requestBody: any): void {
-    this.nocasRequestBody = requestBody;
   }
 }

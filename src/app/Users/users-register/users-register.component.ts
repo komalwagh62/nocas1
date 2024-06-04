@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./users-register.component.scss'] 
 })
 
-export class UsersRegisterComponent {
+export class UsersRegisterComponent implements OnInit {
 
   SignupForm: FormGroup | any;
   otpSent: boolean = false;
@@ -22,27 +22,47 @@ export class UsersRegisterComponent {
   ) { }
   public showPassword: boolean = false;
   generatedOTP: string | undefined;
+
   ngOnInit(): void {
     this.SignupForm = this.formBuilder.group({
-      email: ['', [Validators.required, Validators.email]], // Use FormBuilder for form controls
+      email: ['', [Validators.required, Validators.email]],
       phone_number: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(10), Validators.pattern(/^[6789]\d{9}$/)]],
-      password: ['', [Validators.required]],
+      password: ['', [Validators.required, Validators.minLength(8), Validators.pattern(/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/)]],
       otp: ['', [Validators.required, Validators.pattern(/^\d{4}$/)]],
-      uname: ['', [Validators.required]],
+      uname: ['', [Validators.required, Validators.pattern(/^[a-zA-Z\s]+$/)]],
       address: ['', [Validators.required]],
     });
   }
-  
+  onOtpKeyPress(event: KeyboardEvent) {
+    // Check if the pressed key is a number
+    const charCode = event.which ? event.which : event.keyCode;
+    if (charCode < 48 || charCode > 57) {
+        event.preventDefault();
+    }
+}
+onNameInput(event: any): void {
+  const input = event.target.value;
+  const regex = /^[a-zA-Z\s]*$/;
+  if (!regex.test(input)) {
+    event.target.value = input.replace(/[^a-zA-Z\s]/g, '');
+  }
+}
+
+
+onPhoneNumberKeyPress(event: KeyboardEvent) {
+  // Check if the pressed key is a number
+  const charCode = event.which ? event.which : event.keyCode;
+  if (charCode < 48 || charCode > 57) {
+      event.preventDefault();
+  }
+}
 
   public togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
   }
 
   generateOTP() {
-    // Generate a random 4-digit OTP
     this.generatedOTP = Math.floor(1000 + Math.random() * 9000).toString();
-    // You can implement OTP sending logic here, like sending an SMS to the entered phone number
-
     alert(this.generatedOTP);
   }
 
@@ -55,6 +75,7 @@ export class UsersRegisterComponent {
       this.otpSent = false;
     }
   }
+
   onPhoneNumberChange() {
     const phoneNumberControl = this.SignupForm.get('phone_number');
     if (phoneNumberControl && phoneNumberControl.valid) {
@@ -64,11 +85,9 @@ export class UsersRegisterComponent {
       this.otpSent = false;
     }
   }
+
   createUser() {
-    // Check if the form is valid
     if (this.SignupForm.valid) {
-      // Form is valid, proceed with registration
-      // Send registration data to the server
       this.http.post("http://localhost:3001/api/user/createUser", {
         uname: this.SignupForm.value.uname,
         phone_number: this.SignupForm.value.phone_number,
@@ -87,11 +106,7 @@ export class UsersRegisterComponent {
         }
       );
     } else {
-      // Form is invalid, display error message or take appropriate action
       alert('Please fill in all required fields and ensure they are valid.');
     }
   }
-  
-  
-
 }

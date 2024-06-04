@@ -5,12 +5,12 @@
     <div class="panel pricing-table">
       
       <div class="pricing-plan">
-        <img src="https://s22.postimg.cc/8mv5gn7w1/paper-plane.png" alt="" class="pricing-img">
+        <img src="assets/free.png" alt="" class="pricing-img">
         <h2 class="pricing-header">Free</h2>
         <span class="pricing-price">₹ 0</span>
         <ul class="pricing-features">
           <h2 class="pricing-features-items">30 days</h2>
-          <h2 class="pricing-features-item">2 Free Requests</h2>
+          <h2 class="pricing-features-item">3 Free Requests</h2>
           <h2 class="pricing-features-items">+1 Hr free consultation monthly</h2>
           
         </ul>
@@ -63,12 +63,9 @@
       </div>
 
     </div>
-  </div>
-
-
+    <div *ngIf="transactionId">
+      <p>Payment was successful. If you want to see payment details, please <a [href]="'/subscription-details/' + transactionId">click here</a>.</p>
+    </div>
   
+  </div>
 </div>
-
-
-
-

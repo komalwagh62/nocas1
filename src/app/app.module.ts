@@ -39,7 +39,10 @@ import { UsersLoginComponent } from './Users/users-login/users-login.component';
 import { UsersProfileComponent } from './Users/users-profile/users-profile.component';
 import { UsersRegisterComponent } from './Users/users-register/users-register.component';
 import { PaymentReceiptComponent } from './payment-receipt/payment-receipt.component';
-
+import { TransactionDetailsComponent } from './Users/transaction-details/transaction-details.component';
+import { MatTableModule } from '@angular/material/table';
+import { AdminLoginComponent } from './Admin/admin-login/admin-login.component';
+import { DashboardComponent } from './Admin/dashboard/dashboard.component';
 
 @NgModule({
   declarations: [
@@ -58,6 +61,9 @@ import { PaymentReceiptComponent } from './payment-receipt/payment-receipt.compo
     ForgotPasswordComponent,
     UsersrequestServiceComponent,
     PaymentReceiptComponent,
+    TransactionDetailsComponent,
+    AdminLoginComponent,
+    DashboardComponent
    
   ],
   imports: [
@@ -86,6 +92,7 @@ import { PaymentReceiptComponent } from './payment-receipt/payment-receipt.compo
     MatDividerModule,
     MatRadioModule,
     MatGridListModule,
+    MatTableModule, 
   ],
   providers: [
     provideAnimationsAsync()

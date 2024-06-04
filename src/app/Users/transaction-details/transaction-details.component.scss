@@ -1,0 +1,52 @@
+.btn-primary {
+  background-color: red;
+  border-color: red;
+}
+
+body {
+  font-size: 140%;
+}
+
+.custom-table {
+  margin-top: 20px; /* Adjust the spacing as needed */
+}
+
+h2 {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.table-container table tbody td:first-child {
+  width: 50%;
+}
+
+table caption {
+  padding: .5em 0;
+}
+
+table.dataTable th,
+table.dataTable td {
+  white-space: nowrap;
+}
+
+.p {
+  text-align: center;
+  padding-top: 140px;
+  font-size: 14px;
+}
+
+.table-container table {
+  width: 100%; /* Adjust the width as needed */
+  margin: 0 auto; /* Center the table horizontally */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .table-responsive {
+      overflow-x: auto;
+  }
+
+  .table-container table {
+      width: 100%; /* Full width for small screens */
+  }
+}

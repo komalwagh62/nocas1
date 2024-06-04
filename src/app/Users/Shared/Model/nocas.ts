@@ -7,6 +7,9 @@ export class Nocas {
         public latitude: string,
         public longitude: string,
        public site_elevation:string,
+       public distance:string,
+       public permissible_elevation:string,
+       public permissible_height:string,
        public snap_shot:string,
       
     ) {

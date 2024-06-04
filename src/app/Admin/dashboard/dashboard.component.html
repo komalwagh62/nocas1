@@ -1,0 +1,197 @@
+<main id="main" class="main">
+  <div class="pagetitle">
+    <nav></nav>
+  </div>
+
+  <section class="section dashboard">
+    <div class="row">
+      <div class="col-lg-8">
+        <div class="row">
+
+          <!-- Sales Card -->
+          <div class="col-xxl-4 col-md-6 mb-4">
+            <div class="card info-card sales-card">
+              <div class="filter">
+                <img src="assets/arrow.png" (click)="getAllUsers()" alt="" class="request-img transparent-img"
+                  style="height: 63px; width: 63px">
+                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow"></ul>
+              </div>
+              <div class="card-body">
+                <h5 class="card-title">Users Details</h5>
+                <div class="d-flex align-items-center">
+                  <div class="d-flex align-items-center justify-content-center">
+                    <img src="assets/construction.png" alt="" class="construction-img"
+                      style="height: 63px; width: 63px">
+                  </div>
+                  <div class="ps-3">
+                    <h6>145</h6>
+                    <span class="text-success small pt-1 fw-bold">12%</span> <span
+                      class="text-muted small pt-2 ps-1">increase</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div><!-- End Sales Card -->
+
+          <!-- Subscription Details Card -->
+          <div class="col-xxl-4 col-md-6 mb-4">
+            <div class="card info-card revenue-card">
+              <div class="filter">
+                <img src="assets/arrow.png"  (click)="getAllSubscriptions()" class="request-img transparent-img"
+                  style="height: 63px; width: 63px">
+                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow"></ul>
+              </div>
+              <div class="card-body">
+                <h5 class="card-title">Subscription Details</h5>
+                <div class="d-flex align-items-center">
+                  <div class="d-flex align-items-center justify-content-center">
+                    <img src="assets/membership.png" alt="" class="member-img" style="height: 63px; width: 63px">
+                  </div>
+                  <div class="ps-3">
+                    <h6>$3,264</h6>
+                    <span class="text-success small pt-1 fw-bold">8%</span> <span
+                      class="text-muted small pt-2 ps-1">increase</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div><!-- End Subscription Details Card -->
+
+          <!-- Customers Card -->
+          <div class="col-xxl-4 col-xl-12 mb-4">
+            <div class="card info-card customers-card">
+              <div class="card-body">
+                <div class="filter">
+                  <a class="arrow-icon" data-bs-toggle="dropdown">
+                    <img src="assets/arrow.png" (click)="getAllPermissible()" class="request-img transparent-img"
+                      style="height: 63px; width: 63px">
+                  </a>
+                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow"></ul>
+                </div>
+                <h5 class="card-title">Permissible Details</h5>
+                <div class="d-flex align-items-center">
+                  <div class="d-flex align-items-center justify-content-center">
+                    <img src="assets/request.png" alt="" class="request-img" style="height: 63px; width: 63px">
+                  </div>
+                  <div class="ps-3">
+                    <h6>1244</h6>
+                    <span class="text-danger small pt-1 fw-bold">12%</span> <span
+                      class="text-muted small pt-2 ps-1">decrease</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div><!-- End Customers Card -->
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <div *ngIf="showUserDetails">
+    <div class="table-responsive">
+      <table *ngIf="userDetails && userDetails.length > 0" class="table table-striped">
+        <thead>
+          <tr>
+            <th>User Id</th>
+            <th>User Name</th>
+            <th>Phone Number</th>
+            <th>Address</th>
+            <th>Email</th>
+            <th>Password</th>
+
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of userDetails">
+            <td>{{ user.id }}</td>
+            <td>{{ user.uname }}</td>
+            <td>{{ user.phone_number }}</td>
+            <td>{{ user.address }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.password }}</td>
+
+            <td>
+
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div *ngIf="userDetails && userDetails.length === 0" class="alert alert-warning" role="alert">No Users Data found.
+      </div>
+    </div>
+  </div>
+ 
+  <div *ngIf="showSubscriptionDetails && subscriptionDetails.length > 0" class="table-responsive">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Subscription Id</th>
+          <th>User Id</th>
+          <th>Subscription Status</th>
+          <th>Expiry Date</th>
+          <th>Subscription Type</th>
+          <th>Price</th>
+          <th>Razorpay Payment ID</th>
+          <th>Created At</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let subscription of subscriptionDetails">
+          <td>{{ subscription.subscription_id }}</td>
+          <td>{{ subscription.user_id }}</td>
+          <td>{{ subscription.subscription_status }}</td>
+          <td>{{ subscription.expiry_date }}</td>
+          <td>{{ subscription.subscription_type }}</td>
+          <td>{{ subscription.price }}</td>
+          <td>{{ subscription.razorpay_payment_id }}</td>
+          <td>{{ subscription.createdAt }}</td>
+        </tr>
+      </tbody>
+    </table>
+  
+  <div *ngIf="subscriptionDetails && subscriptionDetails.length === 0" class="alert alert-warning" role="alert">
+    No subscriptions found.
+  </div>
+</div>
+
+
+<div *ngIf="showPermissibleDetails">
+  <div class="table-responsive">
+    <table *ngIf="permissibleDetails && permissibleDetails.length > 0" class="table table-striped">
+      <thead>
+        <tr>
+          <th>Request ID</th>
+          <th>User ID</th>
+          <th>City</th>
+          <th>Airport Name</th>
+          <th>Latitude</th>
+          <th>Longitude</th>
+          <th>Site Elevation</th>
+          <th>Distance From ARP</th>
+          <th>Permissible Height (AGL)</th>
+          <th>Permissible Elevation (AMSL)</th>
+          <th>Snapshot</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let nocas of permissibleDetails">
+          <td>{{ nocas.request_id }}</td>
+          <td>{{ nocas.user_id }}</td>
+          <td>{{ nocas.city }}</td>
+          <td>{{ nocas.airport_name }}</td>
+          <td>{{ nocas.latitude }}</td>
+          <td>{{ nocas.longitude }}</td>
+          <td>{{ nocas.site_elevation }}</td>
+          <td>{{ nocas.distance }}</td>
+          <td>{{ nocas.permissible_height }}</td>
+          <td>{{ nocas.permissible_elevation }}</td>
+          <td>{{ nocas.snap_shot }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <div *ngIf="permissibleDetails && permissibleDetails.length === 0" class="alert alert-warning" role="alert">No Permissible Data found.</div>
+  </div>
+</div>
+</main>

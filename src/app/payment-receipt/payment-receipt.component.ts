@@ -16,6 +16,7 @@ export class PaymentReceiptComponent implements OnInit {
     this.receiptDetails = navigation?.extras?.state?.['receiptDetails'];
     
   }
+  
   isGeneratingPdf: boolean = false;
 
   

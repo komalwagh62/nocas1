@@ -1,24 +1,23 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Component, OnInit,ViewEncapsulation } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ApiService } from '../Shared/Api/api.service';
-import { ChangeDetectorRef } from '@angular/core';
 
 declare var Razorpay: any;
 
 @Component({
   selector: 'app-users-pricing-plans',
   templateUrl: './users-pricing-plans.component.html',
-  styleUrls: ['./users-pricing-plans.component.scss'],
-  encapsulation: ViewEncapsulation.None 
+  styleUrls: ['./users-pricing-plans.component.scss']
 })
 export class UsersPricingPlansComponent implements OnInit {
 
   responseData: any;
   user: any = {};
   freeTrialCount!: number;
+  transactionId: string | null = null;  
   receiptDetails: any = null;
-  pricingPlans: any;
+// To store the transaction ID
 
   constructor(
     private http: HttpClient,
@@ -27,10 +26,12 @@ export class UsersPricingPlansComponent implements OnInit {
     private cdr: ChangeDetectorRef
   ) { }
 
-  ngOnInit(): void { }
+  ngOnInit(): void {
+  }
 
   handlePayment(planName: string, planAmount: number) {
     if (!this.apiService.token) {
+      // User not logged in, redirect to login page
       alert("Please Login First");
       this.router.navigate(['UsersLogin']);
       return;
@@ -45,7 +46,12 @@ export class UsersPricingPlansComponent implements OnInit {
       image: 'https://imgur.com/a/J4UAMhv',
       handler: (response: any) => {
         console.log('Payment successful:', response);
-        alert("Payment Successfully Done");
+        const confirmation = confirm("Payment Successfully Done. If you want to see payment details, please click Ok");
+    if (!confirmation) {
+      // console.log('Form submission cancelled');
+      return; // Exit if the user cancels the confirmation
+    }
+        
         this.makeHttpRequest(planName, planAmount, response);
         this.setReceiptDetails({
           status: 'success',
@@ -56,7 +62,7 @@ export class UsersPricingPlansComponent implements OnInit {
           email: this.apiService.userData.email,
           contact: this.apiService.userData.phone_number
         });
-        this.router.navigate(['PaymentReceipt'], { state: { receiptDetails: this.receiptDetails } });
+        this.router.navigate(['TransactionDetails'], { state: { receiptDetails: this.receiptDetails } });
       },
       prefill: {
         name: this.apiService.userData.uname,
@@ -74,20 +80,25 @@ export class UsersPricingPlansComponent implements OnInit {
     const rzp = new Razorpay(RazorpayOptions);
     rzp.open();
 
+
+    rzp.on('payment.success', (response: any) => {
+      console.log('Payment success:', response);
+    });
+
     rzp.on('payment.error', (error: any) => {
       console.error('Payment error:', error);
       alert("Payment Failed");
-      this.setReceiptDetails({
-        status: 'failure',
-        error_reason: error.error.description,
-        name: this.apiService.userData.uname,
-        email: this.apiService.userData.email,
-        contact: this.apiService.userData.phone_number,
-        price: planAmount,
-        transaction_id: error.error.metadata ? error.error.metadata.payment_id : 'N/A',
-        description: `${planName} Plan Subscription`
-      });
-      this.router.navigate(['PaymentReceipt'], { state: { receiptDetails: this.receiptDetails } });
+      // this.setReceiptDetails({
+      //   status: 'failure',
+      //   error_reason: error.error.description,
+      //   name: this.apiService.userData.uname,
+      //   email: this.apiService.userData.email,
+      //   contact: this.apiService.userData.phone_number,
+      //   price: planAmount,
+      //   transaction_id: error.error.metadata ? error.error.metadata.payment_id : 'N/A',
+      //   description: `${planName} Plan Subscription`
+      // });
+      // this.router.navigate(['TransactionDetails'], { state: { receiptDetails: this.receiptDetails } });
     });
   }
 
@@ -96,9 +107,9 @@ export class UsersPricingPlansComponent implements OnInit {
     this.cdr.detectChanges();
   }
 
-  makeHttpRequest(planName: string, planAmount: number, paymentResponse: any) {
-    const headers = new HttpHeaders().set("Authorization", `Bearer ${this.apiService.token}`);
 
+  async makeHttpRequest(planName: string, planAmount: number, paymentResponse: any): Promise<void> {
+    const headers = new HttpHeaders().set("Authorization", `Bearer ${this.apiService.token}`);
     const apiUrl = 'http://localhost:3001/api/subscription/addSubscription';
     const requestData = {
       user_id: this.apiService.userData.id,
@@ -108,13 +119,20 @@ export class UsersPricingPlansComponent implements OnInit {
       subscribeAgain: true
     };
 
-    this.http.post<any>(apiUrl, requestData, { headers: headers })
-      .subscribe(response => {
-        this.responseData = response;
-        console.log('API response:', this.responseData);
-      }, error => {
-        console.error('Error:', error);
-      });
+    try {
+      const response = await this.http.post<any>(apiUrl, requestData, { headers }).toPromise();
+      this.responseData = response;
+      console.log('API response:', this.responseData);
+
+      if (response.isSubscribed) {
+        console.log('User is already subscribed.');
+        console.log('Forcefully subscribing the user and storing subscription details...');
+      } else {
+        console.log('User subscription stored successfully.');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
   }
 
   freetrial() {
@@ -125,7 +143,7 @@ export class UsersPricingPlansComponent implements OnInit {
     }
 
     if (!this.freeTrialCount) {
-      alert("Sorry, the free trial is not available anymore. Please subscribe to other packages to check the permissible height.");
+      alert("Sorry, the free trial is not available anymore. Please Subscribe Other packages to check the permissible height.");
       return;
     }
 

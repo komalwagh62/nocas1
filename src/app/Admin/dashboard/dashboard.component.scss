@@ -1,0 +1,171 @@
+/* Dashboard Styles */
+.dashboard .filter {
+    position: absolute;
+    right: 0px;
+    top: 15px;
+  }
+  
+  .arrow-icon {
+    font-size: 30px;
+    width: 20px;
+    color: #000; /* Adjust the size as needed */
+  }
+  
+  .dashboard .filter .icon {
+    color: #aab7cf;
+    padding-right: 20px;
+    padding-bottom: 5px;
+    transition: 0.3s;
+    font-size: 16px;
+  }
+  
+  .dashboard .filter .icon:hover,
+  .dashboard .filter .icon:focus {
+    color: #4154f1;
+  }
+  
+  .dashboard .filter .dropdown-header {
+    padding: 8px 15px;
+  }
+  
+  .dashboard .filter .dropdown-header h6 {
+    text-transform: uppercase;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: #aab7cf;
+    margin-bottom: 0;
+    padding: 0;
+  }
+  
+  .dashboard .filter .dropdown-item {
+    padding: 8px 15px;
+  }
+  
+  /* Info Cards */
+  .dashboard .info-card {
+    padding-bottom: 10px;
+  }
+  
+  .dashboard .info-card h6 {
+    font-size: 28px;
+    color: #012970;
+    font-weight: 700;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .dashboard .card-icon {
+    font-size: 32px;
+    line-height: 0;
+    width: 64px;
+    height: 64px;
+    flex-shrink: 0;
+    flex-grow: 0;
+  }
+  
+  .dashboard .sales-card .card-icon {
+    color: #4154f1;
+    background: #f6f6fe;
+  }
+  
+  .dashboard .revenue-card .card-icon {
+    color: #2eca6a;
+    background: #e0f8e9;
+  }
+  
+  .dashboard .customers-card .card-icon {
+    color: #ff771d;
+    background: #ffecdf;
+  }
+  
+  /* Table Styles */
+  .table-responsive {
+    overflow-x: auto;
+  }
+  
+  .table th, .table td {
+    vertical-align: middle;
+  }
+  
+  .table th {
+    background-color: #f8f9fa;
+  }
+  
+  .table thead th {
+    border-bottom: 2px solid #dee2e6;
+  }
+  
+  .table th, .table td {
+    white-space: nowrap;
+  }
+  
+  .download-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background-color: transparent;
+  }
+  
+  .download-btn img {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .status-active {
+    background-color: #28a745;
+    color: #fff;
+  }
+  
+  .status-inactive {
+    background-color: #ffc107;
+    color: #fff;
+  }
+  
+  .status-expired {
+    background-color: #dc3545;
+    color: #fff;
+  }
+  
+  /* Main Styles */
+  #main {
+    margin-top: 60px;
+    padding: 20px;
+    transition: all 0.3s;
+    height: 60vh;
+  }
+  
+  @media (max-width: 1199px) {
+    #main {
+      padding: 20px;
+    }
+  }
+  
+  .pagetitle {
+    margin-bottom: 20px;
+  }
+  
+  .breadcrumb {
+    background: none;
+    padding: 0;
+    margin-bottom: 0;
+  }
+  
+  .breadcrumb-item a {
+    color: #007bff;
+  }
+  
+  .breadcrumb-item.active {
+    color: #6c757d;
+  }
+  
+  .btn-primary {
+    margin-bottom: 10px;
+  }
+  .transparent-img {
+    opacity: 0.5; /* Adjust the opacity value (0.0 to 1.0) */
+  }

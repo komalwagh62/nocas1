@@ -13,6 +13,10 @@
             <button mat-button [matMenuTriggerFor]="menu">Welcome,{{this.apiService.userData.uname}}</button>
         </ng-container>
         <ng-container *ngIf="!apiService.userData?.uname">
+            <button mat-button routerLink="/Admin">Admin</button>
+            
+        </ng-container>
+        <ng-container *ngIf="!apiService.userData?.uname">
             <button mat-button routerLink="/UsersLogin">Log In</button>
             <button mat-stroked-button color="primary rounded-pill" routerLink="/UsersRegister">Join Us</button>
         </ng-container>
@@ -34,6 +38,7 @@
             <a mat-list-item routerLink="/C_NOCAS-MAP"><mat-icon matListItemIcon>airplanemode_active</mat-icon>NOCAS</a>
             <a mat-list-item routerLink="/PricingPlans"><mat-icon matListItemIcon>launch</mat-icon>Subscription</a>
             <a mat-list-item routerLink="/request-Service"><mat-icon matListItemIcon>launch</mat-icon>Other Products</a>
+            <a mat-list-item routerLink="/TransactionDetails"><mat-icon matListItemIcon>launch</mat-icon>Transaction Details</a>
 
         </mat-nav-list>
     </mat-sidenav>
@@ -43,4 +48,4 @@
 
     </mat-sidenav-content>
 </mat-sidenav-container>
-<!-- <app-footer></app-footer> -->
+<app-footer></app-footer>

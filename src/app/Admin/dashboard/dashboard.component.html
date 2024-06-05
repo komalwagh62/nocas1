@@ -37,7 +37,7 @@
           <div class="col-xxl-4 col-md-6 mb-4">
             <div class="card info-card revenue-card">
               <div class="filter">
-                <img src="assets/arrow.png"  (click)="getAllSubscriptions()" class="request-img transparent-img"
+                <img src="assets/arrow.png"  (click)="getAllSubscriptions()"  class="request-img transparent-img"
                   style="height: 63px; width: 63px">
                 <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow"></ul>
               </div>
@@ -62,8 +62,8 @@
             <div class="card info-card customers-card">
               <div class="card-body">
                 <div class="filter">
-                  <a class="arrow-icon" data-bs-toggle="dropdown">
-                    <img src="assets/arrow.png" (click)="getAllPermissible()" class="request-img transparent-img"
+                  <a class="arrow-icon" (click)="getAllPermissible()" data-bs-toggle="dropdown">
+                    <img src="assets/arrow.png"  class="request-img transparent-img"
                       style="height: 63px; width: 63px">
                   </a>
                   <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow"></ul>
@@ -89,109 +89,165 @@
   </section>
 
 
-  <div *ngIf="showUserDetails">
-    <div class="table-responsive">
-      <table *ngIf="userDetails && userDetails.length > 0" class="table table-striped">
-        <thead>
-          <tr>
-            <th>User Id</th>
-            <th>User Name</th>
-            <th>Phone Number</th>
-            <th>Address</th>
-            <th>Email</th>
-            <th>Password</th>
-
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let user of userDetails">
-            <td>{{ user.id }}</td>
-            <td>{{ user.uname }}</td>
-            <td>{{ user.phone_number }}</td>
-            <td>{{ user.address }}</td>
-            <td>{{ user.email }}</td>
-            <td>{{ user.password }}</td>
-
-            <td>
-
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <div *ngIf="userDetails && userDetails.length === 0" class="alert alert-warning" role="alert">No Users Data found.
-      </div>
-    </div>
-  </div>
- 
-  <div *ngIf="showSubscriptionDetails && subscriptionDetails.length > 0" class="table-responsive">
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th>Subscription Id</th>
-          <th>User Id</th>
-          <th>Subscription Status</th>
-          <th>Expiry Date</th>
-          <th>Subscription Type</th>
-          <th>Price</th>
-          <th>Razorpay Payment ID</th>
-          <th>Created At</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let subscription of subscriptionDetails">
-          <td>{{ subscription.subscription_id }}</td>
-          <td>{{ subscription.user_id }}</td>
-          <td>{{ subscription.subscription_status }}</td>
-          <td>{{ subscription.expiry_date }}</td>
-          <td>{{ subscription.subscription_type }}</td>
-          <td>{{ subscription.price }}</td>
-          <td>{{ subscription.razorpay_payment_id }}</td>
-          <td>{{ subscription.createdAt }}</td>
-        </tr>
-      </tbody>
+  <mat-form-field *ngIf="showUserDetails">
+    <mat-label>Filter</mat-label>
+    <input matInput (keyup)="applyFilter($event)" placeholder="Ex. ium" #input>
+  </mat-form-field>
+  <div class="mat-elevation-z8" *ngIf="showUserDetails">
+    <table mat-table [dataSource]="dataSource">
+  
+      <!-- User Table Columns -->
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef> ID </th>
+        <td mat-cell *matCellDef="let user"> {{ user.id }} </td>
+      </ng-container>
+      <ng-container matColumnDef="uname">
+        <th mat-header-cell *matHeaderCellDef> Name </th>
+        <td mat-cell *matCellDef="let user"> {{ user.uname }} </td>
+      </ng-container>
+      <ng-container matColumnDef="phone_number">
+        <th mat-header-cell *matHeaderCellDef> Phone Number </th>
+        <td mat-cell *matCellDef="let user"> {{ user.phone_number }} </td>
+      </ng-container>
+      <ng-container matColumnDef="address">
+        <th mat-header-cell *matHeaderCellDef> Address </th>
+        <td mat-cell *matCellDef="let user"> {{ user.address }} </td>
+      </ng-container>
+      <ng-container matColumnDef="email">
+        <th mat-header-cell *matHeaderCellDef> Email </th>
+        <td mat-cell *matCellDef="let user"> {{ user.email }} </td>
+      </ng-container>
+      
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
   
-  <div *ngIf="subscriptionDetails && subscriptionDetails.length === 0" class="alert alert-warning" role="alert">
-    No subscriptions found.
+    <mat-paginator [pageSizeOptions]="[5, 10, 20,]" showFirstLastButtons></mat-paginator>
   </div>
+  
+
+
+<!-- Subscription Details Table -->
+<mat-form-field *ngIf="showSubscriptionDetails">
+  <mat-label>Filter Subscriptions</mat-label>
+  <input matInput (keyup)="applySubscriptionFilter($event)" placeholder="Ex. type" #subscriptionInput>
+</mat-form-field>
+
+<div class="mat-elevation-z8" *ngIf="showSubscriptionDetails">
+  <div class="mat-elevation-z8" *ngIf="showSubscriptionDetails">
+    <mat-table [dataSource]="subscriptionDataSource" multiTemplateDataRows>
+      <!-- Subscription ID Column -->
+      <ng-container matColumnDef="subscription_id">
+        <mat-header-cell *matHeaderCellDef> Subscription ID </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.subscription_id}} </mat-cell>
+      </ng-container>
+  
+      <!-- Subscription Status Column -->
+      <ng-container matColumnDef="subscription_status">
+        <mat-header-cell *matHeaderCellDef> Status </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.subscription_status}} </mat-cell>
+      </ng-container>
+  
+      <!-- Subscription Type Column -->
+      <ng-container matColumnDef="subscription_type">
+        <mat-header-cell *matHeaderCellDef> Type </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.subscription_type}} </mat-cell>
+      </ng-container>
+  
+      <!-- Expand Button Column -->
+      <ng-container matColumnDef="expand">
+        <mat-header-cell *matHeaderCellDef> </mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          <button mat-icon-button (click)="toggleRow(element)">
+            <mat-icon>expand_more</mat-icon>
+          </button>
+        </mat-cell>
+      </ng-container>
+  
+      <mat-header-row *matHeaderRowDef="['subscription_id', 'subscription_status', 'subscription_type', 'expand']"></mat-header-row>
+      <mat-row *matRowDef="let row; columns: ['subscription_id', 'subscription_status', 'subscription_type', 'expand'];"></mat-row>
+  
+      <!-- Expanded Row -->
+      <ng-container matColumnDef="expandedDetail">
+        <mat-cell *matCellDef="let element">
+          <div *ngIf="expandedElement === element">
+            <div><strong>User ID:</strong> {{element.user_id}}</div>
+            <div><strong>Price:</strong> {{element.price}}</div>
+            <div><strong>Payment ID:</strong> {{element.razorpay_payment_id}}</div>
+            <div><strong>Expiry Date:</strong> {{element.expiry_date}}</div>
+          </div>
+        </mat-cell>
+      </ng-container>
+      <mat-row *matRowDef="let row; columns: ['expandedDetail'];" [class.expanded-row]="expandedElement === row"></mat-row>
+    </mat-table>
+  
+    <mat-paginator #subscriptionPaginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+  </div>
+  
 </div>
 
 
-<div *ngIf="showPermissibleDetails">
-  <div class="table-responsive">
-    <table *ngIf="permissibleDetails && permissibleDetails.length > 0" class="table table-striped">
-      <thead>
-        <tr>
-          <th>Request ID</th>
-          <th>User ID</th>
-          <th>City</th>
-          <th>Airport Name</th>
-          <th>Latitude</th>
-          <th>Longitude</th>
-          <th>Site Elevation</th>
-          <th>Distance From ARP</th>
-          <th>Permissible Height (AGL)</th>
-          <th>Permissible Elevation (AMSL)</th>
-          <th>Snapshot</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let nocas of permissibleDetails">
-          <td>{{ nocas.request_id }}</td>
-          <td>{{ nocas.user_id }}</td>
-          <td>{{ nocas.city }}</td>
-          <td>{{ nocas.airport_name }}</td>
-          <td>{{ nocas.latitude }}</td>
-          <td>{{ nocas.longitude }}</td>
-          <td>{{ nocas.site_elevation }}</td>
-          <td>{{ nocas.distance }}</td>
-          <td>{{ nocas.permissible_height }}</td>
-          <td>{{ nocas.permissible_elevation }}</td>
-          <td>{{ nocas.snap_shot }}</td>
-        </tr>
-      </tbody>
-    </table>
-    <div *ngIf="permissibleDetails && permissibleDetails.length === 0" class="alert alert-warning" role="alert">No Permissible Data found.</div>
+<!-- Permissible Details Table -->
+<mat-form-field *ngIf="showPermissibleDetails">
+  <mat-label>Filter Permissible Details</mat-label>
+  <input matInput (keyup)="applyPermissibleFilter($event)" placeholder="Ex. city" #permissibleInput>
+</mat-form-field>
+
+<div class="mat-elevation-z8" *ngIf="showPermissibleDetails">
+  
+  <div class="mat-elevation-z8" *ngIf="showPermissibleDetails">
+    <mat-table [dataSource]="permissibleDataSource" multiTemplateDataRows>
+      <!-- Request ID Column -->
+      <ng-container matColumnDef="request_id">
+        <mat-header-cell *matHeaderCellDef> Request ID </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.request_id}} </mat-cell>
+      </ng-container>
+  
+      <!-- City Column -->
+      <ng-container matColumnDef="city">
+        <mat-header-cell *matHeaderCellDef> City </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.city}} </mat-cell>
+      </ng-container>
+  
+      <!-- Airport Name Column -->
+      <ng-container matColumnDef="airport_name">
+        <mat-header-cell *matHeaderCellDef> Airport Name </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.airport_name}} </mat-cell>
+      </ng-container>
+  
+      <!-- Expand Button Column -->
+      <ng-container matColumnDef="expand">
+        <mat-header-cell *matHeaderCellDef> </mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          <button mat-icon-button (click)="toggleRow(element)">
+            <mat-icon>expand_more</mat-icon>
+          </button>
+          
+        </mat-cell>
+      </ng-container>
+  
+      <mat-header-row *matHeaderRowDef="permissibleDisplayedColumns"></mat-header-row>
+      <mat-row *matRowDef="let row; columns: permissibleDisplayedColumns;"></mat-row>
+  
+      <!-- Expanded Row -->
+      <ng-container matColumnDef="expandedDetail">
+        <mat-cell *matCellDef="let element">
+          <div *ngIf="expandedElement === element">
+            <div><strong>User ID:</strong> {{element.user_id}}</div>
+            <div><strong>Latitude:</strong> {{element.latitude}}</div>
+            <div><strong>Longitude:</strong> {{element.longitude}}</div>
+            <div><strong>Site Elevation:</strong> {{element.site_elevation}}</div>
+            <div><strong>Distance:</strong> {{element.distance}}</div>
+            <div><strong>Permissible Height (AGL):</strong> {{element.permissible_height}}</div>
+            <div><strong>Permissible Elevation (AMSL):</strong> {{element.permissible_elevation}}</div>
+            <div><strong>Snapshot:</strong> {{element.snap_shot}}</div>
+          </div>
+        </mat-cell>
+      </ng-container>
+      <mat-row *matRowDef="let row; columns: ['expandedDetail'];" [class.expanded-row]="expandedElement === row"></mat-row>
+    </mat-table>
+  
+    <mat-paginator #permissiblePaginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
   </div>
+  
 </div>
-</main>

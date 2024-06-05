@@ -43,6 +43,7 @@ import { TransactionDetailsComponent } from './Users/transaction-details/transac
 import { MatTableModule } from '@angular/material/table';
 import { AdminLoginComponent } from './Admin/admin-login/admin-login.component';
 import { DashboardComponent } from './Admin/dashboard/dashboard.component';
+import { MatPaginator,MatPaginatorModule } from '@angular/material/paginator';
 
 @NgModule({
   declarations: [
@@ -93,6 +94,8 @@ import { DashboardComponent } from './Admin/dashboard/dashboard.component';
     MatRadioModule,
     MatGridListModule,
     MatTableModule, 
+    MatPaginator,
+    MatPaginatorModule
   ],
   providers: [
     provideAnimationsAsync()

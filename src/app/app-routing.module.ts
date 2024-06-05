@@ -16,7 +16,7 @@ import { AdminLoginComponent } from './Admin/admin-login/admin-login.component';
 import { DashboardComponent } from './Admin/dashboard/dashboard.component';
 
 const routes: Routes = [
-  { path: '', redirectTo: 'UsersHome', pathMatch: 'full' }, 
+  { path: '', redirectTo: 'UsersLogin', pathMatch: 'full' }, 
   { path: 'UsersHome', component: UsersHomeComponent },
   { path: 'UsersRegister', component: UsersRegisterComponent },
   { path: 'UsersLogin', component: UsersLoginComponent },

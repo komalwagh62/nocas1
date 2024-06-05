@@ -7,6 +7,9 @@ import { ApiService } from '../Shared/Api/api.service';
 import { Router } from '@angular/router';
 import html2canvas from 'html2canvas';
 
+import * as domtoimage from 'dom-to-image';
+import { saveAs } from 'file-saver';
+
 declare var Razorpay: any;
 @Component({
   selector: 'app-users-nocas',
@@ -119,32 +122,22 @@ export class UsersNOCASComponent implements OnInit {
 
     this.fetchAirports();
     this.showDefaultMap();
-    // this.captureScreenshot();
+    
     this.updateMarkerPositionOnClick();
 
   }
-  captureScreenshot() {
-    if (this.mapElement) {
-      const mapContainer = this.mapElement.nativeElement;
+  
 
-      // Wait for the map to be fully loaded
-      setTimeout(() => {
-        html2canvas(mapContainer).then(canvas => {
-          const imageData = canvas.toDataURL('image/png');
-          this.TopElevationForm.get('imageData')?.setValue(imageData);
-
-          // Set the image data as the screenshot URL to display the captured screenshot
-          this.screenshotUrl = imageData;
-        }).catch(error => {
-          console.error('Error capturing screenshot:', error);
-        });
-      }, 1000); // Adjust the timeout as needed
-    } else {
-      console.error('mapElement is undefined');
-    }
+  captureScreenshot() : void {
+    const mapElement = document.getElementById('map');
+    (domtoimage as any).toBlob(mapElement)
+    .then((blob: Blob) => {
+      const snap=saveAs(blob, 'mapScreenshot.png');
+      console.log(snap)
+    });
   }
-
-
+ 
+  
 
 
   // createNocas() {
@@ -394,15 +387,15 @@ export class UsersNOCASComponent implements OnInit {
             }
           );
         // alert("Payment Succesfully Done")
-        const confirmation = confirm("Payment Successfully Done. If you want to see payment details, please click Ok");
-    if (confirmation) {
-      // console.log('Form submission cancelled');
-      return; // Exit if the user cancels the confirmation
-    }
+        const confirmation = confirm("Payment Successfully Done. If you want to see payment details, please go to Transaction Details page");
+        if (confirmation) {
+          // console.log('Form submission cancelled');
+          return; // Exit if the user cancels the confirmation
+        }
         // this.createNocas(subscription_id);
         this.router.navigate(['C_NOCAS-MAP']);
         this.showModal(); // Display the modal after successful creation
-
+        
         const airportCITY = this.TopElevationForm.get('CITY')?.value;
         const latitude = parseFloat(this.TopElevationForm.get('Latitude')?.value);
         const longitude = parseFloat(this.TopElevationForm.get('Longitude')?.value);
@@ -562,6 +555,7 @@ export class UsersNOCASComponent implements OnInit {
     }
 
     const confirmation = confirm("Kindly confirm that the entered site information is correct or verify");
+    this.captureScreenshot();
     if (!confirmation) {
       console.log('Form submission cancelled');
       return; // Exit if the user cancels the confirmation

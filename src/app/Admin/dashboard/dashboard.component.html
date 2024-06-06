@@ -14,19 +14,21 @@
               <div class="filter">
                 <img src="assets/arrow.png" (click)="getAllUsers()" alt="" class="request-img transparent-img"
                   style="height: 63px; width: 63px">
+                  <!-- Display the count of user rows -->
+
+
                 <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow"></ul>
               </div>
               <div class="card-body">
-                <h5 class="card-title">Users Details</h5>
+                <h3 class="card-title">Users Details</h3>
                 <div class="d-flex align-items-center">
                   <div class="d-flex align-items-center justify-content-center">
-                    <img src="assets/construction.png" alt="" class="construction-img"
+                    <img src="assets/people.png" alt="" class="construction-img"
                       style="height: 63px; width: 63px">
                   </div>
                   <div class="ps-3">
-                    <h6>145</h6>
-                    <span class="text-success small pt-1 fw-bold">12%</span> <span
-                      class="text-muted small pt-2 ps-1">increase</span>
+                    <h6 >{{ userRowCount }}</h6>
+                    
                   </div>
                 </div>
               </div>
@@ -39,18 +41,19 @@
               <div class="filter">
                 <img src="assets/arrow.png"  (click)="getAllSubscriptions()"  class="request-img transparent-img"
                   style="height: 63px; width: 63px">
+             
+
                 <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow"></ul>
               </div>
               <div class="card-body">
-                <h5 class="card-title">Subscription Details</h5>
+                <h3 class="card-title">Subscription Details</h3>
                 <div class="d-flex align-items-center">
                   <div class="d-flex align-items-center justify-content-center">
                     <img src="assets/membership.png" alt="" class="member-img" style="height: 63px; width: 63px">
                   </div>
                   <div class="ps-3">
-                    <h6>$3,264</h6>
-                    <span class="text-success small pt-1 fw-bold">8%</span> <span
-                      class="text-muted small pt-2 ps-1">increase</span>
+                    <h6>INR {{ totalSubscriptionPrice }}</h6>
+                    
                   </div>
                 </div>
               </div>
@@ -68,15 +71,14 @@
                   </a>
                   <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow"></ul>
                 </div>
-                <h5 class="card-title">Permissible Details</h5>
+                <h3 class="card-title">Permissible Details</h3>
                 <div class="d-flex align-items-center">
                   <div class="d-flex align-items-center justify-content-center">
                     <img src="assets/request.png" alt="" class="request-img" style="height: 63px; width: 63px">
                   </div>
                   <div class="ps-3">
-                    <h6>1244</h6>
-                    <span class="text-danger small pt-1 fw-bold">12%</span> <span
-                      class="text-muted small pt-2 ps-1">decrease</span>
+                    <h6>{{ permissibleRowCount }}</h6>
+                    
                   </div>
                 </div>
               </div>
@@ -127,15 +129,18 @@
   
 
 
+
 <!-- Subscription Details Table -->
 <mat-form-field *ngIf="showSubscriptionDetails">
   <mat-label>Filter Subscriptions</mat-label>
   <input matInput (keyup)="applySubscriptionFilter($event)" placeholder="Ex. type" #subscriptionInput>
 </mat-form-field>
+<div *ngIf="showSubscriptionDetails">
+  
 
-<div class="mat-elevation-z8" *ngIf="showSubscriptionDetails">
-  <div class="mat-elevation-z8" *ngIf="showSubscriptionDetails">
+  <div class="mat-elevation-z8">
     <mat-table [dataSource]="subscriptionDataSource" multiTemplateDataRows>
+      
       <!-- Subscription ID Column -->
       <ng-container matColumnDef="subscription_id">
         <mat-header-cell *matHeaderCellDef> Subscription ID </mat-header-cell>
@@ -145,7 +150,19 @@
       <!-- Subscription Status Column -->
       <ng-container matColumnDef="subscription_status">
         <mat-header-cell *matHeaderCellDef> Status </mat-header-cell>
-        <mat-cell *matCellDef="let element"> {{element.subscription_status}} </mat-cell>
+        <mat-cell *matCellDef="let element" [ngClass]="{
+          'status-active': element.subscription_status === 'Active',
+          'status-inactive': element.subscription_status === 'Inactive',
+          'status-expired': element.subscription_status === 'Expired'
+        }">
+          {{element.subscription_status}}
+        </mat-cell>
+      </ng-container>
+      
+      <!-- Expiry Date Column -->
+      <ng-container matColumnDef="expiry_date">
+        <mat-header-cell *matHeaderCellDef> Expiry Date </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.expiry_date}} </mat-cell>
       </ng-container>
   
       <!-- Subscription Type Column -->
@@ -154,37 +171,16 @@
         <mat-cell *matCellDef="let element"> {{element.subscription_type}} </mat-cell>
       </ng-container>
   
-      <!-- Expand Button Column -->
-      <ng-container matColumnDef="expand">
-        <mat-header-cell *matHeaderCellDef> </mat-header-cell>
-        <mat-cell *matCellDef="let element">
-          <button mat-icon-button (click)="toggleRow(element)">
-            <mat-icon>expand_more</mat-icon>
-          </button>
-        </mat-cell>
-      </ng-container>
-  
-      <mat-header-row *matHeaderRowDef="['subscription_id', 'subscription_status', 'subscription_type', 'expand']"></mat-header-row>
-      <mat-row *matRowDef="let row; columns: ['subscription_id', 'subscription_status', 'subscription_type', 'expand'];"></mat-row>
-  
-      <!-- Expanded Row -->
-      <ng-container matColumnDef="expandedDetail">
-        <mat-cell *matCellDef="let element">
-          <div *ngIf="expandedElement === element">
-            <div><strong>User ID:</strong> {{element.user_id}}</div>
-            <div><strong>Price:</strong> {{element.price}}</div>
-            <div><strong>Payment ID:</strong> {{element.razorpay_payment_id}}</div>
-            <div><strong>Expiry Date:</strong> {{element.expiry_date}}</div>
-          </div>
-        </mat-cell>
-      </ng-container>
-      <mat-row *matRowDef="let row; columns: ['expandedDetail'];" [class.expanded-row]="expandedElement === row"></mat-row>
+      <!-- Row Definition -->
+      <mat-header-row *matHeaderRowDef="['subscription_id', 'subscription_status', 'expiry_date', 'subscription_type']"></mat-header-row>
+      <mat-row *matRowDef="let row; columns: ['subscription_id', 'subscription_status', 'expiry_date', 'subscription_type'];"></mat-row>
     </mat-table>
-  
-    <mat-paginator #subscriptionPaginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
   </div>
   
 </div>
+
+
+
 
 
 <!-- Permissible Details Table -->
@@ -234,17 +230,18 @@
         <mat-cell *matCellDef="let element">
           <div *ngIf="expandedElement === element">
             <div><strong>User ID:</strong> {{element.user_id}}</div>
-            <div><strong>Latitude:</strong> {{element.latitude}}</div>
-            <div><strong>Longitude:</strong> {{element.longitude}}</div>
+            <div><strong>Site Latitude:</strong> {{element.latitude}}</div>
+            <div><strong>Site Longitude:</strong> {{element.longitude}}</div>
             <div><strong>Site Elevation:</strong> {{element.site_elevation}}</div>
-            <div><strong>Distance:</strong> {{element.distance}}</div>
+            <div><strong>Distance From ARP:</strong> {{element.distance}}</div>
             <div><strong>Permissible Height (AGL):</strong> {{element.permissible_height}}</div>
             <div><strong>Permissible Elevation (AMSL):</strong> {{element.permissible_elevation}}</div>
             <div><strong>Snapshot:</strong> {{element.snap_shot}}</div>
           </div>
         </mat-cell>
       </ng-container>
-      <mat-row *matRowDef="let row; columns: ['expandedDetail'];" [class.expanded-row]="expandedElement === row"></mat-row>
+      <mat-row *matRowDef="let row; columns: ['expandedDetail'];" [class.expanded-row]="expandedElement === row && expandedElement !== null"></mat-row>
+
     </mat-table>
   
     <mat-paginator #permissiblePaginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>

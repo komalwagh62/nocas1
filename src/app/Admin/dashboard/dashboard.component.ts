@@ -35,7 +35,10 @@ export class DashboardComponent implements AfterViewInit {
   showSubscriptionDetails: boolean = false;
   showUserDetails: boolean = false;
   showPermissibleDetails: boolean = false;
-
+  userRowCount: number = 0;
+  permissibleRowCount: number = 0;
+  totalSubscriptionPrice: number = 0;
+  priceCalculation: string = '';
   constructor(public apiService: ApiService,private datePipe: DatePipe) { }
 
   ngAfterViewInit() {
@@ -44,23 +47,35 @@ export class DashboardComponent implements AfterViewInit {
   }
 
   getAllUsers() {
+    // Set flags to control visibility of different sections
     this.showSubscriptionDetails = false;
     this.showUserDetails = true;
     this.showPermissibleDetails = false;
+  
+    // Call API to fetch user details
     this.apiService.getAllUsers().subscribe(
       (response: any[]) => {
         console.log('User Details:', response);
+        
+        // Update user details arrays
         this.userDetails = response;
-        this.filteredUserDetails = response; // Check if data is fetched
+        this.filteredUserDetails = response;
+  
+        // Update dataSource with fetched data
         this.dataSource.data = response;
+  
         // Assign paginator after data is set
         this.dataSource.paginator = this.paginator;
+  
+        // Update userRowCount with the count of rows
+        this.userRowCount = this.dataSource.data.length;
       },
       (error: any) => {
         console.error('Failed to fetch user details:', error);
       }
     );
   }
+  
 
   getAllSubscriptions() {
     this.showSubscriptionDetails = true;
@@ -69,18 +84,41 @@ export class DashboardComponent implements AfterViewInit {
     this.apiService.getAllSubscriptions().subscribe(
       (response: any[]) => {
         console.log('Subscription Details:', response);
-  
-        // Format the expiry_date
-        response.forEach(subscription => {
+
+        let priceCalculation = '';
+        
+        response.forEach((subscription, index) => {
           console.log('Original expiry_date:', subscription.expiry_date);
           subscription.expiry_date = this.datePipe.transform(subscription.expiry_date, 'dd/MM/yyyy');
           console.log('Formatted expiry_date:', subscription.expiry_date);
+
+          // Ensure price is treated as a number
+          const price = Number(subscription.price);
+          if (!isNaN(price)) {
+            // Append the price to the calculation string
+            priceCalculation += price;
+            if (index < response.length - 1) {
+              priceCalculation += ' + ';
+            }
+
+            // Sum up the total price
+            this.totalSubscriptionPrice += price;
+          } else {
+            console.error('Invalid price:', subscription.price);
+          }
         });
-  
+
+        // Set the calculation string to the component property
+        this.priceCalculation = priceCalculation;
+
+        // Assign response to subscription details
         this.subscriptionDetails = response;
         this.filtersubscriptionDetails = response;
         this.subscriptionDataSource.data = this.filtersubscriptionDetails;
         this.subscriptionDataSource.paginator = this.subscriptionPaginator;
+
+        // Print the total subscription price
+        console.log('Total Subscription Price in Rs:', this.totalSubscriptionPrice);
       },
       (error: any) => {
         console.error('Failed to fetch subscription details:', error);
@@ -96,20 +134,23 @@ export class DashboardComponent implements AfterViewInit {
     this.showSubscriptionDetails = false;
     this.showUserDetails = false;
     this.showPermissibleDetails = true;
+
     this.apiService.getAllPermissible().subscribe(
       (response: any[]) => {
         console.log('Permissible Details:', response);
+
         this.permissibleDetails = response;
         this.filterpermissibleDetails = response;
         this.permissibleDataSource.data = this.filterpermissibleDetails;
         this.permissibleDataSource.paginator = this.permissiblePaginator;
+
+        this.permissibleRowCount = this.permissibleDataSource.data.length;
       },
       (error: any) => {
         console.error('Failed to fetch permissible details:', error);
       }
     );
   }
-
   
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value.toLowerCase();

@@ -1,26 +1,50 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component,OnInit, ViewChild } from '@angular/core';
 import { ApiService } from '../Shared/Api/api.service';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import Chart from 'chart.js/auto';
+import { DatePipe } from '@angular/common'; 
+import { MatTableDataSource } from '@angular/material/table';
+import { MatPaginator } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-users-home',
   templateUrl: './users-home.component.html',
-  styleUrls: ['./users-home.component.scss']
+  styleUrls: ['./users-home.component.scss'],
+  providers: [DatePipe] 
 })
 export class UsersHomeComponent implements OnInit {
+  subscriptionDataSource = new MatTableDataSource<any>();
+  permissibleDataSource = new MatTableDataSource<any>();
+serviceDataSource = new MatTableDataSource<any>();
+
+  @ViewChild('subscriptionPaginator') subscriptionPaginator!: MatPaginator;
+  @ViewChild('permissiblePaginator') permissiblePaginator!: MatPaginator;
+  @ViewChild('servicePaginator') servicePaginator!: MatPaginator;
+
+  subscriptiondisplayedColumns: string[] = ['subscription_id', 'subscription_status', 'subscription_type', 'expand'];
+  expandedElement: any | null;
+  permissibleDisplayedColumns: string[] = [ 'city', 'airport_name','download', 'expand'];
+
   subscriptionDetails: any[] = [];
   serviceDetails: any[] = [];
-  nocasDetails: any[] = [];
+  permissibleDetails: any[] = [];
   showSubscriptionDetails: boolean = false;
   showServiceDetails: boolean = false;
   showPermissibleDetails: boolean = false;
+
   selectedSubscription: any;
   showReceiptDetails: boolean = false;
   permissibleRowCount: number = 0;
+  serviceRowCount:number =0;
   subscriptionRowCount: number = 0;
+  totalSubscriptionPrice: number = 0;
+  priceCalculation: string = '';
+
+  filtersubscriptionDetails: any[] = [];
+  filterpermissibleDetails: any[] = [];
+  filterserviceDetails: any[] = [];
 
 
   serviceNames: { [key: string]: string } = {
@@ -30,67 +54,60 @@ export class UsersHomeComponent implements OnInit {
     service4: 'Aeronautical Study / Shielding Benefits Study',
     service5: 'Documents & Process Management'
   };
+nocas: any;
 
-  constructor(private http: HttpClient, public apiservice: ApiService) { }
+  constructor(private http: HttpClient, public apiservice: ApiService,private datePipe: DatePipe) { }
 
   ngOnInit(): void {
-    this.fetchPermissibleRowCount();
+    this.detailsOfPermissible();
     // Optionally, fetch subscription and service details on component initialization
     // this.detailsOfSubscription();
     // this.detailsOfServices();
   }
-  fetchPermissibleRowCount(): void {
-    // Fetch permissible row count data from API and update permissibleRowCount variable
-    // Example implementation:
-    // this.http.get<any>(API_ENDPOINT)
-    //   .subscribe(
-    //     data => {
-    //       this.permissibleRowCount = data.rowCount;
-    //       this.generatePermissiblePieChart();
-    //     },
-    //     error => {
-    //       console.error('Failed to fetch permissible row count:', error);
-    //     }
-    //   );
-    // For demonstration purpose, setting a static value
-    this.permissibleRowCount = 50;
-    this.generatePermissiblePieChart();
-  }
-  generatePermissiblePieChart(): void {
-    new Chart('permissibleChart', {
-      type: 'pie',
-      data: {
-        labels: ['Permissible', 'Other'],
-        datasets: [{
-          data: [this.permissibleRowCount, 100 - this.permissibleRowCount],
-          backgroundColor: ['#36a2eb', '#ff6384'],
-        }]
-      }
-    });
-  }
-
-  toggleSubscriptionDetails() {
-    this.showSubscriptionDetails = !this.showSubscriptionDetails;
-  }
 
   detailsOfSubscription() {
+    // Show only subscription details section
     this.showSubscriptionDetails = true;
     this.showServiceDetails = false;
     this.showPermissibleDetails = false;
-
+  
+    // Fetch subscription data
     const headers = new HttpHeaders().set("Authorization", `Bearer ${this.apiservice.token}`);
     const user_id = this.apiservice.userData.id;
     this.http.get<any[]>(`http://localhost:3001/api/subscription/getAllsubscriptions?user_id=${user_id}`, { headers: headers })
       .subscribe(
         response => {
           console.log('Subscription data:', response);
+          let priceCalculation = '';
+  
+          response.forEach((subscription, index) => {
+            subscription.expiry_date = this.datePipe.transform(subscription.expiry_date, 'dd/MM/yyyy');
+  
+            const price = Number(subscription.price);
+            if (!isNaN(price)) {
+              priceCalculation += price;
+              if (index < response.length - 1) {
+                priceCalculation += ' + ';
+              }
+              this.totalSubscriptionPrice += price;
+              this.filtersubscriptionDetails = response;
+              this.subscriptionDataSource.data = this.filtersubscriptionDetails;
+              this.subscriptionDataSource.paginator = this.subscriptionPaginator;
+            } else {
+              console.error('Invalid price:', subscription.price);
+            }
+          });
+  
+          this.priceCalculation = priceCalculation;
           this.subscriptionDetails = response;
+          this.subscriptionRowCount = response.length; // Count subscription rows
         },
         error => {
           console.error('Failed to fetch subscription data:', error);
         }
       );
   }
+  
 
   detailsOfServices() {
     this.showSubscriptionDetails = false;
@@ -107,31 +124,43 @@ export class UsersHomeComponent implements OnInit {
             ...service,
             services: JSON.parse(service.services)
           }));
+
+          this.serviceRowCount = response.length;
         },
         error => {
           console.error('Failed to fetch services data:', error);
         }
       );
   }
-
+  toggleRow(element: any) {
+    this.expandedElement = this.expandedElement === element ? null : element;
+  }
   detailsOfPermissible() {
+    // Show only permissible details section
     this.showSubscriptionDetails = false;
     this.showServiceDetails = false;
     this.showPermissibleDetails = true;
-
+  
+    // Fetch permissible data
     const headers = new HttpHeaders().set("Authorization", `Bearer ${this.apiservice.token}`);
     const user_id = this.apiservice.userData.id;
     this.http.get<any[]>(`http://localhost:3001/api/nocas/getAllNocasData?user_id=${user_id}`, { headers: headers })
       .subscribe(
         response => {
           console.log('Nocas data:', response);
-          this.nocasDetails = response;
+          this.permissibleDetails = response;
+          this.filterpermissibleDetails = response;
+          this.permissibleDataSource.data = this.filterpermissibleDetails;
+          this.permissibleDataSource.paginator = this.permissiblePaginator;
+  
+          this.permissibleRowCount = response.length; // Count permissible rows
         },
         error => {
           console.error('Failed to fetch Nocas data:', error);
         }
       );
   }
+  
 
   getServiceKeys(services: any): string[] {
     return Object.keys(services).filter(key => services[key] && this.serviceNames[key]);
@@ -194,4 +223,37 @@ export class UsersHomeComponent implements OnInit {
     // Save PDF
     doc.save('siteDetails.pdf');
   }
+
+ 
+
+  applySubscriptionFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value.toLowerCase();
+    this.filtersubscriptionDetails = this.subscriptionDetails.filter(subscription =>
+      Object.values(subscription).some(val =>
+        String(val).toLowerCase().includes(filterValue)
+      )
+    );
+    this.subscriptionDataSource.data = this.filtersubscriptionDetails;
+  }
+
+  applyPermissibleFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value.toLowerCase();
+    this.filterpermissibleDetails = this.permissibleDetails.filter(permissible =>
+      Object.values(permissible).some(val =>
+        String(val).toLowerCase().includes(filterValue)
+      )
+    );
+    this.permissibleDataSource.data = this.filterpermissibleDetails;
+  }
+  applyServiceFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value.toLowerCase();
+    this.filterserviceDetails = this.serviceDetails.filter(service =>
+      Object.keys(service.services).some(key =>
+        this.serviceNames[key].toLowerCase().includes(filterValue)
+      )
+    );
+    this.serviceDataSource.data = this.filterserviceDetails;
+  }
+  
+  
 }

@@ -16,10 +16,10 @@
             <button mat-button routerLink="/Admin">Admin</button> -->
             
         <!-- </ng-container> -->
-        <ng-container *ngIf="!apiService.userData?.uname">
+        <!-- <ng-container *ngIf="!apiService.userData?.uname">
             <button mat-button routerLink="/UsersLogin">Log In</button>
             <button mat-stroked-button color="primary rounded-pill" routerLink="/UsersRegister">Join Us</button>
-        </ng-container>
+        </ng-container> -->
 
         <mat-menu #menu="matMenu">
             <button mat-menu-item (click)="navigateToProfile()">My Profile</button>

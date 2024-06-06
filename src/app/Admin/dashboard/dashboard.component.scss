@@ -1,10 +1,20 @@
+.expanded-details {
+  background-color: #f5f5f5;
+  padding: 10px;
+  border-top: 1px solid #ccc;
+  margin-top: -1px; /* Compensate for border */
+}
+
 /* dashboard.component.scss */
 .expanded-row {
   &:hover {
     background-color: #f5f5f5;
   }
 }
-
+.card-title {
+  color: #000; /* Dark color */
+  font-weight: bold; /* Optional: to make it bold */
+}
 .mat-row.expanded-row {
   & > .mat-cell {
     padding-bottom: 0;

@@ -64,7 +64,7 @@ export class UsersNOCASComponent implements OnInit {
       location: ['manual'],
       Site_Elevation: new FormControl('', [Validators.required, Validators.nullValidator, Validators.pattern(/^[0-5]+(?:\.[0-5]+)?$/)]),
       elevationOption: ['known', Validators.required],
-      imageData: new FormControl(['']),
+      imageData: new FormControl(''),
 
     });
 
@@ -128,16 +128,19 @@ export class UsersNOCASComponent implements OnInit {
   }
   
 
+
+  
   captureScreenshot() : void {
     const mapElement = document.getElementById('map');
     (domtoimage as any).toBlob(mapElement)
     .then((blob: Blob) => {
-      const snap=saveAs(blob, 'mapScreenshot.png');
-      console.log(snap)
+      saveAs(blob, 'mapScreenshot.png');
     });
   }
  
   
+  
+
 
 
   // createNocas() {
@@ -484,7 +487,7 @@ export class UsersNOCASComponent implements OnInit {
         this.marker.setLatLng([lat, lng]);
 
         // Construct the popup content with latitude and longitude data
-        const popupContent = `Your location : <br> Latitude: ${lat.toFixed(2)}, Longitude: ${lng.toFixed(2)}`;
+        const popupContent = `Site Location : <br>Site Latitude: ${lat.toFixed(2)}, Site Longitude: ${lng.toFixed(2)}`;
 
         // Bind the popup content to the marker
         this.marker.bindPopup(popupContent).openPopup();
@@ -652,7 +655,7 @@ displayMapData(lat: number, lng: number, airportCoordinates: [number, number]) {
 
 
           // Now that you have the location, you can display the popup
-          const popupContent = `Your location : <br>  Latitude: ${this.lat.toFixed(2)}, Longitude: ${this.long.toFixed(2)}`;
+          const popupContent = `Site Location : <br>  Site Latitude: ${this.lat.toFixed(2)}, Site Longitude: ${this.long.toFixed(2)}`;
           this.marker.addTo(this.map).bindPopup(popupContent).openPopup();
           // Update the markers and line with the new location
           this.updateMarkerPosition();
@@ -779,7 +782,7 @@ displayMapData(lat: number, lng: number, airportCoordinates: [number, number]) {
     L.control.scale().addTo(this.map);
     L.control.zoom().addTo(this.map);
 
-    const popupContent = `Your location : <br>  Latitude: ${lat.toFixed(2)}, Longitude: ${lng.toFixed(2)}`;
+    const popupContent = `Site Location : <br>  Site Latitude: ${lat.toFixed(2)}, Site Longitude: ${lng.toFixed(2)}`;
     this.marker = L.marker([lat, lng]).bindPopup(popupContent).addTo(this.map);
     // this.marker.addTo(this.map).bindPopup(popupContent).openPopup();
     // this.line = L.polyline([[lat, lng], [lat, lng]], { color: 'black' }).addTo(this.map);
@@ -918,7 +921,7 @@ displayMapData(lat: number, lng: number, airportCoordinates: [number, number]) {
               this.marker.setLatLng([lat, lng]); // Update the marker position
 
               // Construct the popup content with latitude and longitude data
-              const popupContent = `Your location : <br> Latitude: ${lat.toFixed(2)}, Longitude: ${lng.toFixed(2)}`;
+              const popupContent = `Site Location : <br> Site Latitude: ${lat.toFixed(2)}, Site Longitude: ${lng.toFixed(2)}`;
 
               // Bind the popup content to the marker
               this.marker.bindPopup(popupContent).openPopup();

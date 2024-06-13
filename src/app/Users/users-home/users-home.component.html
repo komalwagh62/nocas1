@@ -213,7 +213,8 @@
               <div><strong>Distance From ARP:</strong> {{element.distance}}</div>
               <div><strong>Permissible Height (AGL):</strong> {{element.permissible_height}}</div>
               <div><strong>Permissible Elevation (AMSL):</strong> {{element.permissible_elevation}}</div>
-              <div><strong>Snapshot:</strong> {{element.snap_shot}}</div>
+              <img [src]="'data:image/png;base64,' + bufferToBase64(element.snapshot)" alt="Snapshot">
+              
             </div>
           </mat-cell>
         </ng-container>

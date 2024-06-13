@@ -44,6 +44,7 @@ import { MatTableModule } from '@angular/material/table';
 import { AdminLoginComponent } from './Admin/admin-login/admin-login.component';
 import { DashboardComponent } from './Admin/dashboard/dashboard.component';
 import { MatPaginator,MatPaginatorModule } from '@angular/material/paginator';
+import { DmsPipe } from './dms.pipe';
 
 @NgModule({
   declarations: [
@@ -64,7 +65,8 @@ import { MatPaginator,MatPaginatorModule } from '@angular/material/paginator';
     PaymentReceiptComponent,
     TransactionDetailsComponent,
     AdminLoginComponent,
-    DashboardComponent
+    DashboardComponent,
+    DmsPipe
    
   ],
   imports: [
@@ -103,3 +105,6 @@ import { MatPaginator,MatPaginatorModule } from '@angular/material/paginator';
   bootstrap: [AppComponent]
 })
 export class AppModule { }
+
+
+

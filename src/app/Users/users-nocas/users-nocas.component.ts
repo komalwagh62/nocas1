@@ -6,9 +6,9 @@ import * as L from 'leaflet';
 import { ApiService } from '../Shared/Api/api.service';
 import { Router } from '@angular/router';
 import html2canvas from 'html2canvas';
-
 import * as domtoimage from 'dom-to-image';
 import { saveAs } from 'file-saver';
+import { data } from 'jquery';
 
 declare var Razorpay: any;
 @Component({
@@ -18,10 +18,10 @@ declare var Razorpay: any;
 })
 export class UsersNOCASComponent implements OnInit {
   [x: string]: any;
-  // latitude: any;
-  // longitude: any;
   line: any;
   popupContent: any;
+  latitudeDMS!: any;
+  longitudeDMS!: any;
   lat!: number;
   long!: number;
   updatedDistance!: number;
@@ -46,14 +46,101 @@ export class UsersNOCASComponent implements OnInit {
   freeTrialCount!: number;
   isSubscribed: boolean = false;
   screenshotUrl: string | null = null;
+  
+  constructor(public apiservice: ApiService,private formbuilder: FormBuilder,private http: HttpClient,private router: Router) { }
+ 
+  
+  captureScreenshot(): void {
+    const mapElement = document.getElementById('map');
 
+    if (mapElement) {
+      domtoimage.toBlob(mapElement)
+        .then((blob: Blob) => {
+          const formData = new FormData();
+          formData.append('image', blob, 'mapScreenshot.png');
 
-  constructor(
-    public apiservice: ApiService,
-    private formbuilder: FormBuilder,
-    private http: HttpClient,
-    private router: Router // Inject Router
-  ) { }
+          this.http.post('http://localhost:3001/api/nocas/save-screenshot', formData).subscribe(
+            response => {
+              console.log('Screenshot saved successfully:', response);
+            },
+            error => {
+              console.error('Error saving screenshot:', error);
+            }
+          );
+        })
+        .catch(error => {
+          console.error('Error converting element to Blob:', error);
+        });
+    } else {
+      console.error('Map element not found');
+    }
+  }
+
+  async createNocas(subscription_id: string = "") {
+    if (this.TopElevationForm.valid) {
+      try {
+        const screenshotPath = await this.captureScreenshot(); // Capture and save the screenshot
+  
+        const lat = parseFloat(this.TopElevationForm.value.Latitude);
+        const lng = parseFloat(this.TopElevationForm.value.Longitude);
+        const distance = this.calculateDistance(lat, lng, this.airportCoordinates[0], this.airportCoordinates[1]);
+  
+        // Retrieve the permissible height and elevation based on the feature's properties
+        const clickedFeature = this.geojsonLayer.getLayers().find((layer: any) => {
+          return layer.getBounds().contains([lat, lng]);
+        });
+  
+        let permissibleHeight = 0;
+        let permissibleElevation = 0;
+        if (clickedFeature) {
+          const properties = clickedFeature.feature.properties;
+          permissibleElevation = parseFloat(properties.Name);
+          permissibleHeight = permissibleElevation - parseFloat(this.TopElevationForm.value.Site_Elevation);
+        }
+  
+        const requestBody = {
+          user_id: this.apiservice.userData.id,
+          distance: distance.toFixed(2) + "km",
+          permissible_elevation: permissibleElevation + "M",
+          permissible_height: permissibleHeight + "M",
+          city: this.TopElevationForm.value.CITY,
+          latitude: lat,
+          longitude: lng,
+          airport_name: this.selectedAirportName,
+          site_elevation: this.TopElevationForm.value.Site_Elevation,
+          snapshot: screenshotPath, // Use the saved screenshot path
+          subscription_id: subscription_id,
+        };
+  
+        console.log(requestBody);
+  
+        const headers = new HttpHeaders().set("Authorization", `Bearer ${this.apiservice.token}`);
+        this.http.post("http://localhost:3001/api/nocas/createNocas", requestBody, { headers: headers })
+          .subscribe(
+            (resultData: any) => {
+              console.log(resultData);
+              if (resultData.isSubscribed || resultData.freeTrialCount > 0 || resultData.isOneTimeSubscription) {
+                this.showData();
+              } else {
+                this.hideData();
+                alert("Your Free trial expired. Please Subscribe Package");
+                this.router.navigate(['PricingPlans']);
+              }
+            },
+            (error: any) => {
+              console.error("Error creating Nocas entry:", error);
+              alert("Failed to create Nocas entry. Please try again.");
+            }
+          );
+      } catch (error) {
+        console.error("Error capturing and saving screenshot:", error);
+        alert("Failed to capture and save screenshot. Please try again.");
+      }
+    } else {
+      alert("Please fill out all required fields in the form.");
+    }
+  }
+  
 
 
   ngOnInit(): void {
@@ -64,28 +151,20 @@ export class UsersNOCASComponent implements OnInit {
       location: ['manual'],
       Site_Elevation: new FormControl('', [Validators.required, Validators.nullValidator, Validators.pattern(/^[0-5]+(?:\.[0-5]+)?$/)]),
       elevationOption: ['known', Validators.required],
-      imageData: new FormControl(''),
-
+      snapshot: [''] 
     });
-
     this.TopElevationForm.get('Latitude').valueChanges.subscribe((lat: number) => {
-      this.lat = lat;
-      console.log('Latitude changed:', lat);
+      this.latitudeDMS = this.convertDDtoDMS(this.lat, true);
+      
       this.updateMarkerPosition();
-      // this.updateMarker2Position(lat, this.TopElevationForm.get('Longitude').value);
-      this.updatePolyline(lat, this.TopElevationForm.get('Longitude').value);
-      this.displayMapData(lat, this.TopElevationForm.get('Longitude').value, this.marker.getLatLng());
+      this.displayMapData(this.latitudeDMS, this.TopElevationForm.get('Longitude').value, this.marker.getLatLng());
     });
-
     this.TopElevationForm.get('Longitude').valueChanges.subscribe((lng: number) => {
-      this.long = lng;
-      console.log('Longitude changed:', lng);
+      this.longitudeDMS = this.convertDDtoDMS(lng, false);
+     
       this.updateMarkerPosition();
-      // this.updateMarker2Position(this.TopElevationForm.get('Latitude').value, lng);
-      this.updatePolyline(this.TopElevationForm.get('Latitude').value, lng);
-      this.displayMapData(this.TopElevationForm.get('Latitude').value, lng, this.marker.getLatLng());
+      this.displayMapData(this.TopElevationForm.get('Latitude').value, this.longitudeDMS, this.marker.getLatLng());
     });
-
     this.TopElevationForm.get('CITY').valueChanges.subscribe((city: string) => {
       console.log('ICAO changed:', city);
       this.city = city; // Set the value of icao when ICAO changes
@@ -94,18 +173,6 @@ export class UsersNOCASComponent implements OnInit {
       this.selectedAirportName = selectedAirport ? selectedAirport.airport_name : '';
       this.selectedAirportIcao = selectedAirport ? selectedAirport.airport_icao : '';
       this.selectedAirportIATA = selectedAirport ? selectedAirport.airport_iata : '';
-
-
-      // // Set default value for Site_Elevation based on selected city
-      // let defaultElevation = null;
-      // if (city === 'Coimbatore') {
-      //   defaultElevation = 10;
-      // } else if (city === 'Mumbai') {
-      //   defaultElevation = 22;
-      // } else if (city === 'Puri') {
-      //   defaultElevation = 22;
-      // }
-      // this.TopElevationForm.patchValue({ Site_Elevation: defaultElevation });
       if (city === 'Coimbatore' || city === 'Mumbai' || city === 'Puri') {
         console.log("Selected airport:", city);
 
@@ -118,58 +185,24 @@ export class UsersNOCASComponent implements OnInit {
         }
       }
     });
-
-
     this.fetchAirports();
     this.showDefaultMap();
     
-    this.updateMarkerPositionOnClick();
 
   }
-  
 
+  convertDDtoDMS(dd: number, isLatitude: boolean): string {
+    const dir = dd < 0 ? (isLatitude ? 'S' : 'W') : (isLatitude ? 'N' : 'E');
+    const absDd = Math.abs(dd);
+    const degrees = Math.floor(absDd);
+    const minutesNotTruncated = (absDd - degrees) * 60;
+    const minutes = Math.floor(minutesNotTruncated);
+    const seconds = Math.floor((minutesNotTruncated - minutes) * 60);
+    return `${degrees}°${minutes}'${seconds}"${dir}`;
+}
 
   
-  captureScreenshot() : void {
-    const mapElement = document.getElementById('map');
-    (domtoimage as any).toBlob(mapElement)
-    .then((blob: Blob) => {
-      saveAs(blob, 'mapScreenshot.png');
-    });
-  }
  
-  
-  
-
-
-
-  // createNocas() {
-  //   if (this.TopElevationForm.valid) {
-  //     const requestBody = {
-  //       user_id: this.apiservice.userData.id,
-  //       city: this.TopElevationForm.value.CITY,
-  //       latitude: this.TopElevationForm.value.Latitude,
-  //       longitude: this.TopElevationForm.value.Longitude,
-  //       airport_name: this.selectedAirportName,
-  //       site_elevation: this.TopElevationForm.value.Site_Elevation,
-  //       snapshot:this.TopElevationForm.imageData
-  //     };
-
-  //     this.http.post("http://localhost:3001/api/nocas/createNocas", requestBody)
-  //       .subscribe(
-  //         (resultData: any) => {
-  //           console.log("Nocas entry created successfully:", resultData);
-  //           alert("Nocas entry created successfully");
-  //         },
-  //         (error: any) => {
-  //           console.error("Error creating Nocas entry:", error);
-  //           alert("Failed to create Nocas entry. Please try again.");
-  //         }
-  //       );
-  //   } else {
-  //     alert("Please fill out all required fields in the form.");
-  //   }
-  // }
   hideData() {
     this.showModal();
     const airportCITY = this.TopElevationForm.get('CITY')?.value;
@@ -177,12 +210,7 @@ export class UsersNOCASComponent implements OnInit {
     const longitude = parseFloat(this.TopElevationForm.get('Longitude')?.value);
     if (airportCITY && !isNaN(latitude) && !isNaN(longitude)) {
       // Update the markers and line
-      console.log('Latitude:', latitude);
-      console.log('Longitude:', longitude);
       this.updateMarkerPosition();
-      this.updatePolyline(latitude, longitude);
-
-      // Update the displayed map data
       this.displayModelData(latitude, longitude, this.airportCoordinates);
       this.showMap(latitude, longitude);
     }
@@ -190,89 +218,23 @@ export class UsersNOCASComponent implements OnInit {
   }
   showData() {
     this.showModal(); // Display the modal after successful creation
-
     const airportCITY = this.TopElevationForm.get('CITY')?.value;
     const latitude = parseFloat(this.TopElevationForm.get('Latitude')?.value);
     const longitude = parseFloat(this.TopElevationForm.get('Longitude')?.value);
     if (airportCITY && !isNaN(latitude) && !isNaN(longitude)) {
       // Update the markers and line
-      console.log('Latitude:', latitude);
-      console.log('Longitude:', longitude);
       this.updateMarkerPosition();
-      this.updatePolyline(latitude, longitude);
-
-      // Update the displayed map data
       this.displayMapData(latitude, longitude, this.airportCoordinates);
       this.showMap(latitude, longitude);
     }
   }
 
-  createNocas(subscription_id: string = "") {
-    if (this.TopElevationForm.valid) {
-      const lat = parseFloat(this.TopElevationForm.value.Latitude);
-      const lng = parseFloat(this.TopElevationForm.value.Longitude);
-      const distance = this.calculateDistance(lat, lng, this.airportCoordinates[0], this.airportCoordinates[1]);
-  
-      // Retrieve the permissible height and elevation based on the feature's properties
-      const clickedFeature = this.geojsonLayer.getLayers().find((layer: any) => {
-        return layer.getBounds().contains([lat, lng]);
-      });
-      
-      let permissibleHeight = 0;
-      let permissibleElevation = 0;
-      if (clickedFeature) {
-        const properties = clickedFeature.feature.properties;
-        permissibleElevation = parseFloat(properties.Name);
-        permissibleHeight = permissibleElevation - parseFloat(this.TopElevationForm.value.Site_Elevation);
-      }
-  
-      const requestBody = {
-        user_id: this.apiservice.userData.id,
-        distance: distance.toFixed(2) + "km",
-        permissible_elevation: permissibleElevation +"M",
-        permissible_height: permissibleHeight +"M",
-        city: this.TopElevationForm.value.CITY,
-        latitude: lat,
-        longitude: lng,
-        airport_name: this.selectedAirportName,
-        site_elevation: this.TopElevationForm.value.Site_Elevation,
-        snapshot: this.TopElevationForm.get('imageData').value,
-        subscription_id: subscription_id,
-      };
-      
-      console.log(requestBody);
-  
-      const headers = new HttpHeaders().set("Authorization", `Bearer ${this.apiservice.token}`);
-      this.http.post("http://localhost:3001/api/nocas/createNocas", requestBody, { headers: headers })
-        .subscribe(
-          (resultData: any) => {
-            console.log(resultData);
-            if(resultData.isSubscribed || resultData.freeTrialCount > 0 || resultData.isOneTimeSubscription){
-              this.showData();
-            } else {
-              this.hideData();
-              alert("Your Free trial expired. Please Subscribe Package");
-              this.router.navigate(['PricingPlans']);
-            }
-          },
-          (error: any) => {
-            console.error("Error creating Nocas entry:", error);
-            alert("Failed to create Nocas entry. Please try again.");
-          }
-        );
-    } else {
-      alert("Please fill out all required fields in the form.");
-    }
-  }
-  
-  
-
   displayModelData(lat: number, lng: number, airportCoordinates: [number, number]) {
     const newDistance = this.calculateDistance(lat, lng, airportCoordinates[0], airportCoordinates[1]);
-    console.log(newDistance);
     const clickedFeature = this.geojsonLayer.getLayers().find((layer: any) => {
       return layer.getBounds().contains([lat, lng]);
     });
+    const airport_name = this.selectedAirportName.split('/')[0];
     const mapData = document.getElementById('mapData');
     if (mapData !== null) {
       mapData.innerHTML = '';
@@ -280,6 +242,8 @@ export class UsersNOCASComponent implements OnInit {
       const siteElevationInput = this.TopElevationForm.get('Site_Elevation');
       const siteElevation = siteElevationInput ? siteElevationInput.value : 0;
       if (clickedFeature) {
+        this.latitudeDMS = this.convertDDtoDMS(lat, true);
+      this.longitudeDMS = this.convertDDtoDMS(lng, false);
         const properties = clickedFeature.feature.properties;
         const elevation = properties.Name;
         const permissibleHeight = parseFloat(properties.Name) - siteElevation;
@@ -311,12 +275,12 @@ export class UsersNOCASComponent implements OnInit {
       } else {
         mapData.innerHTML = `
                 <div>
-                    <b>Site location selected by User is outside CCZM boundary published by AAI. Permissible Elevation calculation could not be processed. Please contact us for further details</b><br><br>
+                    <b>Site location selected by User is outside ${airport_name} CCZM boundary published by AAI. Permissible Elevation calculation could not be processed. Please contact us for further details</b><br><br>
                     <table class="table table-hover">
                         <tbody>
                             <tr>
                                 <th scope="row">Site Location</th>
-                                <td colspan="2">Latitude: ${lat.toFixed(2)} N <br> Longitude: ${lng.toFixed(2)} E</td>
+                                <td colspan="2">Latitude: ${this.latitudeDMS} N <br> Longitude: ${this.longitudeDMS} E</td>
                             </tr>
                             <tr>
                                 <th scope="row">Distance<br>(Site Location from ARP)</th>
@@ -331,8 +295,6 @@ export class UsersNOCASComponent implements OnInit {
             `;
       }
       mapData.style.display = 'block';
-
-      // Add event listener for the subscribe button
       const subscribeButton = document.getElementById('subscribeButton');
       if (subscribeButton) {
         subscribeButton.addEventListener('click', this.subscribe.bind(this));
@@ -343,8 +305,6 @@ export class UsersNOCASComponent implements OnInit {
       }
     }
   }
-
-
   subscribe() {
     this.router.navigate(['PricingPlans']);
   }
@@ -360,10 +320,6 @@ export class UsersNOCASComponent implements OnInit {
       description: ` Plan Subscription`,
       image: 'https://imgur.com/a/J4UAMhv',
       handler: (response: any) => {
-        console.log('Payment successful:', response);
-        
-        
-    
           this.router.navigate(['TransactionDetails']); 
         const paymentDetails = {
           user_id: this.apiservice.userData.id,
@@ -371,49 +327,30 @@ export class UsersNOCASComponent implements OnInit {
           price: 50, // Replace with actual amount
           razorpay_payment_id: response.razorpay_payment_id,
           expiry_date: new Date().toISOString(),  // Assuming response contains payment ID
-          // Add any other relevant payment details here
         };
-        console.log(paymentDetails)
         const headers = new HttpHeaders().set("Authorization", `Bearer ${this.apiservice.token}`);
-
-        // Make API call to your backend to store payment details
         this.http.post('http://localhost:3001/api/subscription/addSubscription', paymentDetails, { headers: headers })
           .subscribe(
             (result: any) => {
               this.createNocas(result.subscription_id)
-              console.log('Payment details stored successfully:', result);
-              // Handle success response
             },
             (error: any) => {
               console.error('Error storing payment details:', error);
-              // Handle error
             }
           );
-        // alert("Payment Succesfully Done")
         const confirmation = confirm("Payment Successfully Done. If you want to see payment details, please go to Transaction Details page");
-        if (confirmation) {
-          // console.log('Form submission cancelled');
-          return; // Exit if the user cancels the confirmation
+        if (!confirmation) {
         }
-        // this.createNocas(subscription_id);
         this.router.navigate(['C_NOCAS-MAP']);
         this.showModal(); // Display the modal after successful creation
-        
         const airportCITY = this.TopElevationForm.get('CITY')?.value;
         const latitude = parseFloat(this.TopElevationForm.get('Latitude')?.value);
         const longitude = parseFloat(this.TopElevationForm.get('Longitude')?.value);
         if (airportCITY && !isNaN(latitude) && !isNaN(longitude)) {
-          // Update the markers and line
-          console.log('Latitude:', latitude);
-          console.log('Longitude:', longitude);
           this.updateMarkerPosition();
-          this.updatePolyline(latitude, longitude);
-          // Update the displayed map data
           this.displayMapData(latitude, longitude, this.airportCoordinates);
-
         }
       },
-
       prefill: {
         name: this.apiservice.userData.uname,
         email: this.apiservice.userData.email,
@@ -427,23 +364,14 @@ export class UsersNOCASComponent implements OnInit {
       }
     };
     const rzp = new Razorpay(RozarpayOptions);
-    // Open Razorpay payment modal
     rzp.open();
-
     rzp.on('payment.success', (response: any) => {
-      // Make API call to store payment details
-
     });
-
     rzp.on('payment.error', (error: any) => {
       console.error('Payment error:', error);
       alert("Payment Failed");
-      // Handle payment error
     });
   }
-
- 
-
 
   onElevationOptionChange() {
     const elevationOptionControl = this.TopElevationForm.get('elevationOption');
@@ -464,168 +392,109 @@ export class UsersNOCASComponent implements OnInit {
       alert("Users shall enter site elevation value received from WGS-84 survey report. Permissible height will be calculated based on site elevation entered by user. In absense of site elevation value from user, ARP (Airport) elevation value will be used as default.")
     }
     else {
-      // Hide the alert message otherwise
-
       this.showAlert = false;
-
     }
   }
-
 
   updateMarkerPositionOnClick(): void {
     this.map.on('click', (e: any) => {
       const { lat, lng } = e.latlng;
-
-      // Update latitude and longitude form fields
+    
       this.TopElevationForm.patchValue({
-        Latitude: lat.toFixed(2),
-        Longitude: lng.toFixed(2)
-      });
-
-      // Update the marker's position
+          Latitude: this.latitudeDMS,
+          Longitude: this.longitudeDMS
+        });
+      
       if (this.marker) {
-        this.marker.setLatLng([lat, lng]);
-
-        // Construct the popup content with latitude and longitude data
-        const popupContent = `Site Location : <br>Site Latitude: ${lat.toFixed(2)}, Site Longitude: ${lng.toFixed(2)}`;
-
-        // Bind the popup content to the marker
+        this.marker.setLatLng([this.latitudeDMS, this.longitudeDMS]);
+        const popupContent = `Site Location : <br>Site Latitude: ${this.latitudeDMS}, Site Longitude: ${this.longitudeDMS}`;
         this.marker.bindPopup(popupContent).openPopup();
+        
       }
     });
   }
 
-
-  // submitForm() {
-  //   // Check if the token exists
-  //   if (!this.apiservice.token) {
-  //     alert('Please Login First');
-  //     // Redirect the user to the login page or take appropriate action
-  //     this.router.navigate(['UsersLogin']);
-  //     return; // Exit the function if the token does not exist
-  //   }
-
-
-  //   if (!this.TopElevationForm.valid) {
-  //     return; // Exit if the form is not valid
-  //   }
-  //   const confirmation = confirm("Kindly confirm that the entered site information is correct or verify");
-  //   if (!confirmation) {
-  //     console.log('Form submission cancelled');
-  //     return; // Exit if the user cancels the confirmation
-  //   }
-  //   // fetch('http://localhost:3001/api/subscription/checkSubscriptions', {
-  //   //   method: 'GET',
-  //   //   headers: {
-  //   //     'Content-Type': 'application/json',
-  //   //     'Authorization': `Bearer ${this.apiservice.token}`
-  //   //   }
-  //   // })
-  //   //   .then(response => {
-  //   //     if (response.ok) {
-  //   //       return response.json();
-  //   //     } else {
-  //   //       // console.error('User is not subscribed.');
-  //   //       // Handle user not subscribed
-  //   //       alert('You have not subscribed to any package. For more information, please click OK.');
-  //   //       this.router.navigate(['PricingPlans']);
-  //   //       return null; // Ensure a value is returned
-  //   //     }
-  //   //   })
-  //   //   .then(data => {
-
-  //   //   })
-  //   // if (data && data.isSubscribed) {
-  //   // User is subscribed, proceed with form submission
-
-  //   this.createNocas();
-  //   console.log('Form submitted successfully');
-
-
-  // }
-
   submitForm() {
-    // Check if the token exists
     if (!this.apiservice.token) {
       alert('Please Login First');
-      // Redirect the user to the login page or take appropriate action
       this.router.navigate(['UsersLogin']);
       return; // Exit the function if the token does not exist
     }
-
     if (!this.TopElevationForm.valid) {
       return; // Exit if the form is not valid
     }
-
     const confirmation = confirm("Kindly confirm that the entered site information is correct or verify");
-    this.captureScreenshot();
+    if (confirmation) {
+      this.captureScreenshot();
+      // Exit if the user cancels the confirmation
+    }
     if (!confirmation) {
-      console.log('Form submission cancelled');
+      
       return; // Exit if the user cancels the confirmation
     }
-
-
-    // Call the API to create Nocas entry
     this.createNocas();
   }
 
-  public permissibleElevation!: number ;
+public permissibleElevation!: number ;
 public permissibleheight!: number;
 
 displayMapData(lat: number, lng: number, airportCoordinates: [number, number]) {
-  const newDistance = this.calculateDistance(lat, lng, airportCoordinates[0], airportCoordinates[1]);
+  console.log(lat)
+  const latitudeDD = this.convertDMSToDD(lat, true);
+  console.log(latitudeDD,"hj")
+  const longitudeDD = this.convertDMSToDD(lng, false);
+  console.log(longitudeDD,"ghbn")
+  const newDistance = this.calculateDistance(latitudeDD, longitudeDD, airportCoordinates[0], airportCoordinates[1]);
   console.log(newDistance);
   const clickedFeature = this.geojsonLayer.getLayers().find((layer: any) => {
     return layer.getBounds().contains([lat, lng]);
   });
+  const airport_name = this.selectedAirportName.split('/')[0];
+
   const mapData = document.getElementById('mapData');
   if (mapData !== null) {
     mapData.innerHTML = '';
     mapData.style.display = 'none';
-    const siteElevationInput = this.TopElevationForm.get('Site_Elevation');
-    const siteElevation = siteElevationInput ? siteElevationInput.value : 0;
     if (clickedFeature) {
       const properties = clickedFeature.feature.properties;
       const elevation = properties.Name;
-      const permissibleheight = parseFloat(properties.Name) - siteElevation;
-
-      // Store permissible elevation and height in the component's state
-      this.permissibleElevation = elevation;
-      this.permissibleheight = permissibleheight;
-
+      const permissibleheight = parseFloat(properties.Name) - parseFloat(this.TopElevationForm.get('Site_Elevation').value);
+      this.latitudeDMS = this.convertDDtoDMS(latitudeDD, true);
+      this.longitudeDMS = this.convertDDtoDMS(longitudeDD, false);
       mapData.innerHTML = `
         <table class="table table-hover">
           <tbody>
             <tr>
-              <th scope="row">Permissible Elevation<br>(AMSL Above Mean Sea Level)</th>
+              <th scope="row">Permissible Elevation (AMSL Above Mean Sea Level)</th>
               <td>${elevation}M</td>
             </tr>
             <tr>
-              <th scope="row">Permissible Height<br>(AGL- Above ground level)</th>
+              <th scope="row">Permissible Height (AGL- Above ground level)</th>
               <td>${permissibleheight < 0 ? '-' : ''}${Math.abs(permissibleheight).toFixed(2)}M</td>
             </tr>
             <tr>
               <th scope="row">Site Location</th>
-              <td colspan="2">Latitude: ${lat.toFixed(2)} N <br> Longitude: ${lng.toFixed(2)} E</td>
+              <td colspan="2">Latitude: ${this.latitudeDMS}<br> Longitude: ${this.longitudeDMS}</td>
             </tr>
             <tr>
-              <th scope="row">Distance<br>(Site Location from ARP)</th>
+              <th scope="row">Distance (Site Location from ARP)</th>
               <td colspan="2">${newDistance.toFixed(2)} km</td>
             </tr>
           </tbody>
         </table>`;
     } else {
+      // If no feature is clicked, display a message
       mapData.innerHTML = `
         <div>
-          <b>Site location selected by User is outside CCZM boundary published by AAI. Permissible Elevation calculation could not be processed. Please contact us for further details</b><br><br>
+          <b>Site location selected by User is outside ${airport_name}CCZM boundary published by AAI. Permissible Elevation calculation could not be processed. Please contact us for further details</b><br><br>
           <table class="table table-hover">
             <tbody>
               <tr>
                 <th scope="row">Site Location</th>
-                <td colspan="2">Latitude: ${lat.toFixed(2)} N <br> Longitude: ${lng.toFixed(2)} E</td>
+                <td colspan="2">Latitude: ${this.latitudeDMS}<br> Longitude: ${this.longitudeDMS}</td>
               </tr>
               <tr>
-                <th scope="row">Distance<br>(Site Location from ARP)</th>
+                <th scope="row">Distance (Site Location from ARP)</th>
                 <td colspan="2">${newDistance.toFixed(2)} km</td>
               </tr>
             </tbody>
@@ -636,65 +505,54 @@ displayMapData(lat: number, lng: number, airportCoordinates: [number, number]) {
   }
 }
 
+// Function to convert DMS to DD format
+convertDMSToDD(dms: number, isLatitude: boolean): number {
+  const degrees = Math.floor(dms);
+  const minutes = Math.floor((dms - degrees) * 100);
+  const seconds = Math.round(((dms - degrees) * 100 - minutes) * 100);
+  const direction = isLatitude ? (dms >= 0 ? 'N' : 'S') : (dms >= 0 ? 'E' : 'W');
+  const dd = degrees + minutes / 60 + seconds / (60 * 60);
+  return direction === 'S' || direction === 'W' ? dd * -1 : dd;
+}
+getLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        this.lat = position.coords.latitude;
+        this.long = position.coords.longitude;
+        
+        const popupContent = `Site Location : <br>  Site Latitude: ${this.latitudeDMS}, Site Longitude: ${this.longitudeDMS}`;
+        this.marker.addTo(this.map).bindPopup(popupContent).openPopup();
+        this.updateMarkerPosition();
 
-
-
-
-
-
-  getLocation() {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          // Location successfully retrieved
-          this.lat = position.coords.latitude;
-          this.long = position.coords.longitude;
-          console.log(this.lat)
-          console.log(this.long)
-
-
-
-          // Now that you have the location, you can display the popup
-          const popupContent = `Site Location : <br>  Site Latitude: ${this.lat.toFixed(2)}, Site Longitude: ${this.long.toFixed(2)}`;
-          this.marker.addTo(this.map).bindPopup(popupContent).openPopup();
-          // Update the markers and line with the new location
-          this.updateMarkerPosition();
-          this.updatePolyline(this.lat, this.long);
-
-
-          // Add the code here that relies on the location data, if any
-          // For example, you can call a method or perform additional operations
-          // this.methodThatUsesLocationData(this.lat, this.long);
-        },
-        (error) => {
-          // Error occurred while retrieving location
-          console.error('Error getting user location:', error);
-          // Notify user about the error or handle it gracefully
-          alert('Error getting user location. Please make sure location services are enabled and try again.');
-        },
-        { enableHighAccuracy: true }
-      );
-    } else {
-      // Geolocation is not supported by the browser
-      console.log('Geolocation is not supported by this browser.');
-      // Notify user or handle it gracefully
-      alert('Geolocation is not supported by this browser.');
-    }
+        // Add the code here that relies on the location data, if any
+        // For example, you can call a method or perform additional operations
+        // this.methodThatUsesLocationData(this.lat, this.long);
+      },
+      (error) => {
+        // Error occurred while retrieving location
+        console.error('Error getting user location:', error);
+        // Notify user about the error or handle it gracefully
+        alert('Error getting user location. Please make sure location services are enabled and try again.');
+      },
+      { enableHighAccuracy: true }
+    );
+  } else {
+    // Geolocation is not supported by the browser
+    console.log('Geolocation is not supported by this browser.');
+    // Notify user or handle it gracefully
+    alert('Geolocation is not supported by this browser.');
   }
-
-
-
-
-
-
+}
 
   updateMarkerPosition() {
     if (this.marker) {
+      this.latitudeDMS = this.convertDDtoDMS(this.lat, true);
+      this.longitudeDMS = this.convertDDtoDMS(this.long, false);
       this.marker.setLatLng([this.lat, this.long]);
 
     }
   }
-
 
   showDefaultMap() {
     const defaultLat = 0.0;
@@ -705,33 +563,14 @@ displayMapData(lat: number, lng: number, airportCoordinates: [number, number]) {
   }
 
   calculateDistance(latitude1: number, longitude1: number, latitude2: number, longitude2: number): number {
-    console.log('Calculating distance with inputs:');
-    console.log('Latitude 1:', latitude1);
-    console.log('Longitude 1:', longitude1);
-    console.log('Latitude 2:', latitude2);
-    console.log('Longitude 2:', longitude2);
-
     const earthRadius = 6371;
     const latitudeDiff = this.degToRad(Math.abs(latitude2 - latitude1));
     const longitudeDiff = this.degToRad(Math.abs(longitude2 - longitude1));
-
-    console.log('Latitude difference:', latitudeDiff);
-    console.log('Longitude difference:', longitudeDiff);
-
     const a = Math.sin(latitudeDiff / 2) * Math.sin(latitudeDiff / 2) +
       Math.cos(this.degToRad(latitude1)) * Math.cos(this.degToRad(latitude2)) *
       Math.sin(longitudeDiff / 2) * Math.sin(longitudeDiff / 2);
-
-    console.log('Value of a:', a);
-
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-    console.log('Value of c:', c);
-
     const distance = earthRadius * c;
-
-    console.log('Calculated distance:', distance);
-
     return distance;
   }
 
@@ -741,11 +580,9 @@ displayMapData(lat: number, lng: number, airportCoordinates: [number, number]) {
 
   showMap(lat: number, lng: number) {
     this.map = L.map('map', { zoomControl: false, attributionControl: false }).setView([20.5937, 78.9629], 5);
-
     const streets = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
       subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
     });
-
     const DarkMatter = L.tileLayer('  https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {});
     const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {});
     const Navigation = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
@@ -764,7 +601,6 @@ displayMapData(lat: number, lng: number, airportCoordinates: [number, number]) {
       maxZoom: 20,
       subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
     });
-
     const baseMaps = {
       'Streets': streets,
       'Satellite': satellite,
@@ -774,21 +610,43 @@ displayMapData(lat: number, lng: number, airportCoordinates: [number, number]) {
       'Terrain': googleTerrain,
       'Dark': DarkMatter
     };
-
     const overlayMaps = {
     };
     L.control.layers(baseMaps, overlayMaps).addTo(this.map);
     streets.addTo(this.map);
     L.control.scale().addTo(this.map);
     L.control.zoom().addTo(this.map);
+    this.marker = L.marker([lat, lng], { draggable: true }).addTo(this.map);
 
-    const popupContent = `Site Location : <br>  Site Latitude: ${lat.toFixed(2)}, Site Longitude: ${lng.toFixed(2)}`;
-    this.marker = L.marker([lat, lng]).bindPopup(popupContent).addTo(this.map);
-    // this.marker.addTo(this.map).bindPopup(popupContent).openPopup();
-    // this.line = L.polyline([[lat, lng], [lat, lng]], { color: 'black' }).addTo(this.map);
+    this.map.on('click', (e: any) => {
+      const { lat, lng } = e.latlng;
+      this.lat = lat;
+      this.long = lng;
+      this.latitudeDMS = this.convertDDtoDMS(lat, true);
+      this.longitudeDMS = this.convertDDtoDMS(lng, false);
+      this.TopElevationForm.patchValue({
+        Latitude: this.lat,
+        Longitude: this.long
+      });
+      const popupContent = `Site Location : <br> Site Latitude: ${this.latitudeDMS}, Site Longitude: ${this.longitudeDMS}`;
+      this.marker.setLatLng([lat, lng]).bindPopup(popupContent).openPopup();
+    });
 
+    this.marker.on('dragend', (e: any) => {
+      const latlng = e.target.getLatLng();
+      this.lat = latlng.lat;
+      this.long = latlng.lng;
+      this.latitudeDMS = this.convertDDtoDMS(this.lat, true);
+      this.longitudeDMS = this.convertDDtoDMS(this.long, false);
+      this.TopElevationForm.patchValue({
+        Latitude: this.lat,
+        Longitude: this.long
+      });
+      const popupContent = `Site Location : <br> Site Latitude: ${this.latitudeDMS}, Site Longitude: ${this.longitudeDMS}`;
+      this.marker.bindPopup(popupContent).openPopup();
+    });
+  
   }
-
 
   showModal(): void {
     // Code to show the modal
@@ -827,10 +685,7 @@ displayMapData(lat: number, lng: number, airportCoordinates: [number, number]) {
       map.removeLayer(this.marker);
       // this.marker = null; // Reset the current location marker
     }
-    if (this.line) {
-      map.removeLayer(this.line);
-      this.line = null; // Reset the polyline
-    }
+  
 
     const selectedAirportCITY = this.TopElevationForm.get('CITY')?.value;
 
@@ -876,7 +731,7 @@ displayMapData(lat: number, lng: number, airportCoordinates: [number, number]) {
 
           // Define the custom icon for marker2 with an offset
           let customIcon = L.icon({
-            iconUrl: 'https://opentopomap.org/leaflet/images/marker-icon-2x.png',
+            iconUrl: 'assets/plane.png',
             shadowUrl: 'https://opentopomap.org/leaflet/images/marker-shadow.png',
             iconSize: [25, 41], // Set the size of the icon [width, height]
             shadowSize: [25, 41], // size of the shadow
@@ -901,7 +756,7 @@ displayMapData(lat: number, lng: number, airportCoordinates: [number, number]) {
           //   this.line = L.polyline([this.airportCoordinates, [this.lat, this.long]], { color: 'black' }).addTo(map);
           // }
           this.marker = L.marker([this.lat, this.long]).addTo(map);
-          this.line = L.polyline([this.airportCoordinates, [this.lat, this.long]], { color: 'black' }).addTo(map);
+          // this.line = L.polyline([this.airportCoordinates, [this.lat, this.long]], { color: 'black' }).addTo(map);
 
           // Fit the map bounds to the GeoJSON layer and the markers
           const bounds = L.latLngBounds([this.airportCoordinates, [this.lat, this.long]]);
@@ -921,24 +776,15 @@ displayMapData(lat: number, lng: number, airportCoordinates: [number, number]) {
               this.marker.setLatLng([lat, lng]); // Update the marker position
 
               // Construct the popup content with latitude and longitude data
-              const popupContent = `Site Location : <br> Site Latitude: ${lat.toFixed(2)}, Site Longitude: ${lng.toFixed(2)}`;
+              const popupContent = `Site Location : <br> Site Latitude: ${this.latitudeDMS}, Site Longitude: ${this.longitudeDMS}`;
 
               // Bind the popup content to the marker
               this.marker.bindPopup(popupContent).openPopup();
             }
 
-            // Remove the previous line if it exists
-            if (this.line) {
-              map.removeLayer(this.line);
-            }
-
+            
             // Draw a new line from the clicked point to the airport
-            const selectedAirportCITY = this.TopElevationForm.get('CITY')?.value;
-            if (selectedAirportCITY) {
-              if (this.airportCoordinates) {
-                this.line = L.polyline([[lat, lng], this.airportCoordinates], { color: 'blue' }).addTo(map);
-              }
-            }
+           
           });
         })
         .catch(error => {
@@ -946,117 +792,6 @@ displayMapData(lat: number, lng: number, airportCoordinates: [number, number]) {
         });
     }
   }
-
-  clearMapData() {
-    // Remove the GeoJSON layer if it exists
-    if (this.geojsonLayer) {
-      this.map.removeLayer(this.geojsonLayer);
-      this.geojsonLayer = null; // Reset the GeoJSON layer
-    }
-
-    // Remove the airport marker if it exists
-    if (this.marker2) {
-      this.map.removeLayer(this.marker2);
-      this.marker2 = null; // Reset the airport marker
-    }
-
-    // // Remove the current location marker if it exists
-    // if (this.marker) {
-    //   this.map.removeLayer(this.marker);
-    //   this.marker = null; // Reset the current location marker
-    // }
-
-    // Remove the polyline if it exists
-    if (this.line) {
-      this.map.removeLayer(this.line);
-      this.line = null; // Reset the polyline
-    }
-
-    // Clear the map data container
-    const mapData = document.getElementById('mapData');
-    if (mapData) {
-      mapData.innerHTML = '';
-    }
-
-    // Reset the form fields
-    // this.TopElevationForm.reset();
-  }
-
-  //   displayMapData(lat: number, lng: number, airportCoordinates: [number, number]) {
-  //     const newDistance = this.calculateDistance(lat, lng, airportCoordinates[0], airportCoordinates[1]);
-  //     const clickedFeature = this.geojsonLayer.getLayers().find((layer: any) => {
-  //       return layer.getBounds().contains([lat, lng]);
-  //     });
-  //     const mapData = document.getElementById('mapData');
-  //     if (mapData !== null) {
-  //       mapData.innerHTML = '';
-  //       mapData.style.display = 'none';
-  //       const siteElevationInput = this.TopElevationForm.get('Site_Elevation');
-  //       const siteElevation = siteElevationInput ? siteElevationInput.value : 0;
-  //       if (clickedFeature) {
-  //         const properties = clickedFeature.feature.properties;
-  //         const elevation = (properties.Name);
-  //         const permissibleHeight = parseFloat(properties.Name) - siteElevation;
-  //         mapData.innerHTML = `
-  //         <table class="table table-hover">
-  //   <tbody>
-  //   <tr>
-  //       <th scope="row"> Permissible Elevation<br>
-  //       (AMSL Above Mean Sea Level)</th>
-  //       <td>${elevation}M</td>
-
-  //     </tr>
-  //     <tr>
-  //       <th scope="row"> Permissible Height<br>
-  //       (AGL- Above ground level)
-  //       </th>
-  //       <td> ${permissibleHeight < 0 ? '-' : ''}${Math.abs(permissibleHeight).toFixed(2)}M</td>
-
-  //     </tr>
-  //     <tr>
-  //       <th scope="row">Site Location </th>
-  //       <td colspan="2" >Latitude: ${lat.toFixed(2)} N <br> Longitude: ${lng.toFixed(2)} E</td>
-
-  //     </tr>
-  //     <tr>
-  //       <th scope="row">Distance<br>
-  //       (Site Location from ARP)</th>
-  //       <td colspan="2"> ${newDistance.toFixed(2)} km</td>
-
-  //     </tr>
-  //   </tbody>
-  // </table> `;
-  //       } else {
-  //         mapData.innerHTML = `
-  //           <div>
-  //          <b>Site location selected by User is outside CCZM boundary published by AAI. Permissible Elevation calculation could not be processed. Please contact us for further details</b><br> <br>
-
-  //          <table class="table table-hover">
-  //          <tbody>
-  //            <tr>
-  //              <th scope="row">Site Location</th>
-  //              <td colspan="2" >Latitude: ${lat.toFixed(2)} N <br> Longitude: ${lng.toFixed(2)} E</td>
-  //            </tr>
-  //            <tr>
-  //              <th scope="row">Distance<br>
-  //              (Site Location from ARP)</th>
-  //              <td colspan="2">${newDistance.toFixed(2)} km</td>
-  //            </tr>
-  //          </tbody>
-  //        </table> 
-  //           </div> <br>`;
-  //       }
-  //       mapData.style.display = 'block';
-  //     }
-  //   }
-
-  updatePolyline(lat: number, lng: number) {
-    if (this.line) {
-      // Update the line's coordinates using the updated marker's position
-      this.line.setLatLngs([[lat, lng], [this.marker2.getLatLng().lat, this.marker2.getLatLng().lng]]);
-    }
-  }
-
 
   fetchAirports() {
     this.http.get<any>('https://nocas-3ab54-default-rtdb.europe-west1.firebasedatabase.app/airportsData.json')

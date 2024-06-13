@@ -55,6 +55,7 @@ serviceDataSource = new MatTableDataSource<any>();
     service5: 'Documents & Process Management'
   };
 nocas: any;
+airport: any;
 
   constructor(private http: HttpClient, public apiservice: ApiService,private datePipe: DatePipe) { }
 
@@ -64,7 +65,9 @@ nocas: any;
     // this.detailsOfSubscription();
     // this.detailsOfServices();
   }
-
+  bufferToBase64(buffer: any) {
+    return btoa(new Uint8Array(buffer).reduce((data, byte) => data + String.fromCharCode(byte), ''));
+  }
   detailsOfSubscription() {
     // Show only subscription details section
     this.showSubscriptionDetails = true;

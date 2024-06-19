@@ -9,6 +9,7 @@ import html2canvas from 'html2canvas';
 import * as domtoimage from 'dom-to-image';
 import { saveAs } from 'file-saver';
 import { data } from 'jquery';
+import { EventListenerFocusTrapInertStrategy } from '@angular/cdk/a11y';
 
 declare var Razorpay: any;
 @Component({
@@ -46,10 +47,10 @@ export class UsersNOCASComponent implements OnInit {
   freeTrialCount!: number;
   isSubscribed: boolean = false;
   screenshotUrl: string | null = null;
-  
-  constructor(public apiservice: ApiService,private formbuilder: FormBuilder,private http: HttpClient,private router: Router) { }
- 
-  
+
+  constructor(public apiservice: ApiService, private formbuilder: FormBuilder, private http: HttpClient, private router: Router) { }
+
+
   captureScreenshot(): void {
     const mapElement = document.getElementById('map');
 
@@ -80,16 +81,17 @@ export class UsersNOCASComponent implements OnInit {
     if (this.TopElevationForm.valid) {
       try {
         const screenshotPath = await this.captureScreenshot(); // Capture and save the screenshot
-  
+
         const lat = parseFloat(this.TopElevationForm.value.Latitude);
         const lng = parseFloat(this.TopElevationForm.value.Longitude);
         const distance = this.calculateDistance(lat, lng, this.airportCoordinates[0], this.airportCoordinates[1]);
-  
+
         // Retrieve the permissible height and elevation based on the feature's properties
         const clickedFeature = this.geojsonLayer.getLayers().find((layer: any) => {
           return layer.getBounds().contains([lat, lng]);
         });
-  
+        this.latitudeDMS = this.convertDDtoDMS(lat, true);
+        this.longitudeDMS = this.convertDDtoDMS(lng, false);
         let permissibleHeight = 0;
         let permissibleElevation = 0;
         if (clickedFeature) {
@@ -97,23 +99,23 @@ export class UsersNOCASComponent implements OnInit {
           permissibleElevation = parseFloat(properties.Name);
           permissibleHeight = permissibleElevation - parseFloat(this.TopElevationForm.value.Site_Elevation);
         }
-  
+
         const requestBody = {
           user_id: this.apiservice.userData.id,
           distance: distance.toFixed(2) + "km",
           permissible_elevation: permissibleElevation + "M",
           permissible_height: permissibleHeight + "M",
           city: this.TopElevationForm.value.CITY,
-          latitude: lat,
-          longitude: lng,
+          latitude: this.latitudeDMS,
+          longitude: this.longitudeDMS,
           airport_name: this.selectedAirportName,
           site_elevation: this.TopElevationForm.value.Site_Elevation,
           snapshot: screenshotPath, // Use the saved screenshot path
           subscription_id: subscription_id,
         };
-  
+
         console.log(requestBody);
-  
+
         const headers = new HttpHeaders().set("Authorization", `Bearer ${this.apiservice.token}`);
         this.http.post("http://localhost:3001/api/nocas/createNocas", requestBody, { headers: headers })
           .subscribe(
@@ -140,7 +142,7 @@ export class UsersNOCASComponent implements OnInit {
       alert("Please fill out all required fields in the form.");
     }
   }
-  
+
 
 
   ngOnInit(): void {
@@ -151,17 +153,17 @@ export class UsersNOCASComponent implements OnInit {
       location: ['manual'],
       Site_Elevation: new FormControl('', [Validators.required, Validators.nullValidator, Validators.pattern(/^[0-5]+(?:\.[0-5]+)?$/)]),
       elevationOption: ['known', Validators.required],
-      snapshot: [''] 
+      snapshot: ['']
     });
     this.TopElevationForm.get('Latitude').valueChanges.subscribe((lat: number) => {
       this.latitudeDMS = this.convertDDtoDMS(this.lat, true);
-      
+       
       this.updateMarkerPosition();
       this.displayMapData(this.latitudeDMS, this.TopElevationForm.get('Longitude').value, this.marker.getLatLng());
     });
     this.TopElevationForm.get('Longitude').valueChanges.subscribe((lng: number) => {
       this.longitudeDMS = this.convertDDtoDMS(lng, false);
-     
+
       this.updateMarkerPosition();
       this.displayMapData(this.TopElevationForm.get('Latitude').value, this.longitudeDMS, this.marker.getLatLng());
     });
@@ -170,6 +172,7 @@ export class UsersNOCASComponent implements OnInit {
       this.city = city; // Set the value of icao when ICAO changes
       const selectedAirport = this.airports.find(airport => airport.airport_city === city);
       this.selectedAirport = selectedAirport;
+      console.log(this.selectedAirport)
       this.selectedAirportName = selectedAirport ? selectedAirport.airport_name : '';
       this.selectedAirportIcao = selectedAirport ? selectedAirport.airport_icao : '';
       this.selectedAirportIATA = selectedAirport ? selectedAirport.airport_iata : '';
@@ -187,22 +190,23 @@ export class UsersNOCASComponent implements OnInit {
     });
     this.fetchAirports();
     this.showDefaultMap();
-    
+
 
   }
 
   convertDDtoDMS(dd: number, isLatitude: boolean): string {
+    console.log(`Converting DD to DMS: ${dd}, isLatitude: ${isLatitude}`);
     const dir = dd < 0 ? (isLatitude ? 'S' : 'W') : (isLatitude ? 'N' : 'E');
     const absDd = Math.abs(dd);
     const degrees = Math.floor(absDd);
     const minutesNotTruncated = (absDd - degrees) * 60;
     const minutes = Math.floor(minutesNotTruncated);
-    const seconds = Math.floor((minutesNotTruncated - minutes) * 60);
-    return `${degrees}°${minutes}'${seconds}"${dir}`;
-}
+    const seconds = Math.round((minutesNotTruncated - minutes) * 60);
+    const dms = `${degrees}°${minutes}'${seconds}"${dir}`;
+    console.log(`Converted to DMS: ${dms}`);
+    return dms;
+  }
 
-  
- 
   hideData() {
     this.showModal();
     const airportCITY = this.TopElevationForm.get('CITY')?.value;
@@ -217,7 +221,7 @@ export class UsersNOCASComponent implements OnInit {
 
   }
   showData() {
-    this.showModal(); // Display the modal after successful creation
+    // this.showModal(); // Display the modal after successful creation
     const airportCITY = this.TopElevationForm.get('CITY')?.value;
     const latitude = parseFloat(this.TopElevationForm.get('Latitude')?.value);
     const longitude = parseFloat(this.TopElevationForm.get('Longitude')?.value);
@@ -242,8 +246,6 @@ export class UsersNOCASComponent implements OnInit {
       const siteElevationInput = this.TopElevationForm.get('Site_Elevation');
       const siteElevation = siteElevationInput ? siteElevationInput.value : 0;
       if (clickedFeature) {
-        this.latitudeDMS = this.convertDDtoDMS(lat, true);
-      this.longitudeDMS = this.convertDDtoDMS(lng, false);
         const properties = clickedFeature.feature.properties;
         const elevation = properties.Name;
         const permissibleHeight = parseFloat(properties.Name) - siteElevation;
@@ -320,7 +322,7 @@ export class UsersNOCASComponent implements OnInit {
       description: ` Plan Subscription`,
       image: 'https://imgur.com/a/J4UAMhv',
       handler: (response: any) => {
-          this.router.navigate(['TransactionDetails']); 
+        this.router.navigate(['TransactionDetails']);
         const paymentDetails = {
           user_id: this.apiservice.userData.id,
           subscription_type: 'OneTime', // Replace with actual subscription type
@@ -373,6 +375,7 @@ export class UsersNOCASComponent implements OnInit {
     });
   }
 
+
   onElevationOptionChange() {
     const elevationOptionControl = this.TopElevationForm.get('elevationOption');
     let defaultElevation = null;
@@ -396,23 +399,12 @@ export class UsersNOCASComponent implements OnInit {
     }
   }
 
-  updateMarkerPositionOnClick(): void {
-    this.map.on('click', (e: any) => {
-      const { lat, lng } = e.latlng;
-    
-      this.TopElevationForm.patchValue({
-          Latitude: this.latitudeDMS,
-          Longitude: this.longitudeDMS
-        });
-      
-      if (this.marker) {
-        this.marker.setLatLng([this.latitudeDMS, this.longitudeDMS]);
-        const popupContent = `Site Location : <br>Site Latitude: ${this.latitudeDMS}, Site Longitude: ${this.longitudeDMS}`;
-        this.marker.bindPopup(popupContent).openPopup();
-        
-      }
-    });
-  }
+  // airportCoordinatesList updated with city and airport names
+  airportCoordinatesList: Array<[number, number, string, string]> = [
+    [11.03, 77.04, 'Coimbatore', 'Coimbatore International Airport/Coimbatore/CJB'],
+    [19.08, 72.86, 'Mumbai', 'Chhatrapati Shivaji Maharaj International Airport/Mumbai/BOM'],
+    [19.79, 85.75, 'Puri', 'PURI AIRPORT/Puri/BBI']
+  ];
 
   submitForm() {
     if (!this.apiservice.token) {
@@ -420,75 +412,111 @@ export class UsersNOCASComponent implements OnInit {
       this.router.navigate(['UsersLogin']);
       return; // Exit the function if the token does not exist
     }
+
     if (!this.TopElevationForm.valid) {
       return; // Exit if the form is not valid
     }
+
     const confirmation = confirm("Kindly confirm that the entered site information is correct or verify");
+
     if (confirmation) {
+      // Capture screenshot before showing any modals
       this.captureScreenshot();
-      // Exit if the user cancels the confirmation
-    }
-    if (!confirmation) {
+      this.createNocas();
+      this.showData();
       
-      return; // Exit if the user cancels the confirmation
     }
-    this.createNocas();
+   
   }
+  public isCheckboxSelected: boolean = false; // Add this flag
+  handleAirportModalOK() {
+    // Show the modal
+    this.showModal();
+    const latitudeDD = this.convertDMSToDD(this.lat, true);
+    const longitudeDD = this.convertDMSToDD(this.long, false);
+    this.distance = this.calculateDistance(latitudeDD, longitudeDD, this.airportCoordinates[0], this.airportCoordinates[1]);
 
-public permissibleElevation!: number ;
-public permissibleheight!: number;
-
-displayMapData(lat: number, lng: number, airportCoordinates: [number, number]) {
-  console.log(lat)
-  const latitudeDD = this.convertDMSToDD(lat, true);
-  console.log(latitudeDD,"hj")
-  const longitudeDD = this.convertDMSToDD(lng, false);
-  console.log(longitudeDD,"ghbn")
-  const newDistance = this.calculateDistance(latitudeDD, longitudeDD, airportCoordinates[0], airportCoordinates[1]);
-  console.log(newDistance);
-  const clickedFeature = this.geojsonLayer.getLayers().find((layer: any) => {
-    return layer.getBounds().contains([lat, lng]);
-  });
-  const airport_name = this.selectedAirportName.split('/')[0];
-
-  const mapData = document.getElementById('mapData');
-  if (mapData !== null) {
-    mapData.innerHTML = '';
-    mapData.style.display = 'none';
-    if (clickedFeature) {
-      const properties = clickedFeature.feature.properties;
-      const elevation = properties.Name;
-      const permissibleheight = parseFloat(properties.Name) - parseFloat(this.TopElevationForm.get('Site_Elevation').value);
-      this.latitudeDMS = this.convertDDtoDMS(latitudeDD, true);
-      this.longitudeDMS = this.convertDDtoDMS(longitudeDD, false);
-      mapData.innerHTML = `
-        <table class="table table-hover">
-          <tbody>
-            <tr>
-              <th scope="row">Permissible Elevation (AMSL Above Mean Sea Level)</th>
-              <td>${elevation}M</td>
-            </tr>
-            <tr>
-              <th scope="row">Permissible Height (AGL- Above ground level)</th>
-              <td>${permissibleheight < 0 ? '-' : ''}${Math.abs(permissibleheight).toFixed(2)}M</td>
-            </tr>
-            <tr>
-              <th scope="row">Site Location</th>
-              <td colspan="2">Latitude: ${this.latitudeDMS}<br> Longitude: ${this.longitudeDMS}</td>
-            </tr>
-            <tr>
-              <th scope="row">Distance (Site Location from ARP)</th>
-              <td colspan="2">${newDistance.toFixed(2)} km</td>
-            </tr>
-          </tbody>
-        </table>`;
-    } else {
-      // If no feature is clicked, display a message
-      mapData.innerHTML = `
+    const airport_name = this.selectedAirportName ? this.selectedAirportName.split('/')[0] : '';
+    
+    // Prepare the content based on whether checkboxes are selected or not
+    let mapDataContent = '';
+    if (!this.isCheckboxSelected) {
+      mapDataContent += `
         <div>
-          <b>Site location selected by User is outside ${airport_name}CCZM boundary published by AAI. Permissible Elevation calculation could not be processed. Please contact us for further details</b><br><br>
+          <b>Site location selected by User is outside ${airport_name} CCZM boundary published by AAI. Permissible Elevation calculation could not be processed. Please contact us for further details</b><br><br>
           <table class="table table-hover">
             <tbody>
+              <tr>
+                <th scope="row">Site Location</th>
+                <td colspan="2">Latitude: ${this.latitudeDMS}<br> Longitude: ${this.longitudeDMS}</td>
+              </tr>
+              <tr>
+                <th scope="row">Distance (Site Location from ARP)</th>
+                <td colspan="2">${this.distance ? this.distance.toFixed(2) : ''} km</td>
+              </tr>
+            </tbody>
+          </table>
+        </div><br>`;
+    }
+  
+    // Update the mapData element with the generated content
+    const mapData = document.getElementById('mapData');
+    if (mapData) {
+      mapData.innerHTML = mapDataContent;
+    }
+    
+    // Close the airport modal
+    const modal = document.getElementById('airportModal');
+    if (modal) {
+      modal.style.display = 'none';
+    }
+    
+  }
+  
+
+  public permissibleElevation!: number;
+  public permissibleheight!: number;
+
+  airportName!: string;
+  distance!: number;
+
+  displayMapData(lat: number, lng: number, airportCoordinates: [number, number]) {
+    const latitudeDD = this.convertDMSToDD(lat, true);
+    const longitudeDD = this.convertDMSToDD(lng, false);
+    const newDistance = this.calculateDistance(latitudeDD, longitudeDD, airportCoordinates[0], airportCoordinates[1]);
+
+    const clickedFeature = this.geojsonLayer.getLayers().find((layer: any) => {
+      return layer.getBounds().contains([lat, lng]);
+    });
+
+    // const airport_name = this.selectedAirportName.split('/')[0];
+    const mapData = document.getElementById('mapData');
+
+    if (mapData !== null) {
+      mapData.innerHTML = '';
+      mapData.style.display = 'none';
+
+      if (clickedFeature) {
+
+        const properties = clickedFeature.feature.properties;
+        const elevation = properties.Name;
+        const permissibleheight = parseFloat(properties.Name) - parseFloat(this.TopElevationForm.get('Site_Elevation').value);
+
+        if (elevation === 'NOC Required') {
+          alert("NOC Required");
+          return;
+        }
+        mapData.innerHTML = `
+          <table class="table table-hover">
+            <tbody>
+              <tr>
+                <th scope="row">Permissible Elevation (AMSL Above Mean Sea Level)</th>
+                <td>${elevation}M</td>
+              </tr>
+              <tr>
+                <th scope="row">Permissible Height (AGL- Above ground level)</th>
+                <td>${permissibleheight < 0 ? '-' : ''}${Math.abs(permissibleheight).toFixed(2)}M</td>
+              </tr>
               <tr>
                 <th scope="row">Site Location</th>
                 <td colspan="2">Latitude: ${this.latitudeDMS}<br> Longitude: ${this.longitudeDMS}</td>
@@ -498,52 +526,114 @@ displayMapData(lat: number, lng: number, airportCoordinates: [number, number]) {
                 <td colspan="2">${newDistance.toFixed(2)} km</td>
               </tr>
             </tbody>
-          </table>
-        </div><br>`;
+          </table>`;
+        this.showModal();
+
+      } else {
+        this.showClosestAirportList(mapData);
+      }
+      mapData.style.display = 'block';
     }
-    mapData.style.display = 'block';
   }
-}
 
-// Function to convert DMS to DD format
-convertDMSToDD(dms: number, isLatitude: boolean): number {
-  const degrees = Math.floor(dms);
-  const minutes = Math.floor((dms - degrees) * 100);
-  const seconds = Math.round(((dms - degrees) * 100 - minutes) * 100);
-  const direction = isLatitude ? (dms >= 0 ? 'N' : 'S') : (dms >= 0 ? 'E' : 'W');
-  const dd = degrees + minutes / 60 + seconds / (60 * 60);
-  return direction === 'S' || direction === 'W' ? dd * -1 : dd;
-}
-getLocation() {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        this.lat = position.coords.latitude;
-        this.long = position.coords.longitude;
-        
-        const popupContent = `Site Location : <br>  Site Latitude: ${this.latitudeDMS}, Site Longitude: ${this.longitudeDMS}`;
-        this.marker.addTo(this.map).bindPopup(popupContent).openPopup();
-        this.updateMarkerPosition();
+  showClosestAirportList(mapData: HTMLElement) {
+    const latitudeDD = this.convertDMSToDD(this.lat, true);
+    const longitudeDD = this.convertDMSToDD(this.long, false);
 
-        // Add the code here that relies on the location data, if any
-        // For example, you can call a method or perform additional operations
-        // this.methodThatUsesLocationData(this.lat, this.long);
-      },
-      (error) => {
-        // Error occurred while retrieving location
-        console.error('Error getting user location:', error);
-        // Notify user about the error or handle it gracefully
-        alert('Error getting user location. Please make sure location services are enabled and try again.');
-      },
-      { enableHighAccuracy: true }
-    );
-  } else {
-    // Geolocation is not supported by the browser
-    console.log('Geolocation is not supported by this browser.');
-    // Notify user or handle it gracefully
-    alert('Geolocation is not supported by this browser.');
+    const distances = this.airportCoordinatesList.map((airport) => {
+      const [airportLat, airportLng, airportCity, airportName] = airport;
+      const distance = this.calculateDistance(latitudeDD, longitudeDD, airportLat, airportLng);
+      return { airportCity, airportName, distance };
+    });
+
+    distances.sort((a, b) => a.distance - b.distance);
+    const top2ClosestAirports = distances.slice(0, 2);
+
+    let modalContent = 'Closest airports:<br>';
+    top2ClosestAirports.forEach((airport, index) => {
+      modalContent += `${index + 1}. <input type="checkbox" class="closest-airport-checkbox" data-airport-city="${airport.airportCity}" data-airport-name="${airport.airportName}" data-distance="${airport.distance}"> ${airport.airportName}<br>`;
+    });
+
+    const airportList = document.getElementById('airportList');
+
+    if (airportList) {
+      airportList.innerHTML = modalContent;
+      const modal = document.getElementById('airportModal');
+      if (modal) {
+        modal.style.display = 'block';
+      }
+    }
+
+    const checkboxes = document.querySelectorAll('.closest-airport-checkbox');
+    checkboxes.forEach((checkbox) => {
+      checkbox.addEventListener('change', (event) => {
+        if ((event.target as HTMLInputElement).checked) {
+          const airportCity = (event.target as HTMLElement).getAttribute('data-airport-city');
+          const airportName = (event.target as HTMLElement).getAttribute('data-airport-name');
+          const distance = parseFloat((event.target as HTMLElement).getAttribute('data-distance')!);
+          if (airportCity && airportName && !isNaN(distance)) {
+            this.updateSelectedAirport(airportCity, airportName, distance);
+          }
+        }
+      });
+    });
   }
-}
+
+  // Update selected airport function
+  updateSelectedAirport(airportCity: string, airportName: string, distance: number) {
+    this.airportName = airportName;
+    this.distance = distance;
+    const airport = this.airportCoordinatesList.find(airport => airport[3] === airportName);
+    if (airport) {
+      this.TopElevationForm.patchValue({
+        CITY: airportCity,
+      });
+      this.selectedAirportName = airportName;
+      this['selectedAirportCoordinates'] = [airport[0], airport[1]]; // Update the coordinates
+    }
+  }
+
+  // Function to convert DMS to DD format
+  convertDMSToDD(dms: number, isLatitude: boolean): number {
+    const degrees = Math.floor(dms);
+    const minutes = Math.floor((dms - degrees) * 100);
+    const seconds = Math.round(((dms - degrees) * 100 - minutes) * 100);
+    const direction = isLatitude ? (dms >= 0 ? 'N' : 'S') : (dms >= 0 ? 'E' : 'W');
+    const dd = degrees + minutes / 60 + seconds / (60 * 60);
+    return direction === 'S' || direction === 'W' ? dd * -1 : dd;
+  }
+
+
+  getLocation() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          this.lat = position.coords.latitude;
+          this.long = position.coords.longitude;
+
+          const popupContent = `Site Location : <br>  Site Latitude: ${this.latitudeDMS}, Site Longitude: ${this.longitudeDMS}`;
+          this.marker.addTo(this.map).bindPopup(popupContent).openPopup();
+          this.updateMarkerPosition();
+
+          // Add the code here that relies on the location data, if any
+          // For example, you can call a method or perform additional operations
+          // this.methodThatUsesLocationData(this.lat, this.long);
+        },
+        (error) => {
+          // Error occurred while retrieving location
+          console.error('Error getting user location:', error);
+          // Notify user about the error or handle it gracefully
+          alert('Error getting user location. Please make sure location services are enabled and try again.');
+        },
+        { enableHighAccuracy: true }
+      );
+    } else {
+      // Geolocation is not supported by the browser
+      console.log('Geolocation is not supported by this browser.');
+      // Notify user or handle it gracefully
+      alert('Geolocation is not supported by this browser.');
+    }
+  }
 
   updateMarkerPosition() {
     if (this.marker) {
@@ -645,7 +735,7 @@ getLocation() {
       const popupContent = `Site Location : <br> Site Latitude: ${this.latitudeDMS}, Site Longitude: ${this.longitudeDMS}`;
       this.marker.bindPopup(popupContent).openPopup();
     });
-  
+
   }
 
   showModal(): void {
@@ -664,7 +754,7 @@ getLocation() {
     }
   }
 
-  loadGeoJSON(map: any) {
+  loadGeoJSON(map: any, zoomLevel: number = 10) {
     if (!map) {
       console.error("Map object is required to load GeoJSON.");
       return;
@@ -680,12 +770,10 @@ getLocation() {
       this.marker2 = null;
     }
 
-    // // Remove the existing marker and line if they exist
     if (this.marker) {
       map.removeLayer(this.marker);
-      // this.marker = null; // Reset the current location marker
+      this.marker = null; // Reset the current location marker
     }
-  
 
     const selectedAirportCITY = this.TopElevationForm.get('CITY')?.value;
 
@@ -711,8 +799,6 @@ getLocation() {
       fetch(airportGeoJSONPath)
         .then(response => response.json())
         .then(geojsonData => {
-          // const geojsonLayer = L.geoJSON(geojsonData);
-
           const features = geojsonData.features;
 
           // Style function to set colors based on properties from JSON
@@ -729,14 +815,20 @@ getLocation() {
           // Fit the map bounds to the GeoJSON layer
           map.fitBounds(geojsonLayer.getBounds());
 
+          // Set the view to the center of the GeoJSON layer with the specified zoom level
+          const center = geojsonLayer.getBounds().getCenter();
+          map.setView(center, zoomLevel);
+
           // Define the custom icon for marker2 with an offset
           let customIcon = L.icon({
-            iconUrl: 'assets/plane.png',
+            iconUrl: 'assets/marker-airport.png',
             shadowUrl: 'https://opentopomap.org/leaflet/images/marker-shadow.png',
-            iconSize: [25, 41], // Set the size of the icon [width, height]
-            shadowSize: [25, 41], // size of the shadow
-            iconAnchor: [12, 40], // point of the icon which will correspond to marker's location
 
+            iconSize: [40, 41],
+
+            shadowSize: [40, 41],
+
+            iconAnchor: [12, 40], // point of the icon which will correspond to marker's location
           });
 
           // Draw a marker for the selected airport with the custom icon
@@ -750,17 +842,11 @@ getLocation() {
           // Bind the popup content to the marker2
           this.marker2.bindPopup(popupContent);
 
-          // // Draw a line from the selected airport to the current location
-          // if (this.lat !=0.0 && this.long!=0.0) {
-          //   this.marker = L.marker([this.lat, this.long]).addTo(map);
-          //   this.line = L.polyline([this.airportCoordinates, [this.lat, this.long]], { color: 'black' }).addTo(map);
-          // }
           this.marker = L.marker([this.lat, this.long]).addTo(map);
-          // this.line = L.polyline([this.airportCoordinates, [this.lat, this.long]], { color: 'black' }).addTo(map);
 
           // Fit the map bounds to the GeoJSON layer and the markers
           const bounds = L.latLngBounds([this.airportCoordinates, [this.lat, this.long]]);
-          map.fitBounds(bounds);
+          map.fitBounds(bounds, { maxZoom: zoomLevel });
 
           map.on('click', (e: any) => {
             const { lat, lng } = e.latlng;
@@ -781,10 +867,6 @@ getLocation() {
               // Bind the popup content to the marker
               this.marker.bindPopup(popupContent).openPopup();
             }
-
-            
-            // Draw a new line from the clicked point to the airport
-           
           });
         })
         .catch(error => {
@@ -792,6 +874,7 @@ getLocation() {
         });
     }
   }
+
 
   fetchAirports() {
     this.http.get<any>('https://nocas-3ab54-default-rtdb.europe-west1.firebasedatabase.app/airportsData.json')
@@ -804,4 +887,4 @@ getLocation() {
         }
       })
   }
-}
+} 

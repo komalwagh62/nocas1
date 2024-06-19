@@ -128,7 +128,7 @@ getUserDetails(): void {
       },
       error => {
         alert("Failed Login");
-        this.router.navigate(['UserLogin']);
+        this.router.navigate(['UsersLogin']);
       }
     );
 }

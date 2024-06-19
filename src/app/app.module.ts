@@ -66,7 +66,7 @@ import { DmsPipe } from './dms.pipe';
     TransactionDetailsComponent,
     AdminLoginComponent,
     DashboardComponent,
-    DmsPipe
+    DmsPipe,
    
   ],
   imports: [
@@ -97,7 +97,8 @@ import { DmsPipe } from './dms.pipe';
     MatGridListModule,
     MatTableModule, 
     MatPaginator,
-    MatPaginatorModule
+    MatPaginatorModule,
+    
   ],
   providers: [
     provideAnimationsAsync()

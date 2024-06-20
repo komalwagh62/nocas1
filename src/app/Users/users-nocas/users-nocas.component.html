@@ -33,13 +33,13 @@
         <div class="form-group">
           <label for="Site_latitude">Site Latitude</label>
           <mat-form-field appearance="outline">
-            <input matInput type="text" [ngModel]="latitudeDMS" name="Latitude" formControlName="Latitude" id="Latitude" placeholder="Latitude">
+            <input matInput type="text" [(ngModel)]="latitudeDMS" name="Latitude" formControlName="Latitude" id="Latitude" placeholder="Latitude">
           </mat-form-field>
         </div>
         <div class="form-group">
           <label for="Site_longitude">Site Longitude</label>
           <mat-form-field appearance="outline">
-            <input matInput type="text" [ngModel]="longitudeDMS" name="Longitude" formControlName="Longitude" id="Longitude" placeholder="Longitude">
+            <input matInput type="text" [(ngModel)]="longitudeDMS" name="Longitude" formControlName="Longitude" id="Longitude" placeholder="Longitude">
           </mat-form-field>
         </div>
 
@@ -74,13 +74,11 @@
 </div>
 
 <!-- Modal -->
-<!-- Modal -->
 <div class="modal" id="airportModal" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
         <h2 class="modal-title">Closest Airports</h2>
-        <!-- <button type="button" class="btn-close" (click)="closeModal()" data-bs-dismiss="modal" aria-label="Close"></button> -->
       </div>
       <div class="modal-body">
         <div id="airportList"></div>
@@ -103,10 +101,7 @@
       </div>
       <div class="modal-body">
         <div id="mapData" style="display:none;">
-          
         </div>
-        
-
         <div>
           <b>We wish you success in your project.<br> Our range of services will assist you in WGS-84 Survey, NOC process support, Aeronautical study & Assessment. Please connect for details.</b><br>
           <button type="button" value="currentLocation" class="btn btn-outline-primary rounded-5" routerLink="/request-Service">Check-Out Now</button>
@@ -115,4 +110,3 @@
     </div>
   </div>
 </div>
-

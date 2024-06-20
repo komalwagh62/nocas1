@@ -1,4 +1,3 @@
-
 import { Component, ElementRef, ViewChild, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -194,6 +193,8 @@ export class UsersNOCASComponent implements OnInit {
 
   }
 
+
+
   convertDDtoDMS(dd: number, isLatitude: boolean): string {
     console.log(`Converting DD to DMS: ${dd}, isLatitude: ${isLatitude}`);
     const dir = dd < 0 ? (isLatitude ? 'S' : 'W') : (isLatitude ? 'N' : 'E');
@@ -221,7 +222,7 @@ export class UsersNOCASComponent implements OnInit {
 
   }
   showData() {
-    // this.showModal(); // Display the modal after successful creation
+    this.showModal(); // Display the modal after successful creation
     const airportCITY = this.TopElevationForm.get('CITY')?.value;
     const latitude = parseFloat(this.TopElevationForm.get('Latitude')?.value);
     const longitude = parseFloat(this.TopElevationForm.get('Longitude')?.value);
@@ -282,7 +283,7 @@ export class UsersNOCASComponent implements OnInit {
                         <tbody>
                             <tr>
                                 <th scope="row">Site Location</th>
-                                <td colspan="2">Latitude: ${this.latitudeDMS} N <br> Longitude: ${this.longitudeDMS} E</td>
+                                <td colspan="2">Latitude: ${this.latitudeDMS}<br> Longitude: ${this.longitudeDMS}</td>
                             </tr>
                             <tr>
                                 <th scope="row">Distance<br>(Site Location from ARP)</th>
@@ -305,6 +306,7 @@ export class UsersNOCASComponent implements OnInit {
       if (paymentButton) {
         paymentButton.addEventListener('click', this.MakePayment.bind(this));
       }
+      this.showModal();
     }
   }
   subscribe() {
@@ -459,17 +461,18 @@ export class UsersNOCASComponent implements OnInit {
         </div><br>`;
     }
   
-    // Update the mapData element with the generated content
-    const mapData = document.getElementById('mapData');
-    if (mapData) {
-      mapData.innerHTML = mapDataContent;
-    }
+   
     
     // Close the airport modal
     const modal = document.getElementById('airportModal');
     if (modal) {
       modal.style.display = 'none';
     }
+     // Update the mapData element with the generated content
+     const mapData = document.getElementById('mapData');
+     if (mapData) {
+       mapData.innerHTML = mapDataContent;
+     }
     
   }
   
@@ -484,28 +487,30 @@ export class UsersNOCASComponent implements OnInit {
     const latitudeDD = this.convertDMSToDD(lat, true);
     const longitudeDD = this.convertDMSToDD(lng, false);
     const newDistance = this.calculateDistance(latitudeDD, longitudeDD, airportCoordinates[0], airportCoordinates[1]);
-
+  
     const clickedFeature = this.geojsonLayer.getLayers().find((layer: any) => {
       return layer.getBounds().contains([lat, lng]);
     });
-
-    // const airport_name = this.selectedAirportName.split('/')[0];
+  
     const mapData = document.getElementById('mapData');
-
+  
     if (mapData !== null) {
       mapData.innerHTML = '';
       mapData.style.display = 'none';
-
+  
       if (clickedFeature) {
-
+        console.log('Clicked Feature:', clickedFeature); // Log clicked feature for debugging
         const properties = clickedFeature.feature.properties;
+        console.log('Properties:', properties); // Log properties for debugging
+  
         const elevation = properties.Name;
-        const permissibleheight = parseFloat(properties.Name) - parseFloat(this.TopElevationForm.get('Site_Elevation').value);
-
-        if (elevation === 'NOC Required') {
+        const permissibleHeight = parseFloat(properties.Name) - parseFloat(this.TopElevationForm.get('Site_Elevation').value);
+  
+        if (elevation == 'NOC Required') { // Trim to ensure no leading/trailing spaces affect the comparison
           alert("NOC Required");
           return;
         }
+  
         mapData.innerHTML = `
           <table class="table table-hover">
             <tbody>
@@ -515,7 +520,7 @@ export class UsersNOCASComponent implements OnInit {
               </tr>
               <tr>
                 <th scope="row">Permissible Height (AGL- Above ground level)</th>
-                <td>${permissibleheight < 0 ? '-' : ''}${Math.abs(permissibleheight).toFixed(2)}M</td>
+                <td>${permissibleHeight < 0 ? '-' : ''}${Math.abs(permissibleHeight).toFixed(2)}M</td>
               </tr>
               <tr>
                 <th scope="row">Site Location</th>
@@ -528,13 +533,16 @@ export class UsersNOCASComponent implements OnInit {
             </tbody>
           </table>`;
         this.showModal();
-
+  
       } else {
         this.showClosestAirportList(mapData);
       }
       mapData.style.display = 'block';
+    } else {
+      console.error('Element with ID "mapData" not found in the DOM.');
     }
   }
+  
 
   showClosestAirportList(mapData: HTMLElement) {
     const latitudeDD = this.convertDMSToDD(this.lat, true);
@@ -888,3 +896,12 @@ export class UsersNOCASComponent implements OnInit {
       })
   }
 } 
+
+
+
+
+
+
+
+
+

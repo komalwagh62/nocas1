@@ -3,7 +3,6 @@ import { AfterViewInit, Component,OnInit, ViewChild } from '@angular/core';
 import { ApiService } from '../Shared/Api/api.service';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
-import Chart from 'chart.js/auto';
 import { DatePipe } from '@angular/common'; 
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
@@ -73,43 +72,47 @@ airport: any;
     this.showSubscriptionDetails = true;
     this.showServiceDetails = false;
     this.showPermissibleDetails = false;
-  
+
+    // Reset total subscription price and row count
+    this.totalSubscriptionPrice = 0;
+    this.subscriptionRowCount = 0;
+
     // Fetch subscription data
     const headers = new HttpHeaders().set("Authorization", `Bearer ${this.apiservice.token}`);
     const user_id = this.apiservice.userData.id;
     this.http.get<any[]>(`http://localhost:3001/api/subscription/getAllsubscriptions?user_id=${user_id}`, { headers: headers })
-      .subscribe(
-        response => {
-          console.log('Subscription data:', response);
-          let priceCalculation = '';
-  
-          response.forEach((subscription, index) => {
-            subscription.expiry_date = this.datePipe.transform(subscription.expiry_date, 'dd/MM/yyyy');
-  
-            const price = Number(subscription.price);
-            if (!isNaN(price)) {
-              priceCalculation += price;
-              if (index < response.length - 1) {
-                priceCalculation += ' + ';
-              }
-              this.totalSubscriptionPrice += price;
-              this.filtersubscriptionDetails = response;
-              this.subscriptionDataSource.data = this.filtersubscriptionDetails;
-              this.subscriptionDataSource.paginator = this.subscriptionPaginator;
-            } else {
-              console.error('Invalid price:', subscription.price);
+        .subscribe(
+            response => {
+                console.log('Subscription data:', response);
+                let priceCalculation = '';
+
+                response.forEach((subscription, index) => {
+                    subscription.expiry_date = this.datePipe.transform(subscription.expiry_date, 'dd/MM/yyyy');
+
+                    const price = Number(subscription.price);
+                    if (!isNaN(price)) {
+                        priceCalculation += price;
+                        if (index < response.length - 1) {
+                            priceCalculation += ' + ';
+                        }
+                        this.totalSubscriptionPrice += price;
+                    } else {
+                        console.error('Invalid price:', subscription.price);
+                    }
+                });
+
+                this.priceCalculation = priceCalculation;
+                this.filtersubscriptionDetails = response;
+                this.subscriptionDataSource.data = this.filtersubscriptionDetails;
+                this.subscriptionDataSource.paginator = this.subscriptionPaginator;
+                this.subscriptionRowCount = response.length; // Count subscription rows
+            },
+            error => {
+                console.error('Failed to fetch subscription data:', error);
             }
-          });
-  
-          this.priceCalculation = priceCalculation;
-          this.subscriptionDetails = response;
-          this.subscriptionRowCount = response.length; // Count subscription rows
-        },
-        error => {
-          console.error('Failed to fetch subscription data:', error);
-        }
-      );
-  }
+        );
+}
+
   
 
   detailsOfServices() {

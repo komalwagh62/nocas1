@@ -5,11 +5,10 @@
 
   <section class="section dashboard">
     <div class="row">
-      <div class="col-lg-8">
+      <div class="col-12">
         <div class="row">
-
           <!-- Sales Card -->
-          <div class="col-xxl-4 col-md-6 mb-4">
+          <div class="col-xxl-4 col-lg-4 col-md-6 mb-4">
             <div class="card info-card sales-card">
               <div class="filter">
                 <img src="assets/arrow.png" (click)="detailsOfPermissible()" alt="" class="request-img transparent-img" style="height: 63px; width: 63px">
@@ -23,7 +22,6 @@
                   </div>
                   <div class="ps-3">
                     <h6>{{permissibleRowCount}}</h6>
-                    
                   </div>
                 </div>
               </div>
@@ -31,7 +29,7 @@
           </div><!-- End Sales Card -->
 
           <!-- Subscription Details Card -->
-          <div class="col-xxl-4 col-md-6 mb-4">
+          <div class="col-xxl-4 col-lg-4 col-md-6 mb-4">
             <div class="card info-card revenue-card">
               <div class="filter">
                 <img src="assets/arrow.png" (click)="detailsOfSubscription()" alt="" class="request-img transparent-img" style="height: 63px; width: 63px">
@@ -45,7 +43,6 @@
                   </div>
                   <div class="ps-3">
                     <h6>INR {{ totalSubscriptionPrice }}</h6>
-                    
                   </div>
                 </div>
               </div>
@@ -53,7 +50,7 @@
           </div><!-- End Subscription Details Card -->
 
           <!-- Customers Card -->
-          <div class="col-xxl-4 col-xl-12 mb-4">
+          <div class="col-xxl-4 col-lg-4 col-md-6 mb-4">
             <div class="card info-card customers-card">
               <div class="card-body">
                 <div class="filter">
@@ -69,7 +66,6 @@
                   </div>
                   <div class="ps-3">
                     <h6>{{serviceRowCount}}</h6>
-                    
                   </div>
                 </div>
               </div>
@@ -80,6 +76,10 @@
       </div>
     </div>
   </section>
+</main>
+
+
+  
   
   <mat-form-field *ngIf="showSubscriptionDetails" >
     <mat-label>Filter Subscriptions</mat-label>
@@ -226,7 +226,6 @@
     </div>
   
  
-  
-</main>
+
 
 <!-- <app-footer></app-footer> -->

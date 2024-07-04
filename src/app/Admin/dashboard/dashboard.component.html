@@ -1,3 +1,4 @@
+
 <main id="main" class="main">
   <div class="pagetitle">
     <nav></nav>
@@ -5,90 +6,76 @@
 
   <section class="section dashboard">
     <div class="row">
-      <div class="col-lg-8">
-        <div class="row">
-
-          <!-- Sales Card -->
-          <div class="col-xxl-4 col-md-6 mb-4">
-            <div class="card info-card sales-card">
-              <div class="filter">
-                <img src="assets/arrow.png" (click)="getAllUsers()" alt="" class="request-img transparent-img"
-                  style="height: 63px; width: 63px">
-                  <!-- Display the count of user rows -->
-
-
-                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow"></ul>
+      <!-- Sales Card -->
+      <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card info-card sales-card">
+          <div class="filter">
+            <img src="assets/arrow.png" (click)="getAllUsers()" alt="" class="request-img transparent-img"
+              style="height: 63px; width: 63px">
+            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow"></ul>
+          </div>
+          <div class="card-body">
+            <h3 class="card-title">Users Details</h3>
+            <div class="d-flex align-items-center">
+              <div class="d-flex align-items-center justify-content-center">
+                <img src="assets/people.png" alt="" class="construction-img" style="height: 63px; width: 63px">
               </div>
-              <div class="card-body">
-                <h3 class="card-title">Users Details</h3>
-                <div class="d-flex align-items-center">
-                  <div class="d-flex align-items-center justify-content-center">
-                    <img src="assets/people.png" alt="" class="construction-img"
-                      style="height: 63px; width: 63px">
-                  </div>
-                  <div class="ps-3">
-                    <h6 >{{ userRowCount }}</h6>
-                    
-                  </div>
-                </div>
+              <div class="ps-3">
+                <h6>{{ userRowCount }}</h6>
               </div>
             </div>
-          </div><!-- End Sales Card -->
-
-          <!-- Subscription Details Card -->
-          <div class="col-xxl-4 col-md-6 mb-4">
-            <div class="card info-card revenue-card">
-              <div class="filter">
-                <img src="assets/arrow.png"  (click)="getAllSubscriptions()"  class="request-img transparent-img"
-                  style="height: 63px; width: 63px">
-             
-
-                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow"></ul>
-              </div>
-              <div class="card-body">
-                <h3 class="card-title">Subscription Details</h3>
-                <div class="d-flex align-items-center">
-                  <div class="d-flex align-items-center justify-content-center">
-                    <img src="assets/membership.png" alt="" class="member-img" style="height: 63px; width: 63px">
-                  </div>
-                  <div class="ps-3">
-                    <h6>INR {{ totalSubscriptionPrice }}</h6>
-                    
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div><!-- End Subscription Details Card -->
-
-          <!-- Customers Card -->
-          <div class="col-xxl-4 col-xl-12 mb-4">
-            <div class="card info-card customers-card">
-              <div class="card-body">
-                <div class="filter">
-                  <a class="arrow-icon" (click)="getAllPermissible()" data-bs-toggle="dropdown">
-                    <img src="assets/arrow.png"  class="request-img transparent-img"
-                      style="height: 63px; width: 63px">
-                  </a>
-                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow"></ul>
-                </div>
-                <h3 class="card-title">Permissible Details</h3>
-                <div class="d-flex align-items-center">
-                  <div class="d-flex align-items-center justify-content-center">
-                    <img src="assets/request.png" alt="" class="request-img" style="height: 63px; width: 63px">
-                  </div>
-                  <div class="ps-3">
-                    <h6>{{ permissibleRowCount }}</h6>
-                    
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div><!-- End Customers Card -->
-
+          </div>
         </div>
-      </div>
+      </div><!-- End Sales Card -->
+
+      <!-- Subscription Details Card -->
+      <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card info-card revenue-card">
+          <div class="filter">
+            <img src="assets/arrow.png" (click)="getAllSubscriptions()" class="request-img transparent-img"
+              style="height: 63px; width: 63px">
+            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow"></ul>
+          </div>
+          <div class="card-body">
+            <h3 class="card-title">Subscription Details</h3>
+            <div class="d-flex align-items-center">
+              <div class="d-flex align-items-center justify-content-center">
+                <img src="assets/membership.png" alt="" class="member-img" style="height: 63px; width: 63px">
+              </div>
+              <div class="ps-3">
+                <h6>INR {{ totalSubscriptionPrice }}</h6>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- End Subscription Details Card -->
+
+      <!-- Customers Card -->
+      <div class="col-lg-4 col-md-12 mb-4">
+        <div class="card info-card customers-card">
+          <div class="card-body">
+            <div class="filter">
+              <a class="arrow-icon" (click)="getAllPermissible()" data-bs-toggle="dropdown">
+                <img src="assets/arrow.png" class="request-img transparent-img" style="height: 63px; width: 63px">
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow"></ul>
+            </div>
+            <h3 class="card-title">Permissible Details</h3>
+            <div class="d-flex align-items-center">
+              <div class="d-flex align-items-center justify-content-center">
+                <img src="assets/request.png" alt="" class="request-img" style="height: 63px; width: 63px">
+              </div>
+              <div class="ps-3">
+                <h6>{{ permissibleRowCount }}</h6>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- End Customers Card -->
     </div>
   </section>
+</main>
+
 
 
   <mat-form-field *ngIf="showUserDetails">
@@ -97,7 +84,7 @@
   </mat-form-field>
   <div class="mat-elevation-z8" *ngIf="showUserDetails">
     <table mat-table [dataSource]="dataSource">
-  
+
       <!-- User Table Columns -->
       <ng-container matColumnDef="id">
         <th mat-header-cell *matHeaderCellDef> ID </th>
@@ -119,132 +106,135 @@
         <th mat-header-cell *matHeaderCellDef> Email </th>
         <td mat-cell *matCellDef="let user"> {{ user.email }} </td>
       </ng-container>
-      
+
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
-  
+
     <mat-paginator [pageSizeOptions]="[5, 10, 20,]" showFirstLastButtons></mat-paginator>
   </div>
-  
 
 
 
-<!-- Subscription Details Table -->
-<mat-form-field *ngIf="showSubscriptionDetails">
-  <mat-label>Filter Subscriptions</mat-label>
-  <input matInput (keyup)="applySubscriptionFilter($event)" placeholder="Ex. type" #subscriptionInput>
-</mat-form-field>
-<div *ngIf="showSubscriptionDetails">
-  
 
-  <div class="mat-elevation-z8">
-    <mat-table [dataSource]="subscriptionDataSource" multiTemplateDataRows>
-      
-      <!-- Subscription ID Column -->
-      <ng-container matColumnDef="subscription_id">
-        <mat-header-cell *matHeaderCellDef> Subscription ID </mat-header-cell>
-        <mat-cell *matCellDef="let element"> {{element.subscription_id}} </mat-cell>
-      </ng-container>
-  
-      <!-- Subscription Status Column -->
-      <ng-container matColumnDef="subscription_status">
-        <mat-header-cell *matHeaderCellDef> Status </mat-header-cell>
-        <mat-cell *matCellDef="let element" [ngClass]="{
+  <!-- Subscription Details Table -->
+  <mat-form-field *ngIf="showSubscriptionDetails">
+    <mat-label>Filter Subscriptions</mat-label>
+    <input matInput (keyup)="applySubscriptionFilter($event)" placeholder="Ex. type" #subscriptionInput>
+  </mat-form-field>
+  <div *ngIf="showSubscriptionDetails">
+
+
+    <div class="mat-elevation-z8">
+      <mat-table [dataSource]="subscriptionDataSource" multiTemplateDataRows>
+
+        <!-- Subscription ID Column -->
+        <ng-container matColumnDef="subscription_id">
+          <mat-header-cell *matHeaderCellDef> Subscription ID </mat-header-cell>
+          <mat-cell *matCellDef="let element"> {{element.subscription_id}} </mat-cell>
+        </ng-container>
+
+        <!-- Subscription Status Column -->
+        <ng-container matColumnDef="subscription_status">
+          <mat-header-cell *matHeaderCellDef> Status </mat-header-cell>
+          <mat-cell *matCellDef="let element" [ngClass]="{
           'status-active': element.subscription_status === 'Active',
           'status-inactive': element.subscription_status === 'Inactive',
           'status-expired': element.subscription_status === 'Expired'
         }">
-          {{element.subscription_status}}
-        </mat-cell>
-      </ng-container>
-      
-      <!-- Expiry Date Column -->
-      <ng-container matColumnDef="expiry_date">
-        <mat-header-cell *matHeaderCellDef> Expiry Date </mat-header-cell>
-        <mat-cell *matCellDef="let element"> {{element.expiry_date}} </mat-cell>
-      </ng-container>
-  
-      <!-- Subscription Type Column -->
-      <ng-container matColumnDef="subscription_type">
-        <mat-header-cell *matHeaderCellDef> Type </mat-header-cell>
-        <mat-cell *matCellDef="let element"> {{element.subscription_type}} </mat-cell>
-      </ng-container>
-  
-      <!-- Row Definition -->
-      <mat-header-row *matHeaderRowDef="['subscription_id', 'subscription_status', 'expiry_date', 'subscription_type']"></mat-header-row>
-      <mat-row *matRowDef="let row; columns: ['subscription_id', 'subscription_status', 'expiry_date', 'subscription_type'];"></mat-row>
-    </mat-table>
+            {{element.subscription_status}}
+          </mat-cell>
+        </ng-container>
+
+        <!-- Expiry Date Column -->
+        <ng-container matColumnDef="expiry_date">
+          <mat-header-cell *matHeaderCellDef> Expiry Date </mat-header-cell>
+          <mat-cell *matCellDef="let element"> {{element.expiry_date}} </mat-cell>
+        </ng-container>
+
+        <!-- Subscription Type Column -->
+        <ng-container matColumnDef="subscription_type">
+          <mat-header-cell *matHeaderCellDef> Type </mat-header-cell>
+          <mat-cell *matCellDef="let element"> {{element.subscription_type}} </mat-cell>
+        </ng-container>
+
+        <!-- Row Definition -->
+        <mat-header-row
+          *matHeaderRowDef="['subscription_id', 'subscription_status', 'expiry_date', 'subscription_type']"></mat-header-row>
+        <mat-row
+          *matRowDef="let row; columns: ['subscription_id', 'subscription_status', 'expiry_date', 'subscription_type'];"></mat-row>
+      </mat-table>
+    </div>
+
   </div>
-  
-</div>
 
 
 
 
 
-<!-- Permissible Details Table -->
-<mat-form-field *ngIf="showPermissibleDetails">
-  <mat-label>Filter Permissible Details</mat-label>
-  <input matInput (keyup)="applyPermissibleFilter($event)" placeholder="Ex. city" #permissibleInput>
-</mat-form-field>
+  <!-- Permissible Details Table -->
+  <mat-form-field *ngIf="showPermissibleDetails">
+    <mat-label>Filter Permissible Details</mat-label>
+    <input matInput (keyup)="applyPermissibleFilter($event)" placeholder="Ex. city" #permissibleInput>
+  </mat-form-field>
 
-<div class="mat-elevation-z8" *ngIf="showPermissibleDetails">
-  
   <div class="mat-elevation-z8" *ngIf="showPermissibleDetails">
-    <mat-table [dataSource]="permissibleDataSource" multiTemplateDataRows>
-      <!-- Request ID Column -->
-      <ng-container matColumnDef="request_id">
-        <mat-header-cell *matHeaderCellDef> Request ID </mat-header-cell>
-        <mat-cell *matCellDef="let element"> {{element.request_id}} </mat-cell>
-      </ng-container>
-  
-      <!-- City Column -->
-      <ng-container matColumnDef="city">
-        <mat-header-cell *matHeaderCellDef> City </mat-header-cell>
-        <mat-cell *matCellDef="let element"> {{element.city}} </mat-cell>
-      </ng-container>
-  
-      <!-- Airport Name Column -->
-      <ng-container matColumnDef="airport_name">
-        <mat-header-cell *matHeaderCellDef> Airport Name </mat-header-cell>
-        <mat-cell *matCellDef="let element"> {{element.airport_name}} </mat-cell>
-      </ng-container>
-  
-      <!-- Expand Button Column -->
-      <ng-container matColumnDef="expand">
-        <mat-header-cell *matHeaderCellDef> </mat-header-cell>
-        <mat-cell *matCellDef="let element">
-          <button mat-icon-button (click)="toggleRow(element)">
-            <mat-icon>expand_more</mat-icon>
-          </button>
-          
-        </mat-cell>
-      </ng-container>
-  
-      <mat-header-row *matHeaderRowDef="permissibleDisplayedColumns"></mat-header-row>
-      <mat-row *matRowDef="let row; columns: permissibleDisplayedColumns;"></mat-row>
-  
-      <!-- Expanded Row -->
-      <ng-container matColumnDef="expandedDetail">
-        <mat-cell *matCellDef="let element">
-          <div *ngIf="expandedElement === element">
-            <div><strong>User ID:</strong> {{element.user_id}}</div>
-            <div><strong>Site Latitude:</strong> {{element.latitude}}</div>
-            <div><strong>Site Longitude:</strong> {{element.longitude}}</div>
-            <div><strong>Site Elevation:</strong> {{element.site_elevation}}</div>
-            <div><strong>Distance From ARP:</strong> {{element.distance}}</div>
-            <div><strong>Permissible Height (AGL):</strong> {{element.permissible_height}}</div>
-            <div><strong>Permissible Elevation (AMSL):</strong> {{element.permissible_elevation}}</div>
-            <div><strong>Snapshot:</strong> {{element.snap_shot}}</div>
-          </div>
-        </mat-cell>
-      </ng-container>
-      <mat-row *matRowDef="let row; columns: ['expandedDetail'];" [class.expanded-row]="expandedElement === row && expandedElement !== null"></mat-row>
 
-    </mat-table>
-  
-    <mat-paginator #permissiblePaginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+    <div class="mat-elevation-z8" *ngIf="showPermissibleDetails">
+      <mat-table [dataSource]="permissibleDataSource" multiTemplateDataRows>
+        <!-- Request ID Column -->
+        <ng-container matColumnDef="request_id">
+          <mat-header-cell *matHeaderCellDef> Request ID </mat-header-cell>
+          <mat-cell *matCellDef="let element"> {{element.request_id}} </mat-cell>
+        </ng-container>
+
+        <!-- City Column -->
+        <ng-container matColumnDef="city">
+          <mat-header-cell *matHeaderCellDef> City </mat-header-cell>
+          <mat-cell *matCellDef="let element"> {{element.city}} </mat-cell>
+        </ng-container>
+
+        <!-- Airport Name Column -->
+        <ng-container matColumnDef="airport_name">
+          <mat-header-cell *matHeaderCellDef> Airport Name </mat-header-cell>
+          <mat-cell *matCellDef="let element"> {{element.airport_name}} </mat-cell>
+        </ng-container>
+
+        <!-- Expand Button Column -->
+        <ng-container matColumnDef="expand">
+          <mat-header-cell *matHeaderCellDef> </mat-header-cell>
+          <mat-cell *matCellDef="let element">
+            <button mat-icon-button (click)="toggleRow(element)">
+              <mat-icon>expand_more</mat-icon>
+            </button>
+
+          </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="permissibleDisplayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: permissibleDisplayedColumns;"></mat-row>
+
+        <!-- Expanded Row -->
+        <ng-container matColumnDef="expandedDetail">
+          <mat-cell *matCellDef="let element">
+            <div *ngIf="expandedElement === element">
+              <div><strong>User ID:</strong> {{element.user_id}}</div>
+              <div><strong>Site Latitude:</strong> {{element.latitude}}</div>
+              <div><strong>Site Longitude:</strong> {{element.longitude}}</div>
+              <div><strong>Site Elevation:</strong> {{element.site_elevation}}</div>
+              <div><strong>Distance From ARP:</strong> {{element.distance}}</div>
+              <div><strong>Permissible Height (AGL):</strong> {{element.permissible_height}}</div>
+              <div><strong>Permissible Elevation (AMSL):</strong> {{element.permissible_elevation}}</div>
+              <div><strong>Snapshot:</strong> {{element.snap_shot}}</div>
+            </div>
+          </mat-cell>
+        </ng-container>
+        <mat-row *matRowDef="let row; columns: ['expandedDetail'];"
+          [class.expanded-row]="expandedElement === row && expandedElement !== null"></mat-row>
+
+      </mat-table>
+
+      <mat-paginator #permissiblePaginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+    </div>
+
   </div>
-  
-</div>

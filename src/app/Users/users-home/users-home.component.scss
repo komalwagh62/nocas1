@@ -5,6 +5,35 @@
   top: 15px;
 }
 
+// example-sidenav-content[_ngcontent-ng-c3576681141] {
+//   height: 80vh;
+//   background-color: white;
+// }
+
+.parent-element {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.header {
+  height: 60px; /* Example header height */
+  background-color: lightgray;
+}
+
+example-sidenav-content[_ngcontent-ng-c3576681141] {
+  flex-grow: 1;
+  overflow: auto;
+  background-color: white;
+  margin: 0;
+  padding: 0;
+}
+
+example-sidenav-content[_ngcontent-ng-c3576681141] {
+  height: 100%;
+}
+
 .arrow-icon {
   font-size: 30px;
   width: 20px;
@@ -136,7 +165,7 @@
   margin-top: 60px;
   padding: 20px;
   transition: all 0.3s;
-  height: 90vh;
+  // height: 90vh;
 }
 
 @media (max-width: 1199px) {
@@ -347,7 +376,7 @@ table {
     margin-top: 60px;
     padding: 20px;
     transition: all 0.3s;
-    height: 90vh;
+    // height: 90vh;
   }
   
   @media (max-width: 1199px) {

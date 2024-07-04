@@ -127,6 +127,8 @@ getUserDetails(): void {
         localStorage.setItem('this.user', JSON.stringify(response.apiservice.userData));
       },
       error => {
+        localStorage.removeItem('userData');
+        localStorage.removeItem('token')
         alert("Failed Login");
         this.router.navigate(['UsersLogin']);
       }

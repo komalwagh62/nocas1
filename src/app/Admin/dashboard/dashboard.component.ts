@@ -81,42 +81,42 @@ export class DashboardComponent implements AfterViewInit {
     this.showSubscriptionDetails = true;
     this.showUserDetails = false;
     this.showPermissibleDetails = false;
+  
+    // Reset totalSubscriptionPrice before fetching new data
+    this.totalSubscriptionPrice = 0;
+    this.priceCalculation = '';
+  
     this.apiService.getAllSubscriptions().subscribe(
       (response: any[]) => {
         console.log('Subscription Details:', response);
-
-        let priceCalculation = '';
-        
+  
         response.forEach((subscription, index) => {
           console.log('Original expiry_date:', subscription.expiry_date);
           subscription.expiry_date = this.datePipe.transform(subscription.expiry_date, 'dd/MM/yyyy');
           console.log('Formatted expiry_date:', subscription.expiry_date);
-
+  
           // Ensure price is treated as a number
           const price = Number(subscription.price);
           if (!isNaN(price)) {
             // Append the price to the calculation string
-            priceCalculation += price;
+            this.priceCalculation += price;
             if (index < response.length - 1) {
-              priceCalculation += ' + ';
+              this.priceCalculation += ' + ';
             }
-
+  
             // Sum up the total price
             this.totalSubscriptionPrice += price;
           } else {
             console.error('Invalid price:', subscription.price);
           }
         });
-
-        // Set the calculation string to the component property
-        this.priceCalculation = priceCalculation;
-
+  
         // Assign response to subscription details
         this.subscriptionDetails = response;
         this.filtersubscriptionDetails = response;
         this.subscriptionDataSource.data = this.filtersubscriptionDetails;
         this.subscriptionDataSource.paginator = this.subscriptionPaginator;
-
+  
         // Print the total subscription price
         console.log('Total Subscription Price in Rs:', this.totalSubscriptionPrice);
       },
@@ -125,6 +125,7 @@ export class DashboardComponent implements AfterViewInit {
       }
     );
   }
+  
   
   toggleRow(element: any) {
     this.expandedElement = this.expandedElement === element ? null : element;

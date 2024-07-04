@@ -4,11 +4,9 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import * as L from 'leaflet';
 import { ApiService } from '../Shared/Api/api.service';
 import { Router } from '@angular/router';
-import html2canvas from 'html2canvas';
 import * as domtoimage from 'dom-to-image';
-import { saveAs } from 'file-saver';
-import { data } from 'jquery';
-import { EventListenerFocusTrapInertStrategy } from '@angular/cdk/a11y';
+import { User } from '../Shared/Model/users/users';
+
 
 declare var Razorpay: any;
 @Component({
@@ -46,13 +44,77 @@ export class UsersNOCASComponent implements OnInit {
   freeTrialCount!: number;
   isSubscribed: boolean = false;
   screenshotUrl: string | null = null;
+  public isCheckboxSelected: boolean = false;
+  public insideMapData = { elevation: "", permissibleHeight: "", latitudeDMS: "", longitudeDMS: "", newDistance: "" }
+  public outsideMapData = { airport_name: "", latitudeDMS: "", longitudeDMS: "", newDistance: "" }
+  public closestAirportList: { airportCity: string, airportName: string, distance: number }[] = [];
 
   constructor(public apiservice: ApiService, private formbuilder: FormBuilder, private http: HttpClient, private router: Router) { }
 
+  ngOnInit(): void {
+    this.TopElevationForm = this.formbuilder.group({
+      Latitude: [''],
+      Longitude: [''],
+      CITY: ['', [Validators.required]], // Ensure required validator is set
+      location: ['manual'],
+      Site_Elevation: new FormControl('', [Validators.required, Validators.pattern(/^[0-5]+(?:\.[0-5]+)?$/)]),
+      elevationOption: ['known', Validators.required],
+      snapshot: ['']
+    });
 
+    this.TopElevationForm.get('Latitude').valueChanges.subscribe((latitudeDMS: string) => {
+
+      const lat = this.convertDMSStringToDD(latitudeDMS);
+      console.log(lat)
+      this.updateMarkersPosition(lat, this.long);
+    });
+
+    this.TopElevationForm.get('Longitude').valueChanges.subscribe((longitudeDMS: string) => {
+
+      const lng = this.convertDMSStringToDD(longitudeDMS);
+      console.log(lng)
+      this.updateMarkersPosition(this.lat, lng);
+
+
+    });
+
+    this.TopElevationForm.get('CITY').valueChanges.subscribe((city: string) => {
+      console.log('City changed:', city);
+      this.city = city;
+
+      const selectedAirport = this.airports.find(airport => airport.airport_city === city);
+      this.selectedAirport = selectedAirport;
+      console.log('Selected airport:', selectedAirport);
+
+      // Update other form fields based on the selected airport
+      this.selectedAirportName = selectedAirport ? selectedAirport.airport_name : '';
+      this.selectedAirportIcao = selectedAirport ? selectedAirport.airport_icao : '';
+      this.selectedAirportIATA = selectedAirport ? selectedAirport.airport_iata : '';
+
+      // Example condition to load geoJSON based on selected cities
+      if (city === 'Coimbatore' || city === 'Mumbai' || city === 'Puri' || city === 'Ahmedabad' || city === 'Akola' || city === 'Chennai' || city === 'Delhi' || city === 'Guwahati' || city === 'Hyderabad' || city === 'Jaipur' || city === 'Nagpur' || city === 'Thiruvananthapuram' || city === 'Vadodara' || city === 'Varanasi') {
+        this.loadGeoJSON(this.map);
+      } else {
+        if (this.geojsonLayer) {
+          this.map.removeLayer(this.geojsonLayer);
+        }
+      }
+
+    });
+
+    this.fetchAirports();
+    this.showDefaultMap();
+  }
+  convertDMSStringToDD(dmsString: string): number {
+    const parts = dmsString.split(/[^\d\w]+/);
+    const degrees = parseFloat(parts[0]);
+    const minutes = parseFloat(parts[1]);
+    const seconds = parseFloat(parts[2]);
+    const direction = parts[3];
+    return this.convertDMSsToDD(degrees, minutes, seconds, direction);
+  }
   captureScreenshot(): void {
     const mapElement = document.getElementById('map');
-
     if (mapElement) {
       domtoimage.toBlob(mapElement)
         .then((blob: Blob) => {
@@ -79,23 +141,23 @@ export class UsersNOCASComponent implements OnInit {
   async createNocas(subscription_id: string = "") {
     if (this.TopElevationForm.valid) {
       try {
-        const screenshotPath = await this.captureScreenshot(); // Capture and save the screenshot
-
+        const screenshotPath = await this.captureScreenshot();
         const lat = parseFloat(this.TopElevationForm.value.Latitude);
         const lng = parseFloat(this.TopElevationForm.value.Longitude);
         const distance = this.calculateDistance(lat, lng, this.airportCoordinates[0], this.airportCoordinates[1]);
 
-        // Retrieve the permissible height and elevation based on the feature's properties
         const clickedFeature = this.geojsonLayer.getLayers().find((layer: any) => {
           return layer.getBounds().contains([lat, lng]);
         });
-        this.latitudeDMS = this.convertDDtoDMS(lat, true);
-        this.longitudeDMS = this.convertDDtoDMS(lng, false);
+
+        // this.latitudeDMS = this.convertDDtoDMS(lat, true);
+        // this.longitudeDMS = this.convertDDtoDMS(lng, false);
         let permissibleHeight = 0;
         let permissibleElevation = 0;
+
         if (clickedFeature) {
           const properties = clickedFeature.feature.properties;
-          permissibleElevation = parseFloat(properties.Name);
+          permissibleElevation = parseFloat(properties.name);
           permissibleHeight = permissibleElevation - parseFloat(this.TopElevationForm.value.Site_Elevation);
         }
 
@@ -109,28 +171,27 @@ export class UsersNOCASComponent implements OnInit {
           longitude: this.longitudeDMS,
           airport_name: this.selectedAirportName,
           site_elevation: this.TopElevationForm.value.Site_Elevation,
-          snapshot: screenshotPath, // Use the saved screenshot path
+          snapshot: screenshotPath,
           subscription_id: subscription_id,
         };
-
-        console.log(requestBody);
 
         const headers = new HttpHeaders().set("Authorization", `Bearer ${this.apiservice.token}`);
         this.http.post("http://localhost:3001/api/nocas/createNocas", requestBody, { headers: headers })
           .subscribe(
             (resultData: any) => {
-              console.log(resultData);
               if (resultData.isSubscribed || resultData.freeTrialCount > 0 || resultData.isOneTimeSubscription) {
-                this.showData();
+                this.isSubscribed = true;
               } else {
-                this.hideData();
-                alert("Your Free trial expired. Please Subscribe Package");
-                this.router.navigate(['PricingPlans']);
+                this.isSubscribed = false;
+                // alert("Your Free trial expired. Please Subscribe Package");
+                // this.router.navigate(['PricingPlans']);
               }
             },
             (error: any) => {
               console.error("Error creating Nocas entry:", error);
-              alert("Failed to create Nocas entry. Please try again.");
+              // alert("Failed to create Nocas entry. Please check if you are logged in.");
+              // this.apiservice.userData = {} as User
+              // this.router.navigate(['UsersLogin']);
             }
           );
       } catch (error) {
@@ -142,56 +203,6 @@ export class UsersNOCASComponent implements OnInit {
     }
   }
 
-
-
-  ngOnInit(): void {
-    this.TopElevationForm = this.formbuilder.group({
-      Latitude: ['', [Validators.required]],
-      Longitude: ['', [Validators.required]],
-      CITY: ['', [Validators.required, Validators.nullValidator,]],
-      location: ['manual'],
-      Site_Elevation: new FormControl('', [Validators.required, Validators.nullValidator, Validators.pattern(/^[0-5]+(?:\.[0-5]+)?$/)]),
-      elevationOption: ['known', Validators.required],
-      snapshot: ['']
-    });
-    this.TopElevationForm.get('Latitude').valueChanges.subscribe((lat: number) => {
-      this.latitudeDMS = this.convertDDtoDMS(this.lat, true);
-       
-      this.updateMarkerPosition();
-      this.displayMapData(this.latitudeDMS, this.TopElevationForm.get('Longitude').value, this.marker.getLatLng());
-    });
-    this.TopElevationForm.get('Longitude').valueChanges.subscribe((lng: number) => {
-      this.longitudeDMS = this.convertDDtoDMS(lng, false);
-
-      this.updateMarkerPosition();
-      this.displayMapData(this.TopElevationForm.get('Latitude').value, this.longitudeDMS, this.marker.getLatLng());
-    });
-    this.TopElevationForm.get('CITY').valueChanges.subscribe((city: string) => {
-      console.log('ICAO changed:', city);
-      this.city = city; // Set the value of icao when ICAO changes
-      const selectedAirport = this.airports.find(airport => airport.airport_city === city);
-      this.selectedAirport = selectedAirport;
-      console.log(this.selectedAirport)
-      this.selectedAirportName = selectedAirport ? selectedAirport.airport_name : '';
-      this.selectedAirportIcao = selectedAirport ? selectedAirport.airport_icao : '';
-      this.selectedAirportIATA = selectedAirport ? selectedAirport.airport_iata : '';
-      if (city === 'Coimbatore' || city === 'Mumbai' || city === 'Puri') {
-        console.log("Selected airport:", city);
-
-        this.loadGeoJSON(this.map);
-
-      } else {
-        console.log("Invalid airport selected");
-        if (this.geojsonLayer) {
-          this.map.removeLayer(this.geojsonLayer);
-        }
-      }
-    });
-    this.fetchAirports();
-    this.showDefaultMap();
-
-
-  }
 
 
 
@@ -209,20 +220,21 @@ export class UsersNOCASComponent implements OnInit {
   }
 
   hideData() {
-    this.showModal();
+    // this.showModals();
     const airportCITY = this.TopElevationForm.get('CITY')?.value;
     const latitude = parseFloat(this.TopElevationForm.get('Latitude')?.value);
     const longitude = parseFloat(this.TopElevationForm.get('Longitude')?.value);
     if (airportCITY && !isNaN(latitude) && !isNaN(longitude)) {
       // Update the markers and line
       this.updateMarkerPosition();
-      this.displayModelData(latitude, longitude, this.airportCoordinates);
+
       this.showMap(latitude, longitude);
     }
 
   }
+
   showData() {
-    this.showModal(); // Display the modal after successful creation
+    // this.showModal(); // Display the modal after successful creation
     const airportCITY = this.TopElevationForm.get('CITY')?.value;
     const latitude = parseFloat(this.TopElevationForm.get('Latitude')?.value);
     const longitude = parseFloat(this.TopElevationForm.get('Longitude')?.value);
@@ -234,81 +246,6 @@ export class UsersNOCASComponent implements OnInit {
     }
   }
 
-  displayModelData(lat: number, lng: number, airportCoordinates: [number, number]) {
-    const newDistance = this.calculateDistance(lat, lng, airportCoordinates[0], airportCoordinates[1]);
-    const clickedFeature = this.geojsonLayer.getLayers().find((layer: any) => {
-      return layer.getBounds().contains([lat, lng]);
-    });
-    const airport_name = this.selectedAirportName.split('/')[0];
-    const mapData = document.getElementById('mapData');
-    if (mapData !== null) {
-      mapData.innerHTML = '';
-      mapData.style.display = 'none';
-      const siteElevationInput = this.TopElevationForm.get('Site_Elevation');
-      const siteElevation = siteElevationInput ? siteElevationInput.value : 0;
-      if (clickedFeature) {
-        const properties = clickedFeature.feature.properties;
-        const elevation = properties.Name;
-        const permissibleHeight = parseFloat(properties.Name) - siteElevation;
-        mapData.innerHTML = `
-                <table class="table table-hover">
-                    <tbody>
-                        <tr>
-                            <th scope="row">Permissible Elevation<br>(AMSL Above Mean Sea Level)</th>
-                            <td>*****</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Permissible Height<br>(AGL- Above ground level)</th>
-                            <td>******</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Site Location</th>
-                            <td colspan="2">Latitude: **** <br> Longitude: ****</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Distance<br>(Site Location from ARP)</th>
-                            <td colspan="2">*****</td>
-                        </tr>
-                    </tbody>
-                </table>
-                <h3>To get the Complete Result Upgrade your Account with our Subscription Plans. If you not prefrred to subscribe You can make one time payment to get the result.</h3>
-                <button type="button" class="btn btn-outline-primary rounded-5 " id="subscribeButton">Subscribe</button>
-                <button type="button" class="btn btn-outline-primary rounded-5 " id="paymentButton">To Make Payment</button>
-            `;
-      } else {
-        mapData.innerHTML = `
-                <div>
-                    <b>Site location selected by User is outside ${airport_name} CCZM boundary published by AAI. Permissible Elevation calculation could not be processed. Please contact us for further details</b><br><br>
-                    <table class="table table-hover">
-                        <tbody>
-                            <tr>
-                                <th scope="row">Site Location</th>
-                                <td colspan="2">Latitude: ${this.latitudeDMS}<br> Longitude: ${this.longitudeDMS}</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Distance<br>(Site Location from ARP)</th>
-                                <td colspan="2">*****</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div> <br>
-                <h3>To get the Complete Result Upgrade your Account with our Subscription Plans. If you not prefrred to subscribe You can make one time payment to get the result. </h3>
-                <button type="button" class="btn btn-outline-primary rounded-5 " id="subscribeButton">Subscribe</button>
-                <button type="button" class="btn btn-outline-primary rounded-5 " id="paymentButton">To Make Payment</button>
-            `;
-      }
-      mapData.style.display = 'block';
-      const subscribeButton = document.getElementById('subscribeButton');
-      if (subscribeButton) {
-        subscribeButton.addEventListener('click', this.subscribe.bind(this));
-      }
-      const paymentButton = document.getElementById('paymentButton');
-      if (paymentButton) {
-        paymentButton.addEventListener('click', this.MakePayment.bind(this));
-      }
-      this.showModal();
-    }
-  }
   subscribe() {
     this.router.navigate(['PricingPlans']);
   }
@@ -343,16 +280,18 @@ export class UsersNOCASComponent implements OnInit {
             }
           );
         const confirmation = confirm("Payment Successfully Done. If you want to see payment details, please go to Transaction Details page");
-        if (!confirmation) {
+        if (confirmation) {
+          this.isSubscribed = true
         }
         this.router.navigate(['C_NOCAS-MAP']);
-        this.showModal(); // Display the modal after successful creation
+        // this.showModal(); // Display the modal after successful creation
         const airportCITY = this.TopElevationForm.get('CITY')?.value;
         const latitude = parseFloat(this.TopElevationForm.get('Latitude')?.value);
         const longitude = parseFloat(this.TopElevationForm.get('Longitude')?.value);
         if (airportCITY && !isNaN(latitude) && !isNaN(longitude)) {
           this.updateMarkerPosition();
           this.displayMapData(latitude, longitude, this.airportCoordinates);
+          this.closeModal('airportModal')
         }
       },
       prefill: {
@@ -392,6 +331,28 @@ export class UsersNOCASComponent implements OnInit {
         defaultElevation = 22;
       } else if (this.city === 'Puri') {
         defaultElevation = 22;
+      } else if (this.city === 'Ahmedabad') {
+        defaultElevation = 55;
+      } else if (this.city === 'Akola') {
+        defaultElevation = 308;
+      } else if (this.city === 'Chennai') {
+        defaultElevation = 16;
+      } else if (this.city === 'Delhi') {
+        defaultElevation = 239;
+      } else if (this.city === 'Guwahati') {
+        defaultElevation = 49;
+      } else if (this.city === 'Hyderabad') {
+        defaultElevation = 542;
+      } else if (this.city === 'Jaipur') {
+        defaultElevation = 390;
+      } else if (this.city === 'Nagpur') {
+        defaultElevation = 317;
+      } else if (this.city === 'Thiruvananthapuram') {
+        defaultElevation = 5;
+      } else if (this.city === 'Vadodara') {
+        defaultElevation = 39;
+      } else if (this.city === 'Varanasi') {
+        defaultElevation = 82;
       }
       this.TopElevationForm.patchValue({ Site_Elevation: defaultElevation });
       alert("Users shall enter site elevation value received from WGS-84 survey report. Permissible height will be calculated based on site elevation entered by user. In absense of site elevation value from user, ARP (Airport) elevation value will be used as default.")
@@ -401,12 +362,24 @@ export class UsersNOCASComponent implements OnInit {
     }
   }
 
-  // airportCoordinatesList updated with city and airport names
+
   airportCoordinatesList: Array<[number, number, string, string]> = [
+    [19.79, 85.75, 'Puri', 'PURI AIRPORT/Puri/BBI'],
     [11.03, 77.04, 'Coimbatore', 'Coimbatore International Airport/Coimbatore/CJB'],
     [19.08, 72.86, 'Mumbai', 'Chhatrapati Shivaji Maharaj International Airport/Mumbai/BOM'],
-    [19.79, 85.75, 'Puri', 'PURI AIRPORT/Puri/BBI']
+    [23.07, 72.63, 'Ahmedabad', 'Sardar Vallabhbhai Patel International Airport/Ahmedabad/AMD'],
+    [20.70, 77.06, 'Akola', 'Akola Airport/Akola/AKD'],
+    [13.00, 80.18, 'Chennai', 'Chennai International Airport/Chennai/MAA'],
+    [28.56, 77.10, 'Delhi', 'Indira Gandhi International Airport/Delhi/DEL'],
+    [26.10, 91.58, 'Guwahati', 'Lokpriya Gopinath Bordoloi International Airport/Guwahati/GAU'],
+    [17.24, 78.43, 'Hyderabad', 'Rajiv Gandhi International Airport/Hyderabad/HYD'],
+    [26.91, 75.80, 'Jaipur', 'Jaipur International Airport/Jaipur/JAI'],
+    [21.09, 79.05, 'Nagpur', 'Dr. Babasaheb Ambedkar International Airport/Nagpur/NAG'],
+    [8.48, 76.92, 'Thiruvananthapuram', 'Trivandrum International Airport/Thiruvananthapuram/TRV'],
+    [22.32, 73.21, 'Vadodara', 'Vadodara Airport/Vadodara/BDQ'],
+    [25.45, 82.86, 'Varanasi', 'Lal Bahadur Shastri International Airport/Varanasi/VNS']
   ];
+
 
   submitForm() {
     if (!this.apiservice.token) {
@@ -414,180 +387,105 @@ export class UsersNOCASComponent implements OnInit {
       this.router.navigate(['UsersLogin']);
       return; // Exit the function if the token does not exist
     }
-
     if (!this.TopElevationForm.valid) {
       return; // Exit if the form is not valid
     }
-
     const confirmation = confirm("Kindly confirm that the entered site information is correct or verify");
-
     if (confirmation) {
       // Capture screenshot before showing any modals
       this.captureScreenshot();
       this.createNocas();
       this.showData();
-      
+
     }
-   
+
   }
-  public isCheckboxSelected: boolean = false; // Add this flag
+
+
   handleAirportModalOK() {
-    // Show the modal
-    this.showModal();
-    const latitudeDD = this.convertDMSToDD(this.lat, true);
-    const longitudeDD = this.convertDMSToDD(this.long, false);
+    let latitudeDD = this.convertDMSToDD(this.lat, true);
+    let longitudeDD = this.convertDMSToDD(this.long, false);
     this.distance = this.calculateDistance(latitudeDD, longitudeDD, this.airportCoordinates[0], this.airportCoordinates[1]);
+    let airport_name = this.selectedAirportName ? this.selectedAirportName.split('/')[0] : '';
 
-    const airport_name = this.selectedAirportName ? this.selectedAirportName.split('/')[0] : '';
-    
-    // Prepare the content based on whether checkboxes are selected or not
-    let mapDataContent = '';
     if (!this.isCheckboxSelected) {
-      mapDataContent += `
-        <div>
-          <b>Site location selected by User is outside ${airport_name} CCZM boundary published by AAI. Permissible Elevation calculation could not be processed. Please contact us for further details</b><br><br>
-          <table class="table table-hover">
-            <tbody>
-              <tr>
-                <th scope="row">Site Location</th>
-                <td colspan="2">Latitude: ${this.latitudeDMS}<br> Longitude: ${this.longitudeDMS}</td>
-              </tr>
-              <tr>
-                <th scope="row">Distance (Site Location from ARP)</th>
-                <td colspan="2">${this.distance ? this.distance.toFixed(2) : ''} km</td>
-              </tr>
-            </tbody>
-          </table>
-        </div><br>`;
+      this.outsideMapData = {
+        airport_name: airport_name,
+        latitudeDMS: this.latitudeDMS,
+        longitudeDMS: this.longitudeDMS,
+        newDistance: this.distance.toFixed(2)
+      };
     }
-  
-   
-    
-    // Close the airport modal
-    const modal = document.getElementById('airportModal');
-    if (modal) {
-      modal.style.display = 'none';
-    }
-     // Update the mapData element with the generated content
-     const mapData = document.getElementById('mapData');
-     if (mapData) {
-       mapData.innerHTML = mapDataContent;
-     }
-    
-  }
-  
+    this.showModal('outsideMapData');
+    this.closeModal('airportModal'); // Close airportModal
 
-  public permissibleElevation!: number;
-  public permissibleheight!: number;
+    if (!this.isSubscribed) {
+      // Show subscription or payment modal here if user is not subscribed
+      this.showModal('outsideMapData');
+      this.closeModal('airportModal');// Example, replace with your subscription modal logic
+
+    }
+    else {
+      this.closeModal('airportModal')
+    }
+  }
 
   airportName!: string;
   distance!: number;
-
   displayMapData(lat: number, lng: number, airportCoordinates: [number, number]) {
-    const latitudeDD = this.convertDMSToDD(lat, true);
-    const longitudeDD = this.convertDMSToDD(lng, false);
+    console.log(this.lat, this.long, airportCoordinates, "wdefr")
+
+    const latitudeDD = this.convertDMSToDD(this.lat, true);
+
+    const longitudeDD = this.convertDMSToDD(this.long, false);
+    console.log(latitudeDD, longitudeDD, "wdr")
     const newDistance = this.calculateDistance(latitudeDD, longitudeDD, airportCoordinates[0], airportCoordinates[1]);
-  
+    console.log(this.geojsonLayer.getLayers(), "gvb")
     const clickedFeature = this.geojsonLayer.getLayers().find((layer: any) => {
-      return layer.getBounds().contains([lat, lng]);
-    });
-  
-    const mapData = document.getElementById('mapData');
-  
-    if (mapData !== null) {
-      mapData.innerHTML = '';
-      mapData.style.display = 'none';
-  
-      if (clickedFeature) {
-        console.log('Clicked Feature:', clickedFeature); // Log clicked feature for debugging
-        const properties = clickedFeature.feature.properties;
-        console.log('Properties:', properties); // Log properties for debugging
-  
-        const elevation = properties.Name;
-        const permissibleHeight = parseFloat(properties.Name) - parseFloat(this.TopElevationForm.get('Site_Elevation').value);
-  
-        if (elevation == 'NOC Required') { // Trim to ensure no leading/trailing spaces affect the comparison
-          alert("NOC Required");
-          return;
-        }
-  
-        mapData.innerHTML = `
-          <table class="table table-hover">
-            <tbody>
-              <tr>
-                <th scope="row">Permissible Elevation (AMSL Above Mean Sea Level)</th>
-                <td>${elevation}M</td>
-              </tr>
-              <tr>
-                <th scope="row">Permissible Height (AGL- Above ground level)</th>
-                <td>${permissibleHeight < 0 ? '-' : ''}${Math.abs(permissibleHeight).toFixed(2)}M</td>
-              </tr>
-              <tr>
-                <th scope="row">Site Location</th>
-                <td colspan="2">Latitude: ${this.latitudeDMS}<br> Longitude: ${this.longitudeDMS}</td>
-              </tr>
-              <tr>
-                <th scope="row">Distance (Site Location from ARP)</th>
-                <td colspan="2">${newDistance.toFixed(2)} km</td>
-              </tr>
-            </tbody>
-          </table>`;
-        this.showModal();
-  
-      } else {
-        this.showClosestAirportList(mapData);
+      if (layer.getBounds().contains([this.lat, this.long])) {
+        console.log(layer.getBounds(), "getBounds")
       }
-      mapData.style.display = 'block';
+
+      return layer.getBounds().contains([this.lat, this.long]);
+    });
+
+    console.log(clickedFeature, "clicked")
+    if (clickedFeature) {
+
+      const properties = clickedFeature.feature.properties;
+      const elevation = properties.name;
+      const permissibleHeight = parseFloat(properties.name) - parseFloat(this.TopElevationForm.get('Site_Elevation').value);
+      if (elevation === 'NOC Required') {
+        alert("The selected location requires a **No Objection Certificate (NOC)** for further processing. Please contact our support team for assistance.");
+        return;
+      }
+      this.insideMapData = { elevation: elevation, permissibleHeight: permissibleHeight < 0 ? '-' : Math.abs(permissibleHeight).toFixed(2), latitudeDMS: this.latitudeDMS, longitudeDMS: this.longitudeDMS, newDistance: newDistance.toFixed(2) }
+      this.showModal('insideMapData');
     } else {
-      console.error('Element with ID "mapData" not found in the DOM.');
+      this.showClosestAirportList();
+
     }
   }
-  
 
-  showClosestAirportList(mapData: HTMLElement) {
+  showClosestAirportList() {
     const latitudeDD = this.convertDMSToDD(this.lat, true);
     const longitudeDD = this.convertDMSToDD(this.long, false);
-
-    const distances = this.airportCoordinatesList.map((airport) => {
+    const allAirports = this.airportCoordinatesList.map((airport) => {
       const [airportLat, airportLng, airportCity, airportName] = airport;
       const distance = this.calculateDistance(latitudeDD, longitudeDD, airportLat, airportLng);
       return { airportCity, airportName, distance };
     });
 
-    distances.sort((a, b) => a.distance - b.distance);
-    const top2ClosestAirports = distances.slice(0, 2);
+    allAirports.sort((a, b) => a.distance - b.distance);
+    const top2ClosestAirports = allAirports.slice(0, 2);
+    this.closestAirportList = top2ClosestAirports
 
-    let modalContent = 'Closest airports:<br>';
-    top2ClosestAirports.forEach((airport, index) => {
-      modalContent += `${index + 1}. <input type="checkbox" class="closest-airport-checkbox" data-airport-city="${airport.airportCity}" data-airport-name="${airport.airportName}" data-distance="${airport.distance}"> ${airport.airportName}<br>`;
-    });
+    this.showModal('airportModal')
 
-    const airportList = document.getElementById('airportList');
 
-    if (airportList) {
-      airportList.innerHTML = modalContent;
-      const modal = document.getElementById('airportModal');
-      if (modal) {
-        modal.style.display = 'block';
-      }
-    }
 
-    const checkboxes = document.querySelectorAll('.closest-airport-checkbox');
-    checkboxes.forEach((checkbox) => {
-      checkbox.addEventListener('change', (event) => {
-        if ((event.target as HTMLInputElement).checked) {
-          const airportCity = (event.target as HTMLElement).getAttribute('data-airport-city');
-          const airportName = (event.target as HTMLElement).getAttribute('data-airport-name');
-          const distance = parseFloat((event.target as HTMLElement).getAttribute('data-distance')!);
-          if (airportCity && airportName && !isNaN(distance)) {
-            this.updateSelectedAirport(airportCity, airportName, distance);
-          }
-        }
-      });
-    });
   }
 
-  // Update selected airport function
   updateSelectedAirport(airportCity: string, airportName: string, distance: number) {
     this.airportName = airportName;
     this.distance = distance;
@@ -611,34 +509,32 @@ export class UsersNOCASComponent implements OnInit {
     return direction === 'S' || direction === 'W' ? dd * -1 : dd;
   }
 
-
   getLocation() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           this.lat = position.coords.latitude;
           this.long = position.coords.longitude;
-
+          this.latitudeDMS = this.convertDDtoDMS(this.lat, true);
+          this.longitudeDMS = this.convertDDtoDMS(this.long, false);
           const popupContent = `Site Location : <br>  Site Latitude: ${this.latitudeDMS}, Site Longitude: ${this.longitudeDMS}`;
           this.marker.addTo(this.map).bindPopup(popupContent).openPopup();
           this.updateMarkerPosition();
 
-          // Add the code here that relies on the location data, if any
-          // For example, you can call a method or perform additional operations
-          // this.methodThatUsesLocationData(this.lat, this.long);
+          // Set values in the form in DMS format
+          this.TopElevationForm.patchValue({
+            Latitude: this.latitudeDMS,
+            Longitude: this.longitudeDMS
+          });
         },
         (error) => {
-          // Error occurred while retrieving location
           console.error('Error getting user location:', error);
-          // Notify user about the error or handle it gracefully
           alert('Error getting user location. Please make sure location services are enabled and try again.');
         },
         { enableHighAccuracy: true }
       );
     } else {
-      // Geolocation is not supported by the browser
       console.log('Geolocation is not supported by this browser.');
-      // Notify user or handle it gracefully
       alert('Geolocation is not supported by this browser.');
     }
   }
@@ -648,7 +544,6 @@ export class UsersNOCASComponent implements OnInit {
       this.latitudeDMS = this.convertDDtoDMS(this.lat, true);
       this.longitudeDMS = this.convertDDtoDMS(this.long, false);
       this.marker.setLatLng([this.lat, this.long]);
-
     }
   }
 
@@ -677,7 +572,8 @@ export class UsersNOCASComponent implements OnInit {
   }
 
   showMap(lat: number, lng: number) {
-    this.map = L.map('map', { zoomControl: false, attributionControl: false }).setView([20.5937, 78.9629], 5);
+    this.map = L.map('map').setView([19.794444, 85.751111], 5);
+
     const streets = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
       subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
     });
@@ -713,49 +609,67 @@ export class UsersNOCASComponent implements OnInit {
     L.control.layers(baseMaps, overlayMaps).addTo(this.map);
     streets.addTo(this.map);
     L.control.scale().addTo(this.map);
-    L.control.zoom().addTo(this.map);
+    // L.control.zoom().addTo(this.map);
     this.marker = L.marker([lat, lng], { draggable: true }).addTo(this.map);
 
     this.map.on('click', (e: any) => {
       const { lat, lng } = e.latlng;
       this.lat = lat;
+      this.lat = lat;
       this.long = lng;
       this.latitudeDMS = this.convertDDtoDMS(lat, true);
       this.longitudeDMS = this.convertDDtoDMS(lng, false);
+      this.updateMarkerPosition();
+
       this.TopElevationForm.patchValue({
-        Latitude: this.lat,
-        Longitude: this.long
+        Latitude: this.latitudeDMS,
+        Longitude: this.longitudeDMS
       });
-      const popupContent = `Site Location : <br> Site Latitude: ${this.latitudeDMS}, Site Longitude: ${this.longitudeDMS}`;
-      this.marker.setLatLng([lat, lng]).bindPopup(popupContent).openPopup();
+      if (this.marker) {
+        this.marker.setLatLng([lat, lng]); // Update the marker position
+        // Construct the popup content with latitude and longitude data
+        const popupContent = `Site Location : <br> Site Latitude: ${this.latitudeDMS}, Site Longitude: ${this.longitudeDMS}`;
+        // Bind the popup content to the marker
+        this.marker.bindPopup(popupContent).openPopup();
+      }
     });
 
     this.marker.on('dragend', (e: any) => {
-      const latlng = e.target.getLatLng();
-      this.lat = latlng.lat;
-      this.long = latlng.lng;
-      this.latitudeDMS = this.convertDDtoDMS(this.lat, true);
-      this.longitudeDMS = this.convertDDtoDMS(this.long, false);
-      this.TopElevationForm.patchValue({
-        Latitude: this.lat,
-        Longitude: this.long
-      });
-      const popupContent = `Site Location : <br> Site Latitude: ${this.latitudeDMS}, Site Longitude: ${this.longitudeDMS}`;
-      this.marker.bindPopup(popupContent).openPopup();
-    });
+      this.updateMarkerPopupContent(lat, lng); // Set initial popup content
+      const position = this.marker.getLatLng();
+      this.lat = position.lat;
+      this.long = position.lng;
+      this.latitudeDMS = this.convertDDtoDMS(position.lat, true);
+      this.longitudeDMS = this.convertDDtoDMS(position.lng, false);
 
+      this.TopElevationForm.patchValue({
+        Latitude: this.latitudeDMS,
+        Longitude: this.longitudeDMS
+      });
+
+      this.updateMarkerPosition();
+
+
+    });
   }
 
-  showModal(): void {
+  updateMarkerPopupContent(lat: number, lng: number) {
+    this.latitudeDMS = this.convertDDtoDMS(lat, true);
+    this.longitudeDMS = this.convertDDtoDMS(lng, false);
+
+    const popupContent = `Site Location : <br> Site Latitude: ${this.latitudeDMS}, Site Longitude: ${this.longitudeDMS}`;
+    this.marker.bindPopup(popupContent).openPopup();
+  }
+  showModal(id: string): void {
     // Code to show the modal
-    const modal = document.getElementById('exampleModal');
+    const modal = document.getElementById(id);
     if (modal) {
       modal.classList.add('show');
       modal.style.display = 'block';
     }
   }
-  closeModal(): void {
-    const modal = document.getElementById('exampleModal');
+  closeModal(id: string): void {
+    const modal = document.getElementById(id);
     if (modal) {
       modal.classList.remove('show');
       modal.style.display = 'none';
@@ -788,18 +702,50 @@ export class UsersNOCASComponent implements OnInit {
     if (selectedAirportCITY) {
       let airportGeoJSONPath: string;
 
-      // Determine the GeoJSON file path based on the selected airport ICAO
       if (selectedAirportCITY === 'Coimbatore') {
-        airportGeoJSONPath = 'assets/Coimbatore.geojson';
+        airportGeoJSONPath = 'assets/GeoJson/Coimbatore.geojson';
         this.airportCoordinates = [11.03, 77.04]; // Coordinates of VOCB
       } else if (selectedAirportCITY === 'Mumbai') {
-        airportGeoJSONPath = 'assets/Mumbai.geojson';
+        airportGeoJSONPath = 'assets/GeoJson/Mumbai.geojson';
         this.airportCoordinates = [19.08, 72.86]; // Coordinates of VABB
       } else if (selectedAirportCITY === 'Puri') {
-        airportGeoJSONPath = 'assets/Puri.geojson';
+        airportGeoJSONPath = 'assets/GeoJson/Puri.geojson';
         this.airportCoordinates = [19.79, 85.75]; // Coordinates of VEJH
+      } else if (selectedAirportCITY === 'Ahmedabad') {
+        airportGeoJSONPath = 'assets/GeoJson/Ahemdabad.geojson';
+        this.airportCoordinates = [23.07, 72.63]; // Coordinates of VAAH
+      } else if (selectedAirportCITY === 'Akola') {
+        airportGeoJSONPath = 'assets/GeoJson/Akola.geojson';
+        this.airportCoordinates = [20.70, 77.06]; // Coordinates of VAAK
+      } else if (selectedAirportCITY === 'Chennai') {
+        airportGeoJSONPath = 'assets/GeoJson/Chennai.geojson';
+        this.airportCoordinates = [13.00, 80.18]; // Coordinates of VOMM
+      } else if (selectedAirportCITY === 'Delhi') {
+        airportGeoJSONPath = 'assets/GeoJson/Delhi.geojson';
+        this.airportCoordinates = [28.56, 77.10]; // Coordinates of VIDP
+      } else if (selectedAirportCITY === 'Guwahati') {
+        airportGeoJSONPath = 'assets/GeoJson/Guwahati.geojson .geojson';
+        this.airportCoordinates = [26.10, 91.58]; // Coordinates of VEGT
+      } else if (selectedAirportCITY === 'Hyderabad') {
+        airportGeoJSONPath = 'assets/GeoJson/Hydrabad.geojson';
+        this.airportCoordinates = [17.24, 78.43]; // Coordinates of VOHS
+      } else if (selectedAirportCITY === 'Jaipur') {
+        airportGeoJSONPath = 'assets/GeoJson/Jaipur.geojson';
+        this.airportCoordinates = [26.91, 75.80]; // Coordinates of VIJP
+      } else if (selectedAirportCITY === 'Nagpur') {
+        airportGeoJSONPath = 'assets/GeoJson/Nagpur.geojson';
+        this.airportCoordinates = [21.09, 79.05]; // Coordinates of VANP
+      } else if (selectedAirportCITY === 'Thiruvananthapuram') {
+        airportGeoJSONPath = 'assets/GeoJson/Trivendrum.geojson';
+        this.airportCoordinates = [8.48, 76.92]; // Coordinates of VOTV
+      } else if (selectedAirportCITY === 'Vadodara') {
+        airportGeoJSONPath = 'assets/GeoJson/Vadodara.geojson';
+        this.airportCoordinates = [22.32, 73.21]; // Coordinates of VABO
+      } else if (selectedAirportCITY === 'Varanasi') {
+        airportGeoJSONPath = 'assets/GeoJson/Varanasi.geojson';
+        this.airportCoordinates = [25.45, 82.86]; // Coordinates of VEBN
       } else {
-        console.error("Invalid airport ICAO code.");
+        console.error("Invalid airport city name.");
         return;
       }
 
@@ -808,70 +754,49 @@ export class UsersNOCASComponent implements OnInit {
         .then(response => response.json())
         .then(geojsonData => {
           const features = geojsonData.features;
-
-          // Style function to set colors based on properties from JSON
           const style = (feature: any) => {
             const color = feature.properties.Color; // Extract color from JSON
             return { fillColor: color, color: 'blue', weight: 1 }; // Define style properties
           };
-
-          // Create GeoJSON layer with custom style function
           const geojsonLayer = L.geoJSON(features, { style: style });
           geojsonLayer.addTo(map);
           this.geojsonLayer = geojsonLayer;
-
-          // Fit the map bounds to the GeoJSON layer
           map.fitBounds(geojsonLayer.getBounds());
-
-          // Set the view to the center of the GeoJSON layer with the specified zoom level
           const center = geojsonLayer.getBounds().getCenter();
           map.setView(center, zoomLevel);
-
-          // Define the custom icon for marker2 with an offset
           let customIcon = L.icon({
             iconUrl: 'assets/marker-airport.png',
             shadowUrl: 'https://opentopomap.org/leaflet/images/marker-shadow.png',
-
             iconSize: [40, 41],
-
             shadowSize: [40, 41],
-
             iconAnchor: [12, 40], // point of the icon which will correspond to marker's location
           });
 
           // Draw a marker for the selected airport with the custom icon
           this.marker2 = L.marker(this.airportCoordinates, { icon: customIcon }).addTo(map);
-
           const popupContent = `ARP:
           <p>${selectedAirportCITY} Airport</p><br>
           Latitude: ${this.airportCoordinates[0].toFixed(2)}
           Longitude: ${this.airportCoordinates[1].toFixed(2)}`;
-
           // Bind the popup content to the marker2
           this.marker2.bindPopup(popupContent);
-
           this.marker = L.marker([this.lat, this.long]).addTo(map);
-
           // Fit the map bounds to the GeoJSON layer and the markers
           const bounds = L.latLngBounds([this.airportCoordinates, [this.lat, this.long]]);
           map.fitBounds(bounds, { maxZoom: zoomLevel });
-
           map.on('click', (e: any) => {
             const { lat, lng } = e.latlng;
-
             // Update latitude and longitude form fields
             this.TopElevationForm.patchValue({
-              Latitude: lat.toFixed(2),
-              Longitude: lng.toFixed(2)
+              Latitude: lat,
+              Longitude: lng
             });
 
             // Update the marker position
             if (this.marker) {
               this.marker.setLatLng([lat, lng]); // Update the marker position
-
               // Construct the popup content with latitude and longitude data
               const popupContent = `Site Location : <br> Site Latitude: ${this.latitudeDMS}, Site Longitude: ${this.longitudeDMS}`;
-
               // Bind the popup content to the marker
               this.marker.bindPopup(popupContent).openPopup();
             }
@@ -885,23 +810,41 @@ export class UsersNOCASComponent implements OnInit {
 
 
   fetchAirports() {
-    this.http.get<any>('https://nocas-3ab54-default-rtdb.europe-west1.firebasedatabase.app/airportsData.json')
-      .subscribe({
-        next: (res) => {
-          this.airports = res;
-        },
-        error: (err) => {
-          alert("error while fetching the data");
+    this.http.get<any>('http://localhost:3001/api/airports').subscribe({
+      next: (res) => {
+        // If the response is an object with an 'airports' property
+        if (res && res.airports) {
+          this.airports = res.airports;
+          console.log(this.airports);
+        } else {
+          console.error('Unexpected response structure:', res);
         }
-      })
+      },
+      error: (err) => {
+        alert('Error fetching data');
+      }
+    });
   }
-} 
+
+
+  convertDMSsToDD(degrees: number, minutes: number, seconds: number, direction: string): number {
+    let dd = degrees + minutes / 60 + seconds / 3600;
+    if (direction === 'S' || direction === 'W') {
+      dd *= -1;
+    }
+    return dd;
+  }
+
+  updateMarkersPosition(lat: number, lng: number): void {
+    this.lat = lat;
+    this.long = lng;
+    this.updateMarkerPosition();
+    const popupContent = `Site Location : <br> Site Latitude: ${this.latitudeDMS}, Site Longitude: ${this.longitudeDMS}`;
+    this.marker.bindPopup(popupContent).openPopup();
+  }
 
 
 
-
-
-
-
+}
 
 

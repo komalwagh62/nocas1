@@ -17,11 +17,7 @@ input::-webkit-inner-spin-button {
 mat-form-field {
   width: 100%;
 }
-
-#mapData {
-  display: none; /* Make sure to use display: block when you want to show it */
-}
-
+ 
 .mat-mdc-radio-button.mat-accent {
   --mdc-radio-disabled-selected-icon-color: #C3B828;
   --mdc-radio-disabled-unselected-icon-color: #C3B828;

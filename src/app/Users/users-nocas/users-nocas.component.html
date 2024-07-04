@@ -6,7 +6,7 @@
           <label for="airportCITY">City</label>
           <mat-form-field appearance="outline">
             <mat-select id="airportCITY" formControlName="CITY">
-              <mat-option value="" disabled selected>Select a City</mat-option>
+              <mat-option value="" disabled>Select a City</mat-option>
               <mat-option *ngFor="let airport of airports" [value]="airport.airport_city">{{ airport.airport_city }}</mat-option>
             </mat-select>
             <mat-icon matSuffix color="primary">location_city</mat-icon>
@@ -20,12 +20,14 @@
             <mat-icon matSuffix color="primary">local_airport</mat-icon>
           </mat-form-field>
         </div>
+      
 
         <div class="form-group">
           <label>Select Site Location</label><br>
           <mat-radio-group formControlName="location">
-            <mat-radio-button value="currentLocation" (click)="getLocation()" class="red-radio">Use current location</mat-radio-button>
-            <mat-radio-button value="manual" class="red-radio">Enter location coordinate manually</mat-radio-button>
+            <mat-radio-button value="currentLocation" (click)="getLocation()" class="red-radio">Use current
+              location</mat-radio-button>
+            <mat-radio-button value="manual"  class="red-radio">Enter location coordinate manually</mat-radio-button>
           </mat-radio-group>
         </div>
         <br>
@@ -33,13 +35,15 @@
         <div class="form-group">
           <label for="Site_latitude">Site Latitude</label>
           <mat-form-field appearance="outline">
-            <input matInput type="text" [(ngModel)]="latitudeDMS" name="Latitude" formControlName="Latitude" id="Latitude" placeholder="Latitude">
+            <input matInput type="text" [value]="latitudeDMS" name="Latitude" formControlName="Latitude" id="Latitude"
+              placeholder="Latitude">
           </mat-form-field>
         </div>
         <div class="form-group">
           <label for="Site_longitude">Site Longitude</label>
           <mat-form-field appearance="outline">
-            <input matInput type="text" [(ngModel)]="longitudeDMS" name="Longitude" formControlName="Longitude" id="Longitude" placeholder="Longitude">
+            <input matInput type="text" [value]="longitudeDMS" name="Longitude" formControlName="Longitude"
+              id="Longitude" placeholder="Longitude">
           </mat-form-field>
         </div>
 
@@ -54,13 +58,15 @@
         <div class="form-group">
           <label for="Site_Elevation">Site Elevation</label>
           <mat-form-field appearance="outline">
-            <input matInput type="number" name="Site_Elevation" id="Site_Elevation" formControlName="Site_Elevation" placeholder="Site Elevation">
+            <input matInput type="number" name="Site_Elevation" id="Site_Elevation" formControlName="Site_Elevation"
+              placeholder="Site Elevation">
             <mat-icon matSuffix color="primary">edit</mat-icon>
           </mat-form-field>
         </div>
 
         <div class="d-grid gap-2 button-Top">
-          <button type="submit" class="btn btn-outline-primary rounded-5 py-2 px-4" (click)="submitForm()">Submit</button>
+          <button type="submit" class="btn btn-outline-primary rounded-5 py-2 px-4"
+            (click)="submitForm()">Submit</button>
         </div>
       </form>
     </div>
@@ -78,10 +84,21 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h2 class="modal-title">Closest Airports</h2>
+        <h2 class="modal-title">Your site location is near the following airports. Please select closest airport:</h2>
       </div>
       <div class="modal-body">
-        <div id="airportList"></div>
+        <div id="airportList">
+          <div *ngFor="let airport of closestAirportList; let i = index">
+            {{ i + 1 }}. 
+            <input type="checkbox" class="closest-airport-checkbox" 
+                   [attr.data-airport-city]="airport.airportCity" 
+                   [attr.data-airport-name]="airport.airportName" 
+                   [attr.data-distance]="airport.distance" 
+                   (change)="updateSelectedAirport(airport.airportCity, airport.airportName, airport.distance)"> 
+            {{ airport.airportName }}
+            <br>
+          </div>
+        </div>
         <div class="d-grid gap-2 button-Top">
           <button type="button" class="btn btn-outline-primary rounded-5" (click)="handleAirportModalOK()">OK</button>
         </div>
@@ -92,7 +109,7 @@
 
 
 <!-- Site Location Details Modal -->
-<div class="modal" id="exampleModal" tabindex="-1">
+<!-- <div class="modal" id="exampleModal" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -106,6 +123,89 @@
           <b>We wish you success in your project.<br> Our range of services will assist you in WGS-84 Survey, NOC process support, Aeronautical study & Assessment. Please connect for details.</b><br>
           <button type="button" value="currentLocation" class="btn btn-outline-primary rounded-5" routerLink="/request-Service">Check-Out Now</button>
         </div>
+      </div>
+    </div>
+  </div>
+</div> -->
+
+
+<!-- Inside Map Data Modal -->
+<div class="modal" id="insideMapData" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Site Location Details</h2>
+        <button type="button" class="btn-close" (click)="closeModal('insideMapData')" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <table class="table table-hover">
+          <tbody>
+            <tr>
+              <td scope="row"><b>Permissible Elevation (AMSL Above Mean Sea Level)</b></td>
+              <td>{{ isSubscribed ? insideMapData.elevation + 'M' : '***' }}</td>
+            </tr>
+            <tr>
+              <td scope="row"><b>Permissible Height (AGL - Above Ground Level)</b></td>
+              <td>{{ isSubscribed ? insideMapData.permissibleHeight + 'M' : '***' }}</td>
+            </tr>
+            <tr>
+              <td scope="row"><b>Site Location</b></td>
+              <td colspan="2">Latitude: {{ isSubscribed ? insideMapData.latitudeDMS : '***' }}<br> Longitude: {{ isSubscribed ? insideMapData.longitudeDMS : '***' }}
+              </td>
+            </tr>
+            <tr>
+              <td scope="row"><b>Distance (Site Location from ARP)</b></td>
+              <td colspan="2">{{ isSubscribed ? insideMapData.newDistance + ' km' : '***' }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <div id="SubscribePlans" [style.display]="isSubscribed ? 'none' : 'block'">
+          <h3>To get the complete result, upgrade your account with our subscription plans. If you prefer not to subscribe, you can make a one-time payment to get the result.</h3>
+          <button type="button" class="btn btn-outline-primary rounded-5" (click)="subscribe()">Subscribe</button>
+          <button type="button" class="btn btn-outline-primary rounded-5" (click)="MakePayment()">Make Payment</button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <p>We wish you success in your project. Our range of services will assist you in WGS-84 Survey, NOC process support, Aeronautical study & Assessment. Please connect for details.</p>
+        <button type="button" class="btn btn-outline-primary rounded-5" routerLink="/request-Service">Check-Out Now</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Outside Map Data Modal -->
+<div class="modal" id="outsideMapData" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Site Location Details</h2>
+        <button type="button" class="btn-close" (click)="closeModal('outsideMapData')" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div>
+          <b>Site location selected by the user is outside {{ outsideMapData.airport_name }} CCZM boundary published by AAI. Permissible Elevation calculation could not be processed. Please contact us for further details.</b><br><br>
+          <table class="table table-hover">
+            <tbody>
+              <tr>
+                <th scope="row">Site Location</th>
+                <td colspan="2">Latitude: {{ isSubscribed ? outsideMapData.latitudeDMS : '***' }}<br> Longitude: {{ isSubscribed ? outsideMapData.longitudeDMS : '***' }}</td>
+              </tr>
+              <tr>
+                <th scope="row">Distance (Site Location from ARP)</th>
+                <td colspan="2">{{ isSubscribed ? outsideMapData.newDistance + ' km' : '***' }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <div id="SubscribePlans" [style.display]="isSubscribed ? 'none' : 'block'">
+            <h3>To get the complete result, upgrade your account with our subscription plans. If you prefer not to subscribe, you can make a one-time payment to get the result.</h3>
+            <button type="button" class="btn btn-outline-primary rounded-5" (click)="subscribe()">Subscribe</button>
+            <button type="button" class="btn btn-outline-primary rounded-5" (click)="MakePayment()">Make Payment</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <p>We wish you success in your project. Our range of services will assist you in WGS-84 Survey, NOC process support, Aeronautical study & Assessment. Please connect for details.</p>
+        <button type="button" class="btn btn-outline-primary rounded-5" routerLink="/request-Service">Check-Out Now</button>
       </div>
     </div>
   </div>

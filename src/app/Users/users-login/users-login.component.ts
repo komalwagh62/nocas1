@@ -38,10 +38,7 @@ export class UsersLoginComponent {
             if (response.success) {
               // Store token in local storage
               localStorage.setItem('token', response.jwttoken);
-              
-              
-              this.apiservice.token = response.jwttoken;
-              
+              this.apiservice.token = response.jwttoken;       
               this.router.navigate(['UsersProfile']);
             } else {
               alert('Invalid email or password. Please try again.');

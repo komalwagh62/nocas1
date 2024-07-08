@@ -6,6 +6,11 @@ import { ApiService } from '../Shared/Api/api.service';
 import { Router } from '@angular/router';
 import * as domtoimage from 'dom-to-image';
 import { User } from '../Shared/Model/users/users';
+import { FetchData } from '../../../Repository/fetch-data';
+import { IrequestOptions } from '../../../Repository/Interfaces/IrequestOptions';
+import { NocasServiceService } from '../../../Api/Features/NocasApi/NocasService/nocas-service.service';
+import { ICreateNocasResponseEntity, IcreateNocasRequestParams } from '../../../Api/Features/NocasApi/Interfaces/ICreateNocasRequestParams';
+
 
 
 declare var Razorpay: any;
@@ -48,8 +53,8 @@ export class UsersNOCASComponent implements OnInit {
   public insideMapData = { elevation: "", permissibleHeight: "", latitudeDMS: "", longitudeDMS: "", newDistance: "" }
   public outsideMapData = { airport_name: "", latitudeDMS: "", longitudeDMS: "", newDistance: "" }
   public closestAirportList: { airportCity: string, airportName: string, distance: number }[] = [];
-
-  constructor(public apiservice: ApiService, private formbuilder: FormBuilder, private http: HttpClient, private router: Router) { }
+;
+  constructor(public apiservice: ApiService, private formbuilder: FormBuilder, private http: HttpClient, private router: Router,public nocasService:NocasServiceService) { }
 
   ngOnInit(): void {
     this.TopElevationForm = this.formbuilder.group({
@@ -113,7 +118,7 @@ export class UsersNOCASComponent implements OnInit {
     const direction = parts[3];
     return this.convertDMSsToDD(degrees, minutes, seconds, direction);
   }
-  captureScreenshot(): void {
+  captureScreenshot() {
     const mapElement = document.getElementById('map');
     if (mapElement) {
       domtoimage.toBlob(mapElement)
@@ -160,8 +165,8 @@ export class UsersNOCASComponent implements OnInit {
           permissibleElevation = parseFloat(properties.name);
           permissibleHeight = permissibleElevation - parseFloat(this.TopElevationForm.value.Site_Elevation);
         }
-
-        const requestBody = {
+  
+        const requestBody:IcreateNocasRequestParams = {
           user_id: this.apiservice.userData.id,
           distance: distance.toFixed(2) + "km",
           permissible_elevation: permissibleElevation + "M",
@@ -171,31 +176,20 @@ export class UsersNOCASComponent implements OnInit {
           longitude: this.longitudeDMS,
           airport_name: this.selectedAirportName,
           site_elevation: this.TopElevationForm.value.Site_Elevation,
-          snapshot: screenshotPath,
+          snapshot: '',
           subscription_id: subscription_id,
         };
-
-        const headers = new HttpHeaders().set("Authorization", `Bearer ${this.apiservice.token}`);
-        this.http.post("http://localhost:3001/api/nocas/createNocas", requestBody, { headers: headers })
-          .subscribe(
-            (resultData: any) => {
-              if (resultData.isSubscribed || resultData.freeTrialCount > 0 || resultData.isOneTimeSubscription) {
-                this.isSubscribed = true;
-              } else {
-                this.isSubscribed = false;
-                // alert("Your Free trial expired. Please Subscribe Package");
-                // this.router.navigate(['PricingPlans']);
-              }
-            },
-            (error: any) => {
-              console.error("Error creating Nocas entry:", error);
-              // alert("Failed to create Nocas entry. Please check if you are logged in.");
-              // this.apiservice.userData = {} as User
-              // this.router.navigate(['UsersLogin']);
-            }
-          );
+      
+        this.nocasService.nocasPresenter.createNocas(requestBody).then((data:ICreateNocasResponseEntity)=>{if (data.isSubscribed || data.freeTrialCount > 0 || data.isOneTimeSubscription) {
+          this.isSubscribed = true;
+        } else {
+          this.isSubscribed = false;
+        }}).catch((error)=>{console.error('Error:', error);})
       } catch (error) {
         console.error("Error capturing and saving screenshot:", error);
+        localStorage.removeItem('userData');
+        localStorage.removeItem('token');
+        // this.router.navigate(['UsersLogin']);
         alert("Failed to capture and save screenshot. Please try again.");
       }
     } else {
@@ -207,7 +201,7 @@ export class UsersNOCASComponent implements OnInit {
 
 
   convertDDtoDMS(dd: number, isLatitude: boolean): string {
-    console.log(`Converting DD to DMS: ${dd}, isLatitude: ${isLatitude}`);
+    // console.log(`Converting DD to DMS: ${dd}, isLatitude: ${isLatitude}`);
     const dir = dd < 0 ? (isLatitude ? 'S' : 'W') : (isLatitude ? 'N' : 'E');
     const absDd = Math.abs(dd);
     const degrees = Math.floor(absDd);
@@ -215,7 +209,7 @@ export class UsersNOCASComponent implements OnInit {
     const minutes = Math.floor(minutesNotTruncated);
     const seconds = Math.round((minutesNotTruncated - minutes) * 60);
     const dms = `${degrees}°${minutes}'${seconds}"${dir}`;
-    console.log(`Converted to DMS: ${dms}`);
+    // console.log(`Converted to DMS: ${dms}`);
     return dms;
   }
 
@@ -433,23 +427,23 @@ export class UsersNOCASComponent implements OnInit {
   airportName!: string;
   distance!: number;
   displayMapData(lat: number, lng: number, airportCoordinates: [number, number]) {
-    console.log(this.lat, this.long, airportCoordinates, "wdefr")
+    // console.log(this.lat, this.long, airportCoordinates, "wdefr")
 
     const latitudeDD = this.convertDMSToDD(this.lat, true);
 
     const longitudeDD = this.convertDMSToDD(this.long, false);
-    console.log(latitudeDD, longitudeDD, "wdr")
+    // console.log(latitudeDD, longitudeDD, "wdr")
     const newDistance = this.calculateDistance(latitudeDD, longitudeDD, airportCoordinates[0], airportCoordinates[1]);
-    console.log(this.geojsonLayer.getLayers(), "gvb")
+    // console.log(this.geojsonLayer.getLayers(), "gvb")
     const clickedFeature = this.geojsonLayer.getLayers().find((layer: any) => {
       if (layer.getBounds().contains([this.lat, this.long])) {
-        console.log(layer.getBounds(), "getBounds")
+        // console.log(layer.getBounds(), "getBounds")
       }
 
       return layer.getBounds().contains([this.lat, this.long]);
     });
 
-    console.log(clickedFeature, "clicked")
+    // console.log(clickedFeature, "clicked")
     if (clickedFeature) {
 
       const properties = clickedFeature.feature.properties;
@@ -534,7 +528,7 @@ export class UsersNOCASComponent implements OnInit {
         { enableHighAccuracy: true }
       );
     } else {
-      console.log('Geolocation is not supported by this browser.');
+      // console.log('Geolocation is not supported by this browser.');
       alert('Geolocation is not supported by this browser.');
     }
   }
@@ -815,7 +809,7 @@ export class UsersNOCASComponent implements OnInit {
         // If the response is an object with an 'airports' property
         if (res && res.airports) {
           this.airports = res.airports;
-          console.log(this.airports);
+          // console.log(this.airports);
         } else {
           console.error('Unexpected response structure:', res);
         }
@@ -846,5 +840,3 @@ export class UsersNOCASComponent implements OnInit {
 
 
 }
-
-

@@ -45,6 +45,12 @@ import { AdminLoginComponent } from './Admin/admin-login/admin-login.component';
 import { DashboardComponent } from './Admin/dashboard/dashboard.component';
 import { MatPaginator,MatPaginatorModule } from '@angular/material/paginator';
 import { DmsPipe } from './dms.pipe';
+import { NocasRepository } from '../Api/Features/NocasApi/NocasRepository';
+import { NocasServiceService } from '../Api/Features/NocasApi/NocasService/nocas-service.service';
+import { NocasPresenter } from '../Api/Features/NocasApi/NocasPresenter';
+import { CreateNocasUseCase } from '../Api/Features/NocasApi/UseCases/CreateNocasUseCase';
+import { FetchData } from '../Repository/fetch-data';
+import { NocasUseCases } from '../Api/Features/NocasApi/UseCases/NocasUseCases';
 
 @NgModule({
   declarations: [
@@ -101,7 +107,17 @@ import { DmsPipe } from './dms.pipe';
     
   ],
   providers: [
-    provideAnimationsAsync()
+    provideAnimationsAsync(),
+    
+      FetchData,
+      NocasRepository,
+      CreateNocasUseCase,
+      NocasPresenter,
+      NocasServiceService,
+      NocasUseCases
+      // other providers
+   
+    
   ],
   bootstrap: [AppComponent]
 })

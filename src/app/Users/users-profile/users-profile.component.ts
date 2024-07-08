@@ -113,7 +113,7 @@ export class UsersProfileComponent implements OnInit {
   // }
 
   
- // Inside the getUserDetails function in UsersProfileComponent
+// Inside the getUserDetails function in UsersProfileComponent
 getUserDetails(): void {
   const headers = new HttpHeaders().set("Authorization", `Bearer ${this.apiservice.token}`);
   this.http.post<any>('http://localhost:3001/api/user/myProfile', {}, { headers: headers })
@@ -129,10 +129,14 @@ getUserDetails(): void {
       error => {
         localStorage.removeItem('userData');
         localStorage.removeItem('token')
+        
         alert("Failed Login");
+        
         this.router.navigate(['UsersLogin']);
       }
+      
     );
+    
 }
 
 

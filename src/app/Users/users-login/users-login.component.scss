@@ -1,127 +1,107 @@
-.field {
-    position: relative;
-}
-
-.eye-icon {
-    position: absolute;
-    top: 50%;
-    right: 10px; /* Adjust the value as needed */
-    transform: translateY(-50%);
-    cursor: pointer;
-}
-
-.eye-icon i {
-    font-size: 1rem; /* Adjust the font size as needed */
-    color: #777; /* Adjust the color as needed */
-}
-
-
-.flex-r,
-.flex-c {
-  justify-content: center;
-  align-items: center;
-  display: flex;
-}
-.flex-c {
-  flex-direction: column;
-}
-.flex-r {
-  flex-direction: row;
-}
 
 .container {
-  width: 100%;
-  min-height: 100vh;
-  padding: 20px 10px;
-
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Changed to 100vh for full viewport height */
+  max-width: 100%; /* Full width */
+  background-image: url('https://images.unsplash.com/photo-1584135401326-17d2b702b9fa?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'); /* Path to your image */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
-
-.login-text {
-
+ 
+.login-wrapper {
   max-width: 400px;
-  min-height: 500px;
+  width: 100%;
+  background-color: rgba(248, 249, 250, 0.9); /* Semi-transparent background */
   border-radius: 10px;
-  padding: 10px 20px;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
-
-
-.logo span,
-.logo span i {
-  font-size: 25px;
-  color: #0d8aa7;
-}
-
+ 
 .login-text h1 {
-  font-size: 25px;
-}
-.login-text p {
-  font-size: 15px;
-  color: #000000b2;
-}
-
-form {
-  align-items: flex-start !important;
-  width: 100%;
-  margin-top: 15px;
-}
-
-.input-box {
-  margin: 10px 0px;
-  width: 100%;
-}
-.label {
-  font-size: 15px;
-  color: black;
-  margin-bottom: 3px;
-}
-.input {
-  background-color: #f6f6f6;
-  padding: 0px 5px;
-  border: 2px solid rgba(216, 216, 216, 1);
-  border-radius: 10px;
-  overflow: hidden;
-  justify-content: flex-start;
-}
-
-input {
-  border: none;
-  outline: none;
-  padding: 10px 5px;
-  background-color: #f6f6f6;
-  flex: 1;
-}
-.input i {
-  color: rgba(0, 0, 0, 0.4);
-}
-
-.check span {
-  color: #000000b2;
-  font-size: 15px;
-  font-weight: bold;
-  margin-left: 5px;
-}
-
-.btn1 {
-  color: #ffffff;
-  border-radius: 30px;
-  padding: 10px 15px;
-  background: linear-gradient(122.33deg, #68bed1 30.62%, #1e94e9 100%);
-  margin-top: 10px;
   margin-bottom: 10px;
-  font-size: 16px;
-  transition: all 0.3s linear;
 }
-
-.btn1:hover {
-  transform: translateY(-2px);
+ 
+.input-box {
+  margin-bottom: 20px;
 }
-.extra-line {
-  font-size: 15px;
-  font-weight: 600;
+ 
+.input-box label {
+  font-weight: bold;
 }
-.extra-line a {
-  color: #0095b6;
+ 
+.input {
+  position: relative;
 }
-img{
-    width: 15%;
+ 
+.input input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+}
+ 
+.input i {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 10px;
+  color: #495057;
+  font-size: 1.2em;
+  cursor: pointer;
+}
+ 
+.alert {
+  color: #721c24;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+  padding: 0.75rem 1.25rem;
+  margin-top: 5px;
+  border-radius: 5px;
+}
+ 
+.alert strong {
+  font-weight: bold;
+}
+ 
+.btn {
+  display: inline-block;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  text-decoration: none;
+}
+ 
+.btn-outline-primary {
+  color: #007bff;
+  border: 1px solid #007bff;
+}
+ 
+.btn-outline-primary:hover {
+  background-color: #007bff;
+  color: #fff;
+}
+ 
+.login-text p {
+  margin-bottom: 20px;
+  text-align: center;
+  color: #666;
+}
+ 
+form {
+  display: flex;
+  flex-direction: column;
+}
+ 
+.forgot-pass {
+  display: inline-block;
+  margin-top: 10px;
+  color: #007bff;
+  text-decoration: none;
+}
+ 
+.forgot-pass:hover {
+  text-decoration: underline;
 }

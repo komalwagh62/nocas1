@@ -4,139 +4,32 @@ input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
+  
 }
-
-.example-container {
-  // background: red;
-  height: 100%;
-  overflow: hidden;
-}
-
-
+ 
 /* map.component.scss */
-
+ 
 .map-container {
   position: relative;
+  
 }
-
-.live-location-button {
-  position: absolute;
-  bottom: 112px;
-  /* Adjust this value as needed */
-  left: 96.3%;
-  /* Adjust this value as needed */
-  z-index: 1000;
-  /* Ensure the button is above the map */
-  background-color: white;
-  border: 1px solid #ccc;
-  border-radius: 50px;
-  padding: 5px 10px;
-  cursor: pointer;
-}
-
-.airplane {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  z-index: 1000;
-  background-color: white;
-  border: 1px solid #ccc;
-  border-radius: 50px;
-  padding: 5px 10px;
-  cursor: pointer;
-
-}
-
-.layer {
-  position: absolute;
-  top: 60px;
-  left: 10px;
-  z-index: 1000;
-  background-color: white;
-  border: 1px solid #ccc;
-  border-radius: 50px;
-  padding: 5px 10px;
-  cursor: pointer;
-}
-
-.circle {
-  position: absolute;
-  bottom: 45px;
-  left: 10px;
-  z-index: 1000;
-  background-color: white;
-  border: 1px solid #ccc;
-  border-radius: 50px;
-  padding: 5px 10px;
-  cursor: pointer;
-}
-
-.pentagon {
-  position: absolute;
-  bottom: 90px;
-  left: 10px;
-  z-index: 1000;
-  background-color: white;
-  border: 1px solid #ccc;
-  border-radius: 50px;
-  padding: 5px 10px;
-  cursor: pointer;
-}
-
-
-.triangle {
-  position: absolute;
-  bottom: 135px;
-  left: 10px;
-  z-index: 1000;
-  background-color: white;
-  border: 1px solid #ccc;
-  border-radius: 50px;
-  padding: 5px 10px;
-  cursor: pointer;
-}
-
-.grid {
-  position: absolute;
-  bottom: -0px;
-  left: 10px;
-  z-index: 1000;
-  background-color: white;
-  border: 1px solid #ccc;
-  border-radius: 50px;
-  padding: 5px 10px;
-  cursor: pointer;
-}
-
+ 
 mat-form-field {
   width: 100%;
 }
-
-.height-Top {
-  margin-top: 5%;
+ 
+.mat-mdc-radio-button.mat-accent {
+  --mdc-radio-disabled-selected-icon-color: #C3B828;
+  --mdc-radio-disabled-unselected-icon-color: #C3B828;
+  --mdc-radio-unselected-hover-icon-color: #C3B828;
+  --mdc-radio-unselected-icon-color: #C3B828;
+  --mdc-radio-unselected-pressed-icon-color: #C3B828;
+  --mdc-radio-selected-focus-icon-color: #C3B828;
+  --mdc-radio-selected-hover-icon-color: #C3B828;
+  --mdc-radio-selected-icon-color: #C3B828;
+  --mdc-radio-selected-pressed-icon-color: #C3B828;
+  --mat-radio-ripple-color: #C3B828;
+  --mat-radio-checked-ripple-color: #C3B828;
+  --mat-radio-disabled-label-color: ;
 }
-
-.button-Top {
-  margin-top: 59%;
-}
-
-img {
-  width: 100%;
-}
-
-.position {
-  margin-bottom: 20%;
-}
-
-.labelstyle {
-  background-color: none;
-  /* Adjust transparency here */
-  border: none;
-  /* Optional: remove border */
-  box-shadow: none;
-  /* Optional: remove box shadow */
-  color: black;
-  /* Optional: set text color */
-}
-
-
+ 

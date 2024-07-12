@@ -9,11 +9,16 @@ import { UsersPricingPlansComponent } from './Users/users-pricing-plans/users-pr
 import { UsersNOCASComponent } from './Users/users-nocas/users-nocas.component';
 import { ForgotPasswordComponent } from './Users/forgot-password/forgot-password.component';
 import { UsersrequestServiceComponent } from './Users/usersrequest-service/usersrequest-service.component';
-
+import { PaymentReceiptComponent } from './payment-receipt/payment-receipt.component';
+import { TransactionDetailsComponent } from './Users/transaction-details/transaction-details.component';
+import { FooterComponent } from './Users/Shared/footer/footer.component';
+import { AdminLoginComponent } from './Admin/admin-login/admin-login.component';
+import { DashboardComponent } from './Admin/dashboard/dashboard.component';
+import { MapComponent } from './map/map.component';
 
 const routes: Routes = [
-  { path: '', component: UsersHomeComponent },
-  { path: '', redirectTo: '', pathMatch: 'full' }, 
+  { path: '', redirectTo: 'UsersLogin', pathMatch: 'full' }, 
+  { path: 'UsersHome', component: UsersHomeComponent },
   { path: 'UsersRegister', component: UsersRegisterComponent },
   { path: 'UsersLogin', component: UsersLoginComponent },
   { path: 'UsersProfile', component: UsersProfileComponent },
@@ -22,6 +27,12 @@ const routes: Routes = [
   { path: 'C_NOCAS-MAP', component: UsersNOCASComponent },
   { path: 'forgot-pass', component: ForgotPasswordComponent },
   { path: 'request-Service', component: UsersrequestServiceComponent },
+  { path: 'PaymentReceipt', component: PaymentReceiptComponent },
+  { path: 'TransactionDetails', component: TransactionDetailsComponent },
+  { path: 'FooterComponent', component: FooterComponent }, // Assuming FooterComponent is a separate page
+  {path: 'Admin', component: AdminLoginComponent},
+  {path:'AdminDashboard', component:DashboardComponent},
+  {path:'Map',component:MapComponent}
 ];
 
 @NgModule({

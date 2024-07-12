@@ -8,6 +8,11 @@
     gap: 1.25rem;
     padding-top: 15px;
   }
+  .readonly-input {
+    background-color: #f8f9fa; /* Change this to the desired color */
+    /* Add any other styles you want for readonly inputs */
+  }
+  
   
   .iconslist .icon {
     background-color: #fff;
@@ -49,7 +54,11 @@
       color: #798eb3;
       padding: 15px;
     }
-    
+    .example-sidenav-content[_ngcontent-ng-c3760549634] {
+      height: 74vh;
+      background-color: white;
+  }
+ 
     .card-title {
       padding: 20px 0 15px 0;
       font-size: 18px;
@@ -197,4 +206,17 @@
   
   #fileInput{
     display: none;
+  }
+
+
+  // .profile {
+  //   padding: 20px;
+  // }
+
+  // .profile .col-2 {
+  //   margin-right: 30px;
+  // }
+
+  .profile .card {
+    margin-left: 40px;
   }

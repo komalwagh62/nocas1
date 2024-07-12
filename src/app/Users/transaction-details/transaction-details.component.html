@@ -1,0 +1,42 @@
+<main id="main" class="main">
+    <!-- Subscription Details Table -->
+    <div class="mt-4">
+        <div class="table-responsive">
+            <table *ngIf="subscriptionDetails && subscriptionDetails.length > 0" class="table table-striped">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Applicant Name</th>
+                        <th>Transaction ID</th>
+                        <th>Transaction Date</th>
+                        <th>Transaction Status</th>
+                        <th>Expiry Date</th>
+                        <th>Subscription Type</th>
+                        <th>Price</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let subscription of subscriptionDetails">
+                        <td>{{this.apiservice.userData.uname}}</td>
+                        <td>{{ subscription.razorpay_payment_id }}</td>
+                        <td>{{subscription.createdAt}}</td>
+                        <td [style.background-color]="subscription.subscription_status === 'Active' ? 'green' : ''">
+                            {{ subscription.subscription_status }}
+                        </td>
+                        <td>{{ subscription.expiry_date }}</td>
+                        <td>{{ subscription.subscription_type }}</td>
+                        <td>{{ subscription.price }}</td>
+                        <td>
+                            <button class="btn btn-primary" (click)="downloadReceipt(subscription)">Download</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Message if no subscriptions are available -->
+        <div *ngIf="subscriptionDetails && subscriptionDetails.length === 0" class="alert alert-warning" role="alert">
+            No subscription details available.
+        </div>
+    </div>
+</main>

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ApiService } from '../Shared/Api/api.service';
@@ -25,13 +25,14 @@ export class UsersProfileComponent implements OnInit {
 
 
 
-  constructor(private route: ActivatedRoute, private http: HttpClient, public apiservice: ApiService, private router: Router) { }
+  constructor(private route: ActivatedRoute, private http: HttpClient, public apiservice: ApiService, private router: Router,private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     // this.user = history.state.user;
     // Copy user data to updatedUser object for editing
     // this.updatedUser = { ...this.user };
     // console.log(this.updatedUser)
+   
     this.getUserDetails();
 
   
@@ -79,7 +80,7 @@ export class UsersProfileComponent implements OnInit {
   }
 
   logout() {
-    console.log("de")
+    // console.log("de")
     this.router.navigate(['UserLogin']);
   }
 
@@ -88,48 +89,38 @@ export class UsersProfileComponent implements OnInit {
   }
 
 
-  // changePassword(): void {
-  //   if (this.newPassword !== this.renewPassword) {
-  //     alert('New passwords do not match.');
-  //     return;
-  //   }
+  
+  
+  
+// Inside the getUserDetails function in UsersProfileComponent
+getUserDetails(): void {
+  const headers = new HttpHeaders().set("Authorization", `Bearer ${this.apiservice.token}`);
+  this.http.post<any>('http://localhost:3001/api/user/myProfile', {}, { headers: headers })
+    .subscribe(
+      response => {
+        this.apiservice.parseUserData(response); // Parse user data here
 
-  //   const passwordData = {
-  //     currentPassword: this.currentPassword,
-  //     newPassword: this.newPassword
-  //   };
+        this.updatedUser = JSON.parse(JSON.stringify(response));
+        this.user = JSON.parse(JSON.stringify(response));
+        console.log(this.user);
+        localStorage.setItem('this.user', JSON.stringify(response.apiservice.userData));
+      },
+      error => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('userData');
+    
+        // Trigger change detection to update the UI
+        this.cdr.detectChanges();
+        
+        alert("Failed Login");
+        
+        this.router.navigate(['UsersLogin']);
+      }
+      
+    );
+    
+}
 
-  //   this.http.post<any>('http://localhost:3001/api/changePassword', passwordData)
-  //     .subscribe(
-  //       response => {
-  //         alert(response.message);
-  //       },
-  //       error => {
-  //         console.error('Error changing password:', error);
-  //         alert('Failed to change password. Please try again.');
-  //       }
-  //     );
-  // }
-
-  getUserDetails(): void {
-
-    const headers = new HttpHeaders().set("Authorization", `Bearer ${this.apiservice.token}`);
-    this.http.post<any>('http://localhost:3001/api/user/myProfile', {}, { headers: headers })
-      .subscribe(
-        response => {
-          this.apiservice.userData = JSON.parse(JSON.stringify(response))
-          // console.log(response)
-          this.updatedUser = JSON.parse(JSON.stringify(response))
-          this.user = JSON.parse(JSON.stringify(response))
-
-        },
-        error => {
-          alert("Failed Login")
-          this.router.navigate(['UserLogin']);
-        }
-      )
-
-  }
 
   validatePassword() {
     // Check if the paswords match

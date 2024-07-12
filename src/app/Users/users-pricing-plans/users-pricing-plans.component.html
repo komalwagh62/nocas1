@@ -1,41 +1,71 @@
+
+
 <div class="background">
   <div class="container">
     <div class="panel pricing-table">
       
       <div class="pricing-plan">
-        <img src="https://s22.postimg.cc/8mv5gn7w1/paper-plane.png" alt="" class="pricing-img">
-        <h2 class="pricing-header">Basic</h2>
+        <img src="assets/free.png" alt="" class="pricing-img">
+        <h2 class="pricing-header">Free</h2>
+        <span class="pricing-price">₹ 0</span>
         <ul class="pricing-features">
-          <li class="pricing-features-item">Unlimited Request</li>
-          <li class="pricing-features-item">30 days</li>
+          <h2 class="pricing-features-items">30 days</h2>
+          <h2 class="pricing-features-item">3 Free Requests</h2>
+          <h2 class="pricing-features-items">+1 Hr free consultation monthly</h2>
+          
         </ul>
+        
+        <button class="pricing-button is-featured" (click)="freetrial()">Free trial</button>
+      </div>
+
+      <div class="pricing-plan">
+        <img src="assets/icon/badge.png" alt="" class="pricing-img">
+
+        <h2 class="pricing-header">Basic</h2>
         <span class="pricing-price">₹ 100</span>
-        <button class="pricing-button "  (click)="handlePayment('Basic', 100)">Buy Now</button>
+        <ul class="pricing-features">
+          <h2 class="pricing-features-item">30 days</h2>
+          <h2 class="pricing-features-item">Unlimited Request</h2>
+          <h2 class="pricing-features-items">+1 Hr free consultation monthly</h2>
+          
+        </ul>
+        
+        <button class="pricing-button is-featured "  (click)="handlePayment('Basic', 100)" >Buy Now</button>
       </div>
       
+      
+      
       <div class="pricing-plan">
-        <img src="https://s28.postimg.cc/ju5bnc3x9/plane.png" alt="" class="pricing-img">
+        <img src="assets/icon/value.png" alt="" class="pricing-img">
         <h2 class="pricing-header">Standard</h2>
-        <ul class="pricing-features">
-          <li class="pricing-features-item">Unlimited Request</li>
-          <li class="pricing-features-item">6 Month</li>
-        </ul>
         <span class="pricing-price">₹ 300</span>
+        <ul class="pricing-features">
+          <h2 class="pricing-features-item">6 Month</h2>
+          <h2 class="pricing-features-item">Unlimited Request</h2>
+          <h2 class="pricing-features-items">+1 Hr free consultation monthly</h2>
+          
+        </ul>
+        
         <button  class="pricing-button is-featured"(click)="handlePayment('Standard', 300)" >Buy Now</button>
       </div>
       
       <div class="pricing-plan">
-        <img src="https://s21.postimg.cc/tpm0cge4n/space-ship.png" alt="" class="pricing-img">
+        <img src="assets/icon/coin.png" alt="" class="pricing-img">
         <h2 class="pricing-header">Advance</h2>
-        <ul class="pricing-features">
-          <li class="pricing-features-item">Unlimited Request</li>
-          <li class="pricing-features-item">+1 Hr free consultation monthly</li>
-          <li class="pricing-features-item">1 year</li>
-        </ul>
         <span class="pricing-price">₹ 500</span>
-        <button  class="pricing-button" (click)="handlePayment('Advance', 500)">Buy Now </button>
+        <ul class="pricing-features">
+          <h2 class="pricing-features-item">1 year</h2>
+          <h2 class="pricing-features-item">Unlimited Request</h2>
+          <h2 class="pricing-features-item">+1 Hr free consultation monthly</h2>
+          
+        </ul>
+        <button  class="pricing-button is-featured" (click)="handlePayment('Advance', 500)">Buy Now </button>
       </div>
-      
+
     </div>
+    <div *ngIf="transactionId">
+      <p>Payment was successful. If you want to see payment details, please <a [href]="'/subscription-details/' + transactionId">click here</a>.</p>
+    </div>
+  
   </div>
 </div>

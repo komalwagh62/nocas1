@@ -1,44 +1,56 @@
-html {
-    box-sizing: border-box;
-    font-family: 'Open Sans', sans-serif;
+.background {
+  padding: 0 25px 25px;
+  position: relative;
+  width: 100%;
+  overflow-x: hidden; /* Hide horizontal overflow */
+}
+
+.container {
+  margin: 0 auto;
+  padding: 50px 0 0;
+  max-width: 1050px; /* Set maximum width */
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap; /* Allow flex items to wrap */
+  justify-content: center; /* Center flex items */
+}
+
+.pricing-plan {
+  flex: 1 1 300px; /* Allow flex items to grow and shrink, with a basis of 300px */
+  max-width: 300px; /* Limit the maximum width of pricing plans */
+  margin: 0 15px 30px; /* Add spacing between pricing plans */
+}
+.example-sidenav-content[_ngcontent-ng-c2839225140] {
+  height: 93vh;
+}
+@media (min-width: 900px) {
+  .pricing-table {
+    flex-direction: row;
   }
-  
-  *, *:before, *:after {
-    box-sizing: inherit;
-  }
-  
-  .background {
-    padding: 0 25px 25px;
-    position: relative;
-    width: 100%;
-  }
-  
-  .background::after {
-    content: '';
-    background: #60a9ff;
-    background: -moz-linear-gradient(top, #60a9ff 0%, #4394f4 100%);
-    background: -webkit-linear-gradient(top, #60a9ff 0%,#4394f4 100%);
-    background: linear-gradient(to bottom, #60a9ff 0%,#4394f4 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#60a9ff', endColorstr='#4394f4',GradientType=0 );
-    height: 350px;
-    left: 0;
-    position: absolute;
-    top: 0;
-    width: 100%;
-    z-index: 1;
-  }
-  
-  @media (min-width: 900px) {
-    .background {
-      padding: 0 0 25px;
-    }
-  }
+} .background::after {
+  content: '';
+  background: #4682B4 ;
+  background: -moz-linear-gradient(top, #4682B4  0%, #4682B4  100%);
+  background: -webkit-linear-gradient(top, #4682B4  0%,#4682B4 100%);
+  background: linear-gradient(to bottom, #4682B4  0%,#4682B4  100%);
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#60a9ff', endColorstr='#4394f4',GradientType=0 );
+  height: 350px;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  z-index: 1;
+}
+
+/* Other styles remain unchanged */
+
   
   .container {
     margin: 0 auto;
     padding: 50px 0 0;
-    max-width: 960px;
+    max-width: 1050px;
     width: 100%;
+  
   }
   
   .panel {
@@ -46,8 +58,9 @@ html {
     border-radius: 10px;
     padding: 15px 25px;
     position: relative;
-    width: 100%;
+    /* width: 115%; Remove this line */
     z-index: 10;
+    margin: 0 auto; /* Add this line to center the panel */
   }
   
   .pricing-table {
@@ -110,11 +123,21 @@ html {
   .pricing-features-item {
     border-top: 1px solid #e1f1ff;
     font-size: 12px;
-    line-height: 1.5;
+    line-height: 1;
     padding: 15px 0;
   }
   
   .pricing-features-item:last-child {
+    border-bottom: 1px solid #e1f1ff;
+  }
+  .pricing-features-items {
+    border-top: 1px solid #e1f1ff;
+    font-size: 12px;
+    line-height: 1;
+    padding: 15px 0;
+  }
+  
+  .pricing-features-items:last-child {
     border-bottom: 1px solid #e1f1ff;
   }
   
@@ -150,3 +173,34 @@ html {
   .pricing-button.is-featured:active {
     background-color: #269aff;
   }
+
+  .pricing-features-item {
+    position: relative;
+    padding-left: 20px; /* Adjust this value to control the space between the symbol and the text */
+  }
+
+  .pricing-features-item::before {
+    content: "\2713"; /* Unicode checkmark symbol */
+    position: absolute;
+    left: 0;
+    font-size: 20px; 
+  }
+
+  .pricing-features-items {
+    position: relative;
+    padding-left: 20px; /* Adjust this value to control the space between the symbol and the text */
+
+}
+
+.pricing-features-items::before {
+  content: "\2717"; /* Unicode cross mark symbol */
+  position: absolute;
+  left: 0;
+  color: red; /* Change color to red for the wrong symbol */
+  font-size: 17px; /* Adjust the font size as needed */
+}
+.pricing-button[_ngcontent-ng-c2223092857] {
+  
+  padding: 12px 32px;
+ 
+}

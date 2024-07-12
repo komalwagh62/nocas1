@@ -1,72 +1,53 @@
-<div class=" flex-r container">
-    <div class="flex-r login-wrapper">
+
+ 
+<div class="container">
+    <div class="login-wrapper">
         <div class="login-text">
-
             <h1>Log In</h1>
-            <p>It's not long before you embark on this journey! </p>
-
-            <form class="flex-c" [formGroup]="LogInForm"  (ngSubmit)="login()">
+            <p>It's not long before you embark on this journey!</p>
+ 
+            <form [formGroup]="LogInForm" (ngSubmit)="login()">
                 <div class="input-box">
-                    <span class="label">E-mail</span>
-                    <div class=" flex-r input">
-                        <input type="email" placeholder="name@abc.com" name="email" formControlName="email" autocomplete="email"
-                            id="email" required >
+                    <label for="email">E-mail</label>
+                    <div class="input">
+                        <input type="email" placeholder="name@abc.com" id="email" formControlName="email" autocomplete="email" required>
                         <i class="bi bi-envelope-at-fill"></i>
-
                     </div>
                     <div *ngIf="LogInForm.get('email').invalid && (LogInForm.get('email').dirty || LogInForm.get('email').touched)"
                         class="alert alert-danger mt-2">
                         <div *ngIf="LogInForm.get('email').errors.required">
                             Email is <strong>required.</strong>
                         </div>
-                        <div *ngIf="LogInForm.get('email').errors.nullValidator">
-                            Email is <strong>required.</strong>
-                        </div>
                         <div *ngIf="LogInForm.get('email').errors.email">
                             Please enter a valid <strong>Email address</strong>
                         </div>
-                        <!-- <div *ngIf="LogInForm.get('email').errors.minlength">
-                    Name must be at least 2 characters long.
-                  </div> -->
                     </div>
                 </div>
-
+ 
                 <div class="input-box">
-                    <span class="label">Password</span>
-                    <div class="flex-r input">
-                        <input type="password" [type]="showPassword ? 'text' : 'password'" id="password"
-                            autocomplete="password" name="password" formControlName="password" placeholder="8+ (a, A, 1, #)">
-                        <span> <i class="bi " [ngClass]="{
-                  'bi-eye-slash-fill': !showPassword,
-                  'bi-eye-fill': showPassword}" (click)="togglePasswordVisibility()"></i></span>
+                    <label for="password">Password</label>
+                    <div class="input">
+                        <input type="password" [type]="showPassword ? 'text' : 'password'" id="password" formControlName="password" placeholder="Enter Password" autocomplete="current-password" required>
+                        <i class="bi" [ngClass]="{ 'bi-eye-slash-fill': !showPassword, 'bi-eye-fill': showPassword }" (click)="togglePasswordVisibility()"></i>
                     </div>
                     <div *ngIf="LogInForm.get('password').invalid && (LogInForm.get('password').dirty || LogInForm.get('password').touched)"
                         class="alert alert-danger mt-2">
                         <div *ngIf="LogInForm.get('password').errors.required">
-                            password is <strong>required.</strong>
+                            Password is <strong>required.</strong>
                         </div>
-                        <div *ngIf="LogInForm.get('password').errors.nullValidator">
-                            password is <strong>required.</strong>
-                        </div>
-
                     </div>
-                    <!-- Forgot password link -->
                     <div class="form-outline mt-2">
                         <a href="forgot-pass" class="forgot-pass" routerLink="/forgot-pass">Forgot password?</a>
                     </div>
                 </div>
-
-
-                <button class=" btn  btn-outline-primary rounded-5 py-2 px-4" type="submit">
-                    LogIn
-                </button>
-                <!-- Signup link -->
+ 
+                <button class="btn btn-outline-primary" type="submit">Log In</button>
                 <div class="text-center text-muted mt-1 mb-0">
-                    <span>Don't have an account? <a href="" routerLink="/UsersRegister" class="fw-bold text-body"><u>Signup
-                                here</u></a></span>
+                    <span>Don't have an account? <a href="" routerLink="/UsersRegister" class="fw-bold text-body"><u>Signup here</u></a></span>
                 </div>
             </form>
-
         </div>
     </div>
 </div>
+ 
+ 

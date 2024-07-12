@@ -2,9 +2,7 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { UsersProfileComponent } from './Users/users-profile/users-profile.component';
-import { UsersLoginComponent } from './Users/users-login/users-login.component';
-import { UsersRegisterComponent } from './Users/users-register/users-register.component';
+
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { UsersSideNavComponent } from './Users/users-side-nav/users-side-nav.component';
 import { MatSidenavModule } from '@angular/material/sidenav';
@@ -37,7 +35,23 @@ import { ForgotPasswordComponent } from './Users/forgot-password/forgot-password
 import { UsersrequestServiceComponent } from './Users/usersrequest-service/usersrequest-service.component';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatGridListModule } from '@angular/material/grid-list';
-
+import { UsersLoginComponent } from './Users/users-login/users-login.component';
+import { UsersProfileComponent } from './Users/users-profile/users-profile.component';
+import { UsersRegisterComponent } from './Users/users-register/users-register.component';
+import { PaymentReceiptComponent } from './payment-receipt/payment-receipt.component';
+import { TransactionDetailsComponent } from './Users/transaction-details/transaction-details.component';
+import { MatTableModule } from '@angular/material/table';
+import { AdminLoginComponent } from './Admin/admin-login/admin-login.component';
+import { DashboardComponent } from './Admin/dashboard/dashboard.component';
+import { MatPaginator,MatPaginatorModule } from '@angular/material/paginator';
+import { DmsPipe } from './dms.pipe';
+import { NocasRepository } from '../Api/Features/NocasApi/NocasRepository';
+import { NocasServiceService } from '../Api/Features/NocasApi/NocasService/nocas-service.service';
+import { NocasPresenter } from '../Api/Features/NocasApi/NocasPresenter';
+import { CreateNocasUseCase } from '../Api/Features/NocasApi/UseCases/CreateNocasUseCase';
+import { FetchData } from '../Repository/fetch-data';
+import { NocasUseCases } from '../Api/Features/NocasApi/UseCases/NocasUseCases';
+import { MapComponent } from './map/map.component';
 
 @NgModule({
   declarations: [
@@ -55,6 +69,12 @@ import { MatGridListModule } from '@angular/material/grid-list';
     UsersNOCASComponent,
     ForgotPasswordComponent,
     UsersrequestServiceComponent,
+    PaymentReceiptComponent,
+    TransactionDetailsComponent,
+    AdminLoginComponent,
+    DashboardComponent,
+    DmsPipe,
+    MapComponent,
    
   ],
   imports: [
@@ -83,10 +103,27 @@ import { MatGridListModule } from '@angular/material/grid-list';
     MatDividerModule,
     MatRadioModule,
     MatGridListModule,
+    MatTableModule, 
+    MatPaginator,
+    MatPaginatorModule,
+    
   ],
   providers: [
-    provideAnimationsAsync()
+    provideAnimationsAsync(),
+    
+      FetchData,
+      NocasRepository,
+      CreateNocasUseCase,
+      NocasPresenter,
+      NocasServiceService,
+      NocasUseCases
+      // other providers
+   
+    
   ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
+
+
+

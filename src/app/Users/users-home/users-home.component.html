@@ -1,216 +1,231 @@
 <main id="main" class="main">
+  <div class="pagetitle">
+    <nav></nav>
+  </div>
 
-    <div class="pagetitle">
-      <h1>Dashboard</h1>
-      <nav>
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-          <li class="breadcrumb-item active">Dashboard</li>
-        </ol>
-      </nav>
-    </div><!-- End Page Title -->
-
-    <section class="section dashboard">
-      <div class="row">
-
-        <!-- Left side columns -->
-        <div class="col-lg-8">
-          <div class="row">
-
-            <!-- Sales Card -->
-            <div class="col-xxl-4 col-md-6">
-              <div class="card info-card sales-card">
-
-                <div class="filter">
-                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <li class="dropdown-header text-start">
-                      <h6>Filter</h6>
-                    </li>
-
-                    <li><a class="dropdown-item" href="#">Today</a></li>
-                    <li><a class="dropdown-item" href="#">This Month</a></li>
-                    <li><a class="dropdown-item" href="#">This Year</a></li>
-                  </ul>
-                </div>
-
-                <div class="card-body">
-                  <h5 class="card-title">Sales <span>| Today</span></h5>
-
-                  <div class="d-flex align-items-center">
-                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                      <i class="bi bi-cart"></i>
-                    </div>
-                    <div class="ps-3">
-                      <h6>145</h6>
-                      <span class="text-success small pt-1 fw-bold">12%</span> <span class="text-muted small pt-2 ps-1">increase</span>
-
-                    </div>
+  <section class="section dashboard">
+    <div class="row">
+      <div class="col-12">
+        <div class="row">
+          <!-- Sales Card -->
+          <div class="col-xxl-4 col-lg-4 col-md-6 mb-4">
+            <div class="card info-card sales-card">
+              <div class="filter">
+                <img src="assets/arrow.png" (click)="detailsOfPermissible()" alt="" class="request-img transparent-img" style="height: 63px; width: 63px">
+                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow"></ul>
+              </div>
+              <div class="card-body">
+                <h3 class="card-title">Permissible Details</h3>
+                <div class="d-flex align-items-center">
+                  <div class="d-flex align-items-center justify-content-center">
+                    <img src="assets/construction.png" alt="" class="construction-img" style="height: 63px; width: 63px">
+                  </div>
+                  <div class="ps-3">
+                    <h6>{{permissibleRowCount}}</h6>
                   </div>
                 </div>
-
               </div>
-            </div><!-- End Sales Card -->
+            </div>
+          </div><!-- End Sales Card -->
 
-            <!-- Revenue Card -->
-            <div class="col-xxl-4 col-md-6">
-              <div class="card info-card revenue-card">
-
-                <div class="filter">
-                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <li class="dropdown-header text-start">
-                      <h6>Filter</h6>
-                    </li>
-
-                    <li><a class="dropdown-item" href="#">Today</a></li>
-                    <li><a class="dropdown-item" href="#">This Month</a></li>
-                    <li><a class="dropdown-item" href="#">This Year</a></li>
-                  </ul>
-                </div>
-
-                <div class="card-body">
-                  <h5 class="card-title">Revenue <span>| This Month</span></h5>
-
-                  <div class="d-flex align-items-center">
-                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                      <i class="bi bi-currency-dollar"></i>
-                    </div>
-                    <div class="ps-3">
-                      <h6>$3,264</h6>
-                      <span class="text-success small pt-1 fw-bold">8%</span> <span class="text-muted small pt-2 ps-1">increase</span>
-
-                    </div>
+          <!-- Subscription Details Card -->
+          <div class="col-xxl-4 col-lg-4 col-md-6 mb-4">
+            <div class="card info-card revenue-card">
+              <div class="filter">
+                <img src="assets/arrow.png" (click)="detailsOfSubscription()" alt="" class="request-img transparent-img" style="height: 63px; width: 63px">
+                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow"></ul>
+              </div>
+              <div class="card-body">
+                <h3 class="card-title">Subscription Details</h3>
+                <div class="d-flex align-items-center">
+                  <div class="d-flex align-items-center justify-content-center">
+                    <img src="assets/membership.png" alt="" class="member-img" style="height: 63px; width: 63px">
+                  </div>
+                  <div class="ps-3">
+                    <h6>INR {{ totalSubscriptionPrice }}</h6>
                   </div>
                 </div>
-
               </div>
-            </div><!-- End Revenue Card -->
+            </div>
+          </div><!-- End Subscription Details Card -->
 
-            <!-- Customers Card -->
-            <div class="col-xxl-4 col-xl-12">
-
-              <div class="card info-card customers-card">
-
+          <!-- Customers Card -->
+          <div class="col-xxl-4 col-lg-4 col-md-6 mb-4">
+            <div class="card info-card customers-card">
+              <div class="card-body">
                 <div class="filter">
-                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <li class="dropdown-header text-start">
-                      <h6>Filter</h6>
-                    </li>
-
-                    <li><a class="dropdown-item" href="#">Today</a></li>
-                    <li><a class="dropdown-item" href="#">This Month</a></li>
-                    <li><a class="dropdown-item" href="#">This Year</a></li>
-                  </ul>
+                  <a class="arrow-icon" data-bs-toggle="dropdown">
+                    <img src="assets/arrow.png" (click)="detailsOfServices()" alt="" class="request-img transparent-img" style="height: 63px; width: 63px">
+                  </a>
+                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow"></ul>
                 </div>
-
-                <div class="card-body">
-                  <h5 class="card-title">Customers <span>| This Year</span></h5>
-
-                  <div class="d-flex align-items-center">
-                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                      <i class="bi bi-people"></i>
-                    </div>
-                    <div class="ps-3">
-                      <h6>1244</h6>
-                      <span class="text-danger small pt-1 fw-bold">12%</span> <span class="text-muted small pt-2 ps-1">decrease</span>
-
-                    </div>
+                <h3 class="card-title">Cross Sale Form Details</h3>
+                <div class="d-flex align-items-center">
+                  <div class="d-flex align-items-center justify-content-center">
+                    <img src="assets/request.png" alt="" class="request-img" style="height: 63px; width: 63px">
                   </div>
-
+                  <div class="ps-3">
+                    <h6>{{serviceRowCount}}</h6>
+                  </div>
                 </div>
               </div>
-
-            </div><!-- End Customers Card -->
-
-            <!-- Reports -->
-            <div class="col-12">
-              <div class="card">
-
-                <div class="filter">
-                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <li class="dropdown-header text-start">
-                      <h6>Filter</h6>
-                    </li>
-
-                    <li><a class="dropdown-item" href="#">Today</a></li>
-                    <li><a class="dropdown-item" href="#">This Month</a></li>
-                    <li><a class="dropdown-item" href="#">This Year</a></li>
-                  </ul>
-                </div>
-
-                <div class="card-body">
-                  <h5 class="card-title">Reports <span>/Today</span></h5>
-
-                  <!-- Line Chart -->
-                  <div id="reportsChart"></div>
-
-                  <script>
-                    document.addEventListener("DOMContentLoaded", () => {
-                      new ApexCharts(document.querySelector("#reportsChart"), {
-                        series: [{
-                          name: 'Sales',
-                          data: [31, 40, 28, 51, 42, 82, 56],
-                        }, {
-                          name: 'Revenue',
-                          data: [11, 32, 45, 32, 34, 52, 41]
-                        }, {
-                          name: 'Customers',
-                          data: [15, 11, 32, 18, 9, 24, 11]
-                        }],
-                        chart: {
-                          height: 350,
-                          type: 'area',
-                          toolbar: {
-                            show: false
-                          },
-                        },
-                        markers: {
-                          size: 4
-                        },
-                        colors: ['#4154f1', '#2eca6a', '#ff771d'],
-                        fill: {
-                          type: "gradient",
-                          gradient: {
-                            shadeIntensity: 1,
-                            opacityFrom: 0.3,
-                            opacityTo: 0.4,
-                            stops: [0, 90, 100]
-                          }
-                        },
-                        dataLabels: {
-                          enabled: false
-                        },
-                        stroke: {
-                          curve: 'smooth',
-                          width: 2
-                        },
-                        xaxis: {
-                          type: 'datetime',
-                          categories: ["2018-09-19T00:00:00.000Z", "2018-09-19T01:30:00.000Z", "2018-09-19T02:30:00.000Z", "2018-09-19T03:30:00.000Z", "2018-09-19T04:30:00.000Z", "2018-09-19T05:30:00.000Z", "2018-09-19T06:30:00.000Z"]
-                        },
-                        tooltip: {
-                          x: {
-                            format: 'dd/MM/yy HH:mm'
-                          },
-                        }
-                      }).render();
-                    });
-                  </script>
-                  <!-- End Line Chart -->
-
-                </div>
-
-              </div>
-            </div><!-- End Reports -->
-
-            <!-- Recent Sales -->
             </div>
-            </div>
-            </div>
-            
-  
-        </section>
+          </div><!-- End Customers Card -->
+
+        </div>
+      </div>
+    </div>
+  </section>
 </main>
+
+
+  
+  
+  <mat-form-field *ngIf="showSubscriptionDetails" >
+    <mat-label>Filter Subscriptions</mat-label>
+    <input matInput (keyup)="applySubscriptionFilter($event)" placeholder="Ex. type" #subscriptionInput>
+  </mat-form-field>
+  <div class="mat-elevation-z8" *ngIf="showSubscriptionDetails">
+    <mat-table [dataSource]="subscriptionDataSource" multiTemplateDataRows>
+      
+      <!-- Subscription ID Column -->
+      <ng-container matColumnDef="subscription_id">
+        <mat-header-cell *matHeaderCellDef> Subscription ID </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.subscription_id}} </mat-cell>
+      </ng-container>
+  
+      <!-- Subscription Status Column -->
+      <ng-container matColumnDef="subscription_status">
+        <mat-header-cell *matHeaderCellDef> Status </mat-header-cell>
+        <mat-cell *matCellDef="let element" [ngClass]="{
+          'status-active': element.subscription_status === 'Active',
+          'status-inactive': element.subscription_status === 'Inactive',
+          'status-expired': element.subscription_status === 'Expired'
+        }">
+          {{element.subscription_status}}
+        </mat-cell>
+      </ng-container>
+      
+      <!-- Expiry Date Column -->
+      <ng-container matColumnDef="expiry_date">
+        <mat-header-cell *matHeaderCellDef> Expiry Date </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.expiry_date}} </mat-cell>
+      </ng-container>
+  
+      <!-- Subscription Type Column -->
+      <ng-container matColumnDef="subscription_type">
+        <mat-header-cell *matHeaderCellDef> Type </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.subscription_type}} </mat-cell>
+      </ng-container>
+  
+      <!-- Row Definition -->
+      <mat-header-row *matHeaderRowDef="['subscription_id', 'subscription_status', 'expiry_date', 'subscription_type']"></mat-header-row>
+      <mat-row *matRowDef="let row; columns: ['subscription_id', 'subscription_status', 'expiry_date', 'subscription_type'];"></mat-row>
+    </mat-table>
+  </div>
+  
+  
+  <mat-form-field *ngIf="showServiceDetails">
+    <mat-label>Filter Service Details</mat-label>
+    <input matInput (keyup)="applyServiceFilter($event)" placeholder="Ex. city" #serviceInput>
+  </mat-form-field>
+  <div *ngIf="showServiceDetails">
+    <div class="table-responsive">
+      <table *ngIf="serviceDetails && serviceDetails.length > 0" class="table table-striped">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Service Name</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let request of serviceDetails">
+            <td>{{ this.apiservice.userData.uname }}</td>
+            <td>
+              <ul>
+                <li *ngFor="let serviceKey of getServiceKeys(request.services)">
+                  {{ serviceNames[serviceKey] }}
+                </li>
+              </ul>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div *ngIf="serviceDetails && serviceDetails.length === 0" class="alert alert-warning" role="alert">No services found.</div>
+    </div>
+  </div>
+
+
+
+
+  <mat-form-field *ngIf="showPermissibleDetails">
+    <mat-label>Filter Permissible Details</mat-label>
+    <input matInput (keyup)="applyPermissibleFilter($event)" placeholder="Ex. city" #permissibleInput>
+  </mat-form-field>
+  
+    <div class="mat-elevation-z8" *ngIf="showPermissibleDetails">
+      <mat-table [dataSource]="permissibleDataSource" multiTemplateDataRows>
+        <!-- Request ID Column -->
+  
+        <!-- City Column -->
+        <ng-container matColumnDef="city">
+          <mat-header-cell *matHeaderCellDef> City </mat-header-cell>
+          <mat-cell *matCellDef="let element"> {{element.city}} </mat-cell>
+        </ng-container>
+  
+        <!-- Airport Name Column -->
+        <ng-container matColumnDef="airport_name">
+          <mat-header-cell *matHeaderCellDef> Airport Name </mat-header-cell>
+          <mat-cell *matCellDef="let element"> {{element.airport_name}} </mat-cell>
+        </ng-container>
+  
+        <!-- Expand Button Column -->
+        <ng-container matColumnDef="expand">
+          <mat-header-cell *matHeaderCellDef> </mat-header-cell>
+          <mat-cell *matCellDef="let element">
+            <button mat-icon-button (click)="toggleRow(element)">
+              <mat-icon>expand_more</mat-icon>
+            </button>
+          </mat-cell>
+        </ng-container>
+  
+        <!-- Download Button Column -->
+        <ng-container matColumnDef="download">
+          <mat-header-cell *matHeaderCellDef> Download </mat-header-cell>
+          <mat-cell *matCellDef="let element">
+            <button mat-icon-button (click)="downloadPDF(element)">
+              <mat-icon>download</mat-icon>
+            </button>
+          </mat-cell>
+        </ng-container>
+  
+        <mat-header-row *matHeaderRowDef="permissibleDisplayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: permissibleDisplayedColumns;"></mat-row>
+  
+        <!-- Expanded Row -->
+        <ng-container matColumnDef="expandedDetail">
+          <mat-cell *matCellDef="let element">
+            <div *ngIf="expandedElement === element">
+              <div><strong>Name:</strong> {{ this.apiservice.userData.uname }}</div>
+              <div><strong>Site Latitude:</strong> {{element.latitude}}</div>
+              <div><strong>Site Longitude:</strong> {{element.longitude}}</div>
+              <div><strong>Site Elevation:</strong> {{element.site_elevation}}</div>
+              <div><strong>Distance From ARP:</strong> {{element.distance}}</div>
+              <div><strong>Permissible Height (AGL):</strong> {{element.permissible_height}}</div>
+              <div><strong>Permissible Elevation (AMSL):</strong> {{element.permissible_elevation}}</div>
+              <img [src]="'data:image/png;base64,' + bufferToBase64(element.snapshot)" alt="Snapshot">
+              
+            </div>
+          </mat-cell>
+        </ng-container>
+        <mat-row *matRowDef="let row; columns: ['expandedDetail'];" [class.expanded-row]="expandedElement === row && expandedElement !== null"></mat-row>
+  
+      </mat-table>
+  
+      <mat-paginator #permissiblePaginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+    </div>
+  
+ 
+
+
+<!-- <app-footer></app-footer> -->

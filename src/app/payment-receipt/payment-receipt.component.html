@@ -1,0 +1,55 @@
+<div class="container table-container" style="margin-top: 150px;">
+    <table summary="Receipt details" class="table table-bordered table-hover dt-responsive">
+        <div class="row">
+            <div class="col-xs-12">
+                <table summary="Receipt details" class="table table-bordered table-hover dt-responsive">
+                    <thead>
+                        <tr class="transaction-details" style="background-color: blue;">
+                            <td colspan="2" class="text-center">Transaction Details</td>
+                        </tr>
+                        <tr class="permissible-height" style="background-color: lightgreen;">
+                            <td colspan="2" class="text-center">Check Permissible Height</td>
+                        </tr>
+                        <tr>
+                            <th>Detail</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Applicant Name</td>
+                            <td>{{ receiptDetails.name }}</td>
+                        </tr>
+                        <tr>
+                            <td>Transaction ID</td>
+                            <td>{{ receiptDetails.razorpay_payment_id || receiptDetails.transaction_id }}</td>
+                        </tr>
+                        <tr [ngClass]="{'status-success': receiptDetails.status === 'success', 'status-failure': receiptDetails.status !== 'success'}">
+                            <td>Transaction Status</td>
+                            <td>{{ receiptDetails.status === 'success' ? 'Success' : 'Failure' }}</td>
+                        </tr>
+                        <tr>
+                            <td>Transaction Amount</td>
+                            <td>{{ receiptDetails.amount ? receiptDetails.amount / 100 : receiptDetails.price }} INR</td>
+                        </tr>
+                        <tr>
+                            <td>Plan</td>
+                            <td>{{ receiptDetails.description }}</td>
+                        </tr>
+                        <tr>
+                            <td>Applicant Email</td>
+                            <td>{{ receiptDetails.email }}</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="2" class="text-center">
+                                <button (click)="downloadPdf()" class="btn btn-primary">Download PDF</button>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </table>
+</div>

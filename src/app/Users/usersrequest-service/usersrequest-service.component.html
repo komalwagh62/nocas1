@@ -56,53 +56,65 @@
             </div>
         </div>
     </div> -->
-    <div class="container">
-        <div class=" flex-r container1">
-            <div class="flex-r login-wrapper">
-                <div class="login-text">
-                    <h1>Select a Service</h1>
-                    <p>It's not long before you embark on this journey! </p>
-                    <form [formGroup]="requestForm" (ngSubmit)="createRequest()">
-                        <!-- <div class="input-box">
-                            <span class="label">Full Name</span>
-                            <div class=" flex-r input">
-                                <input type="text" placeholder="Your Name" name="FullName" formControlName="FullName"
-                                    autocomplete="FullName" id="FullName" required>
+  
+        <div class="container">
+            <div class="flex-r container1">
+                <div class="flex-r login-wrapper">
+                    <div class="login-text">
+                        <h1>Select a Service</h1>
+                        <p>It's not long before you embark on this journey!</p>
+                        <div class="tab-pane fade show active profile-overview" id="profile-overview">
+                            <div class="user-info">
+                                <div class="label">Full Name</div>
+                                <div class="flex-r input">
                                     <i class="bi bi-person-circle"></i>
+                                    <div>{{ user.uname }}</div>
+                                </div>
+                            </div>
+                            <div class="user-info">
+                                <div class="label">Email</div>
+                                <div class="flex-r input">
+                                    <i class="bi bi-envelope-at-fill"></i>
+                                    <div>{{ user.email }}</div>
+                                </div>
                             </div>
                         </div>
-                        <div class="input-box">
-                            <span class="label">E-mail</span>
-                            <div class=" flex-r input">
-                                <input type="email" placeholder="name@abc.com" name="email" formControlName="email"
-                                    autocomplete="email" id="email" required>
-                                <i class="bi bi-envelope-at-fill"></i>
+                        <form [formGroup]="requestForm" (ngSubmit)="createRequest()">
+                            <div class="input-box">
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="WGSSurvey" name="service1"
+                                        value="WGS-84 Survey" formControlName="service1">
+                                    <label for="WGSSurvey" class="checkbox-label">WGS-84 Survey</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="nocApplication" name="service2"
+                                        value="NOC Application & Associated Service" formControlName="service2">
+                                    <label for="nocApplication" class="checkbox-label">NOC Application & Associated
+                                        Service</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="preAeronauticalStudy" name="service3"
+                                        value="Pre-aeronautical Study" formControlName="service3">
+                                    <label for="preAeronauticalStudy" class="checkbox-label">Pre-aeronautical Study</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="aeronauticalStudy" name="service4"
+                                        value="Aeronautical Study / Shielding Benefits Study" formControlName="service4">
+                                    <label for="aeronauticalStudy" class="checkbox-label">Aeronautical Study / Shielding Benefits Study</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="documentsManagement" name="service5"
+                                        value="Documents & Process Management" formControlName="service5">
+                                    <label for="documentsManagement" class="checkbox-label">Documents & Process Management</label>
+                                </div>
+
+                                
                             </div>
-                        </div> -->
-                        <div class="input-box">
-                            <input type="checkbox" id="nocApplication" name="service1"
-                                value="NOC Application & Associated Service" formControlName="service1">
-                            <label for="nocApplication">NOC Application & Associated Service</label><br>
-
-                            <input type="checkbox" id="preAeronauticalStudy" name="service2"
-                                value="Pre-aeronautical Study" formControlName="service2">
-                            <label for="preAeronauticalStudy">Pre-aeronautical Study</label><br>
-
-                            <input type="checkbox" id="aeronauticalStudy" name="service3"
-                                value="Aeronautical Study / Shielding Benefits Study" formControlName="service3">
-                            <label for="aeronauticalStudy">Aeronautical Study / Shielding Benefits Study</label><br>
-
-                            <input type="checkbox" id="documentsManagement" name="service4"
-                                value="Documents & Process Management" formControlName="service4">
-                            <label for="documentsManagement">Documents & Process Management</label><br>
-                        </div>
-                        <button class=" btn  btn-outline-primary rounded-5 py-2 px-4" type="submit">
-                            Submit
-                        </button>
-                       
-                    </form>
+                            <button class="btn btn-outline-primary rounded-5 py-2 px-4" type="submit">Submit</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
+    

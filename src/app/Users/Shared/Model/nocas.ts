@@ -10,7 +10,7 @@ export class Nocas {
        public distance:string,
        public permissible_elevation:string,
        public permissible_height:string,
-       public snapshot: Blob | String
+       public snapshot: string
       
     ) {
     }

@@ -14,6 +14,7 @@ import { TransactionDetailsComponent } from './Users/transaction-details/transac
 import { FooterComponent } from './Users/Shared/footer/footer.component';
 import { AdminLoginComponent } from './Admin/admin-login/admin-login.component';
 import { DashboardComponent } from './Admin/dashboard/dashboard.component';
+import { MapComponent } from './map/map.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'UsersLogin', pathMatch: 'full' }, 
@@ -30,7 +31,8 @@ const routes: Routes = [
   { path: 'TransactionDetails', component: TransactionDetailsComponent },
   { path: 'FooterComponent', component: FooterComponent }, // Assuming FooterComponent is a separate page
   {path: 'Admin', component: AdminLoginComponent},
-  {path:'AdminDashboard', component:DashboardComponent}
+  {path:'AdminDashboard', component:DashboardComponent},
+  {path:'Map',component:MapComponent}
 ];
 
 @NgModule({

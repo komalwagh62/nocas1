@@ -1,44 +1,48 @@
-/* Style for the login form */
-.flex-r.container {
+
+.container {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 90vh;
-  max-width: 380px;
+  height: 100vh; /* Changed to 100vh for full viewport height */
+  max-width: 100%; /* Full width */
+  background-image: url('https://images.unsplash.com/photo-1584135401326-17d2b702b9fa?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'); /* Path to your image */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
-
-.flex-r.login-wrapper {
+ 
+.login-wrapper {
   max-width: 400px;
   width: 100%;
-  background-color: #f8f9fa;
+  background-color: rgba(248, 249, 250, 0.9); /* Semi-transparent background */
   border-radius: 10px;
   padding: 20px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
-
+ 
 .login-text h1 {
   margin-bottom: 10px;
 }
-
+ 
 .input-box {
   margin-bottom: 20px;
 }
-
+ 
 .input-box label {
   font-weight: bold;
 }
-
+ 
 .input {
   position: relative;
 }
-
+ 
 .input input {
   width: 100%;
   padding: 10px;
   border: 1px solid #ced4da;
   border-radius: 5px;
 }
-
+ 
 .input i {
   position: absolute;
   top: 50%;
@@ -46,8 +50,9 @@
   right: 10px;
   color: #495057;
   font-size: 1.2em;
+  cursor: pointer;
 }
-
+ 
 .alert {
   color: #721c24;
   background-color: #f8d7da;
@@ -56,11 +61,11 @@
   margin-top: 5px;
   border-radius: 5px;
 }
-
+ 
 .alert strong {
   font-weight: bold;
 }
-
+ 
 .btn {
   display: inline-block;
   padding: 10px 20px;
@@ -68,24 +73,35 @@
   cursor: pointer;
   text-decoration: none;
 }
-
-.btn.btn-outline-primary {
+ 
+.btn-outline-primary {
   color: #007bff;
   border: 1px solid #007bff;
 }
-
-.btn.btn-outline-primary:hover {
+ 
+.btn-outline-primary:hover {
   background-color: #007bff;
   color: #fff;
 }
-
+ 
 .login-text p {
   margin-bottom: 20px;
   text-align: center;
   color: #666;
 }
-
+ 
 form {
   display: flex;
   flex-direction: column;
+}
+ 
+.forgot-pass {
+  display: inline-block;
+  margin-top: 10px;
+  color: #007bff;
+  text-decoration: none;
+}
+ 
+.forgot-pass:hover {
+  text-decoration: underline;
 }

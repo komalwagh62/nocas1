@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ApiService } from '../../Admin/shared/api.service';
+import { AuthService } from '../../Admin/auth.service';
 @Component({
   selector: 'app-admin-login',
   templateUrl: './admin-login.component.html',
@@ -11,7 +11,7 @@ export class AdminLoginComponent implements OnInit {
 
   LogInForm: FormGroup | any;
 
-  constructor(private formbuilder: FormBuilder, private router: Router,private authService: ApiService,) { }
+  constructor(private formbuilder: FormBuilder, private formBuilder: FormBuilder, private router: Router, private authService: AuthService) { }
   public showPassword: boolean = false;
 
   ngOnInit(): void {
@@ -29,19 +29,15 @@ export class AdminLoginComponent implements OnInit {
 
 
   onsubmit() {
-    const { email, password } = this.LogInForm.value;
-    // const email = this.LogInForm.controls.email.value;
-    // const password = this.LogInForm.controls.password.value;
-    
-    // Check if the entered email and password are valid
-    if (email === 'komalwagh62@gmail.com' && password === 'password') {
-      this.authService.login();
-      // Perform the login logic here (e.g., navigate to another page)
-      this.router.navigate(['/AdminDashboard']);
-      console.log('Login successful');
-    } else {
-      // Display an error message or perform another action for invalid credentials
-      console.log('Invalid email or password');
+    if (this.LogInForm.valid) {
+      const email = this.LogInForm.get('email')?.value;
+      const password = this.LogInForm.get('password')?.value;
+
+      if (this.authService.login(email, password)) {
+        this.router.navigate(['AdminDashboard']);
+      } else {
+        // Handle authentication error (show error message, etc.)
+      }
     }
   }
 }

@@ -51,6 +51,7 @@ import { NocasPresenter } from '../Api/Features/NocasApi/NocasPresenter';
 import { CreateNocasUseCase } from '../Api/Features/NocasApi/UseCases/CreateNocasUseCase';
 import { FetchData } from '../Repository/fetch-data';
 import { NocasUseCases } from '../Api/Features/NocasApi/UseCases/NocasUseCases';
+import { MapComponent } from './map/map.component';
 
 @NgModule({
   declarations: [
@@ -73,6 +74,7 @@ import { NocasUseCases } from '../Api/Features/NocasApi/UseCases/NocasUseCases';
     AdminLoginComponent,
     DashboardComponent,
     DmsPipe,
+    MapComponent,
    
   ],
   imports: [

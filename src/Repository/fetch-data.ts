@@ -3,28 +3,24 @@ import axios, { AxiosHeaders, AxiosRequestHeaders } from "axios";
 import { IfetchData } from "./Interfaces/IfetchData";
 import { IrequestOptions } from "./Interfaces/IrequestOptions";
 
-import { Injectable } from "@angular/core";
-@Injectable({
-  providedIn: 'root',
-})
 export class FetchData implements IfetchData {
   constructor() { }
 
-  async makeRequest<T>(requestOptions: IrequestOptions): Promise<T> {
-    const { method, url, headers, body } = requestOptions;
-    
+  async makeRequest<T>(requestOptions: IrequestOptions, callbacks?: { ifSuccess: (data: T) => void; ifError: (error: Error) => void }): Promise<T> {
+    const { method, url, headers, body, token } = requestOptions;
+    // const { ifSuccess, ifError } = callbacks;
 
     const axiosHeaders = new AxiosHeaders();
     Object.entries(axiosBase.defaults.headers.common as AxiosRequestHeaders).forEach(([key, value]) => {
       axiosHeaders.set(key, value);
     });
+    // Add custom headers from requestOptions
     if (headers) {
       Object.entries(headers).forEach(([key, value]) => {
         axiosHeaders.set(key, value);
       });
     }
     // Add token to headers if provided
-    const token = localStorage.getItem('token');
     if (token) {
       axiosHeaders.set('Authorization', `Bearer ${token}`);
     }
@@ -36,21 +32,15 @@ export class FetchData implements IfetchData {
         data: body
 
       });
-      console.log(response,"fcvg")
-      if (response.status == 401 || response.status == 403){
-        alert("Login failed")
-        localStorage.removeItem('userData');
-        localStorage.removeItem('token')
-        // window.location.reload();
-        // this.router.navigate(['UsersLogin']);
-        
-      }
+      // ifSuccess(response.data);
       return response.data;
 
     } catch (error) {
       if (axios.isAxiosError(error)) {
+        // ifError(new Error(`Error making request: ${error.message}`));
         throw new Error(`Error making request: ${error.message}`);
       } else {
+        // ifError(new Error(`Unexpected error: ${error}`));
         throw new Error(`Unexpected error: ${error}`);
       }
     }

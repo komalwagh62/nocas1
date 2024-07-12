@@ -19,9 +19,12 @@ export class ApiService {
   public subscriptionData!: Subscription;
   public nocasData!: Nocas;
   public handlePayment!: UsersPricingPlansComponent;
-  
 
   constructor(public http: HttpClient) {
+    this.loadFromLocalStorage();
+  }
+
+  private loadFromLocalStorage(): void {
     const token = localStorage.getItem('token');
     if (token) {
       this.token = token;
@@ -30,12 +33,21 @@ export class ApiService {
     if (userData) {
       this.userData = JSON.parse(userData);
     }
-    
   }
 
   // Function to parse user data
   parseUserData(userData: any): void {
     this.userData = userData;
     localStorage.setItem('userData', JSON.stringify(userData));
+  }
+
+  // Function to clear user data and token
+  clearUserData(): void {
+    this.userData = {} as User;
+    this.token = '';
+    this.isAuthenticated = false;
+    localStorage.removeItem('token');
+    localStorage.removeItem('userData');
+    
   }
 }

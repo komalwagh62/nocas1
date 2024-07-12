@@ -33,7 +33,7 @@ export class UsersSideNavComponent {
     this.apiService.isAuthenticated = false;
     this.apiService.userData.id = ""; // Set userData to null
 
-    
+     
     localStorage.removeItem('token');
     localStorage.removeItem('userData');
     

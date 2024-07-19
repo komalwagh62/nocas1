@@ -19,7 +19,7 @@ export class ForgotPasswordComponent {
 
   sendOTP() {
     const email = this.email;
-    this.http.post<any>('http://localhost:3001/api/otp/sendOtp', { email })
+    this.http.post<any>('http://localhost:3003/api/otp/sendOtp', { email })
       .subscribe(
         response => {
           console.log(response);
@@ -33,7 +33,7 @@ export class ForgotPasswordComponent {
 
   submitOTP() {
     console.log("uhjnkm")
-    this.http.post<any>('http://localhost:3001/api/otp/validateOtp', { email: this.email, otp: this.otp })
+    this.http.post<any>('http://localhost:3003/api/otp/validateOtp', { email: this.email, otp: this.otp })
       .subscribe(
         response => {
           console.log(response);
@@ -58,7 +58,7 @@ export class ForgotPasswordComponent {
   submitNewPassword() {
     const newPassword = this.newPassword; // Get the new password value from the component property
    
-    this.http.post<any>('http://localhost:3001/api/user/updatePassword', { email: this.email, password: this.newPassword })
+    this.http.post<any>('http://localhost:3003/api/user/updatePassword', { email: this.email, password: this.newPassword })
     .subscribe(
       response => {
         console.log(response);

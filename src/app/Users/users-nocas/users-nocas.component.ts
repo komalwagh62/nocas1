@@ -129,35 +129,45 @@ export class UsersNOCASComponent implements OnInit {
     const direction = parts[3];
     return this.convertDMSsToDD(degrees, minutes, seconds, direction);
   }
-  captureScreenshot(): void {
-    const mapElement = document.getElementById('map');
-    if (mapElement) {
-      domtoimage.toBlob(mapElement)
-        .then((blob: Blob) => {
-          const formData = new FormData();
-          formData.append('image', blob, 'mapScreenshot.png');
-
-          this.http.post('http://localhost:3001/api/nocas/save-screenshot', formData).subscribe(
-            response => {
-              console.log('Screenshot saved successfully:', response);
-            },
-            error => {
-              console.error('Error saving screenshot:', error);
-            }
-          );
-        })
-        .catch(error => {
-          console.error('Error converting element to Blob:', error);
-        });
-    } else {
-      console.error('Map element not found');
-    }
+  captureScreenshot(): Promise<string | null> {
+    return new Promise((resolve, reject) => {
+      const mapElement = document.getElementById('map');
+      if (mapElement) {
+        domtoimage.toBlob(mapElement)
+          .then((blob: Blob) => {
+            console.log('Blob created:', blob);
+  
+            const formData = new FormData();
+            formData.append('screenshot', blob, 'mapScreenshot.png');
+  
+            this.http.post('http://localhost:3003/api/nocas/save-screenshot', formData).subscribe(
+              (response: any) => {
+                console.log('Screenshot saved successfully:', response);
+                resolve(response.filePath); // Ensure the server responds with the file path
+              },
+              error => {
+                console.error('Error saving screenshot:', error);
+                reject('Error saving screenshot');
+              }
+            );
+          })
+          .catch(error => {
+            console.error('Error converting element to Blob:', error);
+            reject('Error converting element to Blob');
+          });
+      } else {
+        console.error('Map element not found');
+        reject('Map element not found');
+      }
+    });
   }
+  
 
   async createNocas(subscription_id: string = "") {
     if (this.TopElevationForm.valid) {
       try {
         const screenshotPath = await this.captureScreenshot();
+        console.log(screenshotPath)
         const lat = parseFloat(this.TopElevationForm.value.Latitude);
         const lng = parseFloat(this.TopElevationForm.value.Longitude);
         const distance = this.calculateDistance(lat, lng, this.airportCoordinates[0], this.airportCoordinates[1]);
@@ -192,7 +202,7 @@ export class UsersNOCASComponent implements OnInit {
         };
 
         const headers = new HttpHeaders().set("Authorization", `Bearer ${this.apiservice.token}`);
-        this.http.post("http://localhost:3001/api/nocas/createNocas", requestBody, { headers: headers })
+        this.http.post("http://localhost:3003/api/nocas/createNocas", requestBody, { headers: headers })
           .subscribe(
             (resultData: any) => {
               if (resultData.isSubscribed || resultData.freeTrialCount > 0 || resultData.isOneTimeSubscription) {
@@ -293,7 +303,7 @@ export class UsersNOCASComponent implements OnInit {
           expiry_date: new Date().toISOString(),  // Assuming response contains payment ID
         };
         const headers = new HttpHeaders().set("Authorization", `Bearer ${this.apiservice.token}`);
-        this.http.post('http://localhost:3001/api/subscription/addSubscription', paymentDetails, { headers: headers })
+        this.http.post('http://localhost:3003/api/subscription/addSubscription', paymentDetails, { headers: headers })
           .subscribe(
             (result: any) => {
               this.createNocas(result.subscription_id)
@@ -833,7 +843,7 @@ export class UsersNOCASComponent implements OnInit {
 
 
   fetchAirports() {
-    this.http.get<any>('http://localhost:3001/api/airports').subscribe({
+    this.http.get<any>('http://localhost:3003/api/airports').subscribe({
       next: (res) => {
         // If the response is an object with an 'airports' property
         if (res && res.airports) {

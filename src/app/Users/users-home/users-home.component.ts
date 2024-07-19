@@ -80,7 +80,7 @@ airport: any;
     // Fetch subscription data
     const headers = new HttpHeaders().set("Authorization", `Bearer ${this.apiservice.token}`);
     const user_id = this.apiservice.userData.id;
-    this.http.get<any[]>(`http://localhost:3001/api/subscription/getAllsubscriptions?user_id=${user_id}`, { headers: headers })
+    this.http.get<any[]>(`http://localhost:3003/api/subscription/getAllsubscriptions?user_id=${user_id}`, { headers: headers })
         .subscribe(
             response => {
                 console.log('Subscription data:', response);
@@ -122,7 +122,7 @@ airport: any;
 
     const headers = new HttpHeaders().set("Authorization", `Bearer ${this.apiservice.token}`);
     const user_id = this.apiservice.userData.id;
-    this.http.get<any[]>(`http://localhost:3001/api/request/getAllService?user_id=${user_id}`, { headers: headers })
+    this.http.get<any[]>(`http://localhost:3003/api/request/getAllService?user_id=${user_id}`, { headers: headers })
       .subscribe(
         response => {
           console.log('Service data:', response);
@@ -150,7 +150,7 @@ airport: any;
     // Fetch permissible data
     const headers = new HttpHeaders().set("Authorization", `Bearer ${this.apiservice.token}`);
     const user_id = this.apiservice.userData.id;
-    this.http.get<any[]>(`http://localhost:3001/api/nocas/getAllNocasData?user_id=${user_id}`, { headers: headers })
+    this.http.get<any[]>(`http://localhost:3003/api/nocas/getAllNocasData?user_id=${user_id}`, { headers: headers })
       .subscribe(
         response => {
           console.log('Nocas data:', response);

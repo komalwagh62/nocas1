@@ -88,7 +88,7 @@ onPhoneNumberKeyPress(event: KeyboardEvent) {
 
   createUser() {
     if (this.SignupForm.valid) {
-      this.http.post("http://localhost:3001/api/user/createUser", {
+      this.http.post("http://localhost:3003/api/user/createUser", {
         uname: this.SignupForm.value.uname,
         phone_number: this.SignupForm.value.phone_number,
         address: this.SignupForm.value.address,

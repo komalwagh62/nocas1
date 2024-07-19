@@ -37,7 +37,7 @@ export class TransactionDetailsComponent implements OnInit {
   detailsOfSubscription() {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${this.apiservice.token}`);
     const user_id = this.apiservice.userData.id;
-    this.http.get<any[]>(`http://localhost:3001/api/subscription/getAllsubscriptions?user_id=${user_id}`, { headers: headers })
+    this.http.get<any[]>(`http://localhost:3003/api/subscription/getAllsubscriptions?user_id=${user_id}`, { headers: headers })
       .subscribe(
         response => {
           console.log('Subscription data:', response);

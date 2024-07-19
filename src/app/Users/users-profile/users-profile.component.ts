@@ -62,7 +62,7 @@ export class UsersProfileComponent implements OnInit {
 
   saveChanges(): void {
     console.log(this.updatedUser)
-    this.http.put<any>('http://localhost:3001/api/user/updateUser', this.updatedUser)
+    this.http.put<any>('http://localhost:3003/api/user/updateUser', this.updatedUser)
       .subscribe(
         response => {
           this.apiservice.userData = JSON.parse(JSON.stringify(response.updatedUser))
@@ -95,7 +95,7 @@ export class UsersProfileComponent implements OnInit {
 // Inside the getUserDetails function in UsersProfileComponent
 getUserDetails(): void {
   const headers = new HttpHeaders().set("Authorization", `Bearer ${this.apiservice.token}`);
-  this.http.post<any>('http://localhost:3001/api/user/myProfile', {}, { headers: headers })
+  this.http.post<any>('http://localhost:3003/api/user/myProfile', {}, { headers: headers })
     .subscribe(
       response => {
         this.apiservice.parseUserData(response); // Parse user data here
@@ -133,7 +133,7 @@ changePassword(): void {
   const headers = new HttpHeaders().set("Authorization", `Bearer ${this.apiservice.token}`);
   let passwordData = {currentPassword:this.currentPassword,newPassword:this.confirmPassword}
   console.log(passwordData)
-  this.http.post<any>('http://localhost:3001/api/user/changePassword', passwordData, { headers: headers })
+  this.http.post<any>('http://localhost:3003/api/user/changePassword', passwordData, { headers: headers })
     .subscribe(
       response => {
         // this.apiservice.userData = JSON.parse(JSON.stringify(response))

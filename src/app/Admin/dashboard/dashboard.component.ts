@@ -139,7 +139,7 @@ export class DashboardComponent implements AfterViewInit {
     this.apiService.getAllPermissible().subscribe(
       (response: any[]) => {
         console.log('Permissible Details:', response);
-
+        
         this.permissibleDetails = response;
         this.filterpermissibleDetails = response;
         this.permissibleDataSource.data = this.filterpermissibleDetails;
@@ -147,6 +147,7 @@ export class DashboardComponent implements AfterViewInit {
 
         this.permissibleRowCount = this.permissibleDataSource.data.length;
       },
+      
       (error: any) => {
         console.error('Failed to fetch permissible details:', error);
       }

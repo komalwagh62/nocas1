@@ -11,6 +11,13 @@ import { ApiService } from '../shared/api.service';
   providers: [DatePipe] 
 })
 export class DashboardComponent implements AfterViewInit {
+  private baseUrl = 'C:/Users/Public/uploads';
+fileName: any;
+
+  getSnapshotUrl(snapshotFileName: string): string {
+    return `${this.baseUrl}${snapshotFileName}`;
+  }
+  
   displayedColumns: string[] = ['id', 'uname', 'phone_number', 'address', 'email'];
   subscriptiondisplayedColumns: string[] = ['subscription_id', 'subscription_status', 'subscription_type', 'expand'];
   expandedElement: any | null;

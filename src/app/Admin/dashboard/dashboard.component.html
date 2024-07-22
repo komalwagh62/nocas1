@@ -226,11 +226,11 @@
               <div><strong>Permissible Height (AGL):</strong> {{element.permissible_height}}</div>
               <div><strong>Permissible Elevation (AMSL):</strong> {{element.permissible_elevation}}</div>
               <div><strong>Snapshot:</strong> {{element.snapshot}}</div>
-              <div><img src="'/uploads/' + element.snapshot" alt="Snapshot Image" *ngIf="element.snapshot" width="400"/>
-              </div>
+              <div><img [src]="getSnapshotUrl(element.snapshot)" alt="Snapshot Image" *ngIf="element.snapshot" width="400"/></div>
             </div>
           </mat-cell>
         </ng-container>
+        
         
         <mat-row *matRowDef="let row; columns: ['expandedDetail'];"
           [class.expanded-row]="expandedElement === row && expandedElement !== null"></mat-row>

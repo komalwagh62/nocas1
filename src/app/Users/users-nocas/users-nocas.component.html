@@ -2,24 +2,40 @@
   <div class="row">
     <div class="col-lg-2">
       <form [formGroup]="TopElevationForm" autocomplete="on" novalidate>
+        <!-- Radio buttons to select default or manual city -->
         <div class="form-group">
-          <label for="airportCITY">City</label>
-          <mat-form-field appearance="outline">
-            <mat-select id="airportCITY" formControlName="CITY">
-              <mat-option value="" disabled>Select a City</mat-option>
-              <mat-option *ngFor="let airport of airports" [value]="airport.airport_city">{{ airport.airport_city }}</mat-option>
-            </mat-select>
-            <mat-icon matSuffix color="primary">location_city</mat-icon>
-          </mat-form-field>
+          <label>Selection Mode</label>
+          <mat-radio-group formControlName="selectionMode">
+             <br>
+            <mat-radio-button value="default">Default Airport City</mat-radio-button>
+            <mat-radio-button value="manual">Manually Select Airport City</mat-radio-button>
+          </mat-radio-group>
         </div>
+       
 
-        <div class="form-group">
-          <label for="airportName">Airport Name</label>
-          <mat-form-field appearance="outline">
-            <input matInput type="text" name="airportName" id="airportName" [value]="selectedAirportName" placeholder="Airport Name" readonly>
-            <mat-icon matSuffix color="primary">local_airport</mat-icon>
-          </mat-form-field>
+        <!-- Conditional fields based on selectionMode -->
+        <div *ngIf="TopElevationForm.get('selectionMode')?.value === 'manual'">
+          <div class="form-group">
+            <label for="airportCITY">City</label>
+            <mat-form-field appearance="outline">
+              <mat-select id="airportCITY" formControlName="CITY">
+                <mat-option value="" disabled>Select a City</mat-option>
+                <mat-option *ngFor="let airport of airports" [value]="airport.airport_city">{{ airport.airport_city }}</mat-option>
+              </mat-select>
+              <mat-icon matSuffix color="primary">location_city</mat-icon>
+            </mat-form-field>
+          </div>
+
+          <div class="form-group">
+            <label for="airportName">Airport Name</label>
+            <mat-form-field appearance="outline">
+              <input matInput type="text" name="airportName" id="airportName" [value]="selectedAirportName" placeholder="Airport Name" readonly>
+              <mat-icon matSuffix color="primary">local_airport</mat-icon>
+            </mat-form-field>
+          </div>
         </div>
+      
+
       
 
         <div class="form-group">

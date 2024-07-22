@@ -12,13 +12,7 @@ import { ApiService } from '../Shared/Api/api.service';
 
 
 export class UsersSideNavComponent {
-  isAdminDashboardActive: boolean = false;
-
   
-  // Method to determine if the admin dashboard is active
-  isDashboardActive(url: string): boolean {
-    return url.includes('/AdminDashboard');
-  }
 
   isloggedIn : boolean = false
   constructor(private router: Router, public apiService: ApiService) { 

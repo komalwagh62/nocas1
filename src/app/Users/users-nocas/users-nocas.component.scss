@@ -1,23 +1,14 @@
-
-/* Chrome, Safari, Edge, Opera */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
-  
 }
- 
-/* map.component.scss */
- 
 .map-container {
   position: relative;
-  
 }
- 
 mat-form-field {
   width: 100%;
 }
- 
 .mat-mdc-radio-button.mat-accent {
   --mdc-radio-disabled-selected-icon-color: #C3B828;
   --mdc-radio-disabled-unselected-icon-color: #C3B828;

@@ -11,7 +11,7 @@ import { UsersPricingPlansComponent } from '../../users-pricing-plans/users-pric
 })
 export class ApiService {
   isAuthenticated: boolean = false;
-  public baseUrl: string = 'http://localhost:3003/api';
+  public baseUrl: string = 'http://localhost:3001/api';
   public loginUserId: string = '';
   public userData!: User;
   public token: string = '';

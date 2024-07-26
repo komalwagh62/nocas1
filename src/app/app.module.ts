@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { UsersSideNavComponent } from './Users/users-side-nav/users-side-nav.component';
 import { MatSidenavModule } from '@angular/material/sidenav';
@@ -25,10 +24,8 @@ import { MatInputModule } from '@angular/material/input';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { FooterComponent } from './Users/Shared/footer/footer.component';
-import { BannerComponent } from './Users/Shared/banner/banner.component';
 import { UsersHomeComponent } from './Users/users-home/users-home.component';
 import { UsersPricingPlansComponent } from './Users/users-pricing-plans/users-pricing-plans.component';
-// import { PermissibleHeight } from './Users/permissible-height/permissible-height.component';
 import { UsersEditUpdateComponent } from './Users/users-edit-update/users-edit-update.component';
 import { UsersNOCASComponent } from './Users/users-nocas/users-nocas.component';
 import { ForgotPasswordComponent } from './Users/forgot-password/forgot-password.component';
@@ -38,20 +35,9 @@ import { MatGridListModule } from '@angular/material/grid-list';
 import { UsersLoginComponent } from './Users/users-login/users-login.component';
 import { UsersProfileComponent } from './Users/users-profile/users-profile.component';
 import { UsersRegisterComponent } from './Users/users-register/users-register.component';
-import { PaymentReceiptComponent } from './payment-receipt/payment-receipt.component';
 import { TransactionDetailsComponent } from './Users/transaction-details/transaction-details.component';
 import { MatTableModule } from '@angular/material/table';
-import { AdminLoginComponent } from './Admin/admin-login/admin-login.component';
-import { DashboardComponent } from './Admin/dashboard/dashboard.component';
 import { MatPaginator,MatPaginatorModule } from '@angular/material/paginator';
-import { DmsPipe } from './dms.pipe';
-import { NocasRepository } from '../Api/Features/NocasApi/NocasRepository';
-import { NocasServiceService } from '../Api/Features/NocasApi/NocasService/nocas-service.service';
-import { NocasPresenter } from '../Api/Features/NocasApi/NocasPresenter';
-import { CreateNocasUseCase } from '../Api/Features/NocasApi/UseCases/CreateNocasUseCase';
-import { FetchData } from '../Repository/fetch-data';
-import { NocasUseCases } from '../Api/Features/NocasApi/UseCases/NocasUseCases';
-import { MapComponent } from './map/map.component';
 
 @NgModule({
   declarations: [
@@ -61,21 +47,13 @@ import { MapComponent } from './map/map.component';
     UsersRegisterComponent,
     UsersSideNavComponent,
     FooterComponent,
-    BannerComponent,
     UsersHomeComponent,
     UsersPricingPlansComponent,
-    // PermissibleHeight,
     UsersEditUpdateComponent,
     UsersNOCASComponent,
     ForgotPasswordComponent,
     UsersrequestServiceComponent,
-    PaymentReceiptComponent,
     TransactionDetailsComponent,
-    AdminLoginComponent,
-    DashboardComponent,
-    DmsPipe,
-    MapComponent,
-   
   ],
   imports: [
     BrowserModule,
@@ -92,8 +70,8 @@ import { MapComponent } from './map/map.component';
     MatIconModule,
     MatListModule,
     MatToolbarModule,
-    FormsModule, // Import FormsModule
-    ReactiveFormsModule, // Import ReactiveFormsModule
+    FormsModule,
+    ReactiveFormsModule,
     MatCardModule,
     MatDialogModule,
     MatInputModule,
@@ -110,16 +88,6 @@ import { MapComponent } from './map/map.component';
   ],
   providers: [
     provideAnimationsAsync(),
-    
-      FetchData,
-      NocasRepository,
-      CreateNocasUseCase,
-      NocasPresenter,
-      NocasServiceService,
-      NocasUseCases
-      // other providers
-   
-    
   ],
   bootstrap: [AppComponent]
 })

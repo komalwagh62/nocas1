@@ -110,7 +110,7 @@ export class UsersPricingPlansComponent implements OnInit {
 
   async makeHttpRequest(planName: string, planAmount: number, paymentResponse: any): Promise<void> {
     const headers = new HttpHeaders().set("Authorization", `Bearer ${this.apiService.token}`);
-    const apiUrl = 'http://localhost:3003/api/subscription/addSubscription';
+    const apiUrl = 'http://localhost:3001/api/subscription/addSubscription';
     const requestData = {
       user_id: this.apiService.userData.id,
       subscription_type: planName,

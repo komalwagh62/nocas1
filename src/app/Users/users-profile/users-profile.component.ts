@@ -31,7 +31,7 @@ export class UsersProfileComponent implements OnInit {
     // this.user = history.state.user;
     // Copy user data to updatedUser object for editing
     // this.updatedUser = { ...this.user };
-    // console.log(this.updatedUser)
+    // //console.log(this.updatedUser)
    
     this.getUserDetails();
 
@@ -61,12 +61,12 @@ export class UsersProfileComponent implements OnInit {
 
 
   saveChanges(): void {
-    console.log(this.updatedUser)
-    this.http.put<any>('http://localhost:3003/api/user/updateUser', this.updatedUser)
+    //console.log(this.updatedUser)
+    this.http.put<any>('http://localhost:3001/api/user/updateUser', this.updatedUser)
       .subscribe(
         response => {
           this.apiservice.userData = JSON.parse(JSON.stringify(response.updatedUser))
-          console.log(response)
+          //console.log(response)
           this.updatedUser = JSON.parse(JSON.stringify(response.updatedUser))
           this.user = JSON.parse(JSON.stringify(response.updatedUser))
 
@@ -80,7 +80,7 @@ export class UsersProfileComponent implements OnInit {
   }
 
   logout() {
-    // console.log("de")
+    // //console.log("de")
     this.router.navigate(['UserLogin']);
   }
 
@@ -95,15 +95,15 @@ export class UsersProfileComponent implements OnInit {
 // Inside the getUserDetails function in UsersProfileComponent
 getUserDetails(): void {
   const headers = new HttpHeaders().set("Authorization", `Bearer ${this.apiservice.token}`);
-  this.http.post<any>('http://localhost:3003/api/user/myProfile', {}, { headers: headers })
+  this.http.post<any>('http://localhost:3001/api/user/myProfile', {}, { headers: headers })
     .subscribe(
       response => {
         this.apiservice.parseUserData(response); // Parse user data here
 
         this.updatedUser = JSON.parse(JSON.stringify(response));
         this.user = JSON.parse(JSON.stringify(response));
-        console.log(this.user);
-        localStorage.setItem('this.user', JSON.stringify(response.apiservice.userData));
+        //console.log(this.user);
+        // localStorage.setItem('this.user', JSON.stringify(response.apiservice.userData));
       },
       error => {
         localStorage.removeItem('token');
@@ -132,12 +132,12 @@ changePassword(): void {
 
   const headers = new HttpHeaders().set("Authorization", `Bearer ${this.apiservice.token}`);
   let passwordData = {currentPassword:this.currentPassword,newPassword:this.confirmPassword}
-  console.log(passwordData)
-  this.http.post<any>('http://localhost:3003/api/user/changePassword', passwordData, { headers: headers })
+  //console.log(passwordData)
+  this.http.post<any>('http://localhost:3001/api/user/changePassword', passwordData, { headers: headers })
     .subscribe(
       response => {
         // this.apiservice.userData = JSON.parse(JSON.stringify(response))
-        // // console.log(response)
+        // // //console.log(response)
         // this.updatedUser = JSON.parse(JSON.stringify(response))
         // this.user = JSON.parse(JSON.stringify(response))
        alert(response.message)

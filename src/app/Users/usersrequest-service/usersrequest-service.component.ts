@@ -42,7 +42,7 @@ export class UsersrequestServiceComponent implements OnInit {
 
       console.log(this.requestForm.value,"dgtrf")
  
-      this.http.post<any>('http://localhost:3003/api/request/createRequest', requestData)
+      this.http.post<any>('http://localhost:3001/api/request/createRequest', requestData)
         .subscribe(
           (result) => {
             console.log("Request creation response:", result);
@@ -60,7 +60,7 @@ export class UsersrequestServiceComponent implements OnInit {
 
   getUserDetails(): void {
     const headers = new HttpHeaders().set("Authorization", `Bearer ${this.apiService.token}`);
-    this.http.post<any>('http://localhost:3003/api/user/myProfile', {}, { headers })
+    this.http.post<any>('http://localhost:3001/api/user/myProfile', {}, { headers })
       .subscribe(
         response => {
           this.apiService.userData = JSON.parse(JSON.stringify(response))

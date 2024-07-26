@@ -2,7 +2,6 @@
   <div class="row">
     <div class="col-lg-2">
       <form [formGroup]="TopElevationForm" autocomplete="on" novalidate>
-        <!-- Radio buttons to select default or manual city -->
         <div class="form-group">
           <label>Selection Mode</label>
           <mat-radio-group formControlName="selectionMode">
@@ -11,9 +10,6 @@
             <mat-radio-button value="manual">Manually Select Airport City</mat-radio-button>
           </mat-radio-group>
         </div>
-       
-
-        <!-- Conditional fields based on selectionMode -->
         <div *ngIf="TopElevationForm.get('selectionMode')?.value === 'manual'">
           <div class="form-group">
             <label for="airportCITY">City</label>
@@ -25,19 +21,15 @@
               <mat-icon matSuffix color="primary">location_city</mat-icon>
             </mat-form-field>
           </div>
-
           <div class="form-group">
             <label for="airportName">Airport Name</label>
             <mat-form-field appearance="outline">
               <input matInput type="text" name="airportName" id="airportName" [value]="selectedAirportName" placeholder="Airport Name" readonly>
+
               <mat-icon matSuffix color="primary">local_airport</mat-icon>
             </mat-form-field>
           </div>
         </div>
-      
-
-      
-
         <div class="form-group">
           <label>Select Site Location</label><br>
           <mat-radio-group formControlName="location">
@@ -47,7 +39,6 @@
           </mat-radio-group>
         </div>
         <br>
-
         <div class="form-group">
           <label for="Site_latitude">Site Latitude</label>
           <mat-form-field appearance="outline">
@@ -123,28 +114,6 @@
   </div>
 </div>
 
-
-<!-- Site Location Details Modal -->
-<!-- <div class="modal" id="exampleModal" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 class="modal-title">Site Location Details</h2>
-        <button type="button" class="btn-close" (click)="closeModal()" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div id="mapData" style="display:none;">
-        </div>
-        <div>
-          <b>We wish you success in your project.<br> Our range of services will assist you in WGS-84 Survey, NOC process support, Aeronautical study & Assessment. Please connect for details.</b><br>
-          <button type="button" value="currentLocation" class="btn btn-outline-primary rounded-5" routerLink="/request-Service">Check-Out Now</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div> -->
-
-
 <!-- Inside Map Data Modal -->
 <div class="modal" id="insideMapData" tabindex="-1">
   <div class="modal-dialog">
@@ -158,7 +127,7 @@
           <tbody>
             <tr>
               <td scope="row"><b>Permissible Elevation (AMSL Above Mean Sea Level)</b></td>
-              <td>{{ isSubscribed ? insideMapData.elevation + 'M' : '***' }}</td>
+              <td>{{ isSubscribed ? insideMapData.elevation : '***' }}</td>
             </tr>
             <tr>
               <td scope="row"><b>Permissible Height (AGL - Above Ground Level)</b></td>

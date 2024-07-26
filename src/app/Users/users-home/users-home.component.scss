@@ -108,10 +108,12 @@ example-sidenav-content[_ngcontent-ng-c3576681141] {
   background: #ffecdf;
 }
 
-/* Table Styles */
 .table-responsive {
+  padding-left: 15px;
+  padding-right: 15px;
   overflow-x: auto;
 }
+
 
 .table th, .table td {
   vertical-align: middle;
@@ -385,50 +387,4 @@ table {
     }
   }
   
-  .pagetitle {
-    margin-bottom: 20px;
-  }
   
-  .breadcrumb {
-    background: none;
-    padding: 0;
-    margin-bottom: 0;
-  }
-  
-  .breadcrumb-item a {
-    color: #007bff;
-  }
-  
-  .breadcrumb-item.active {
-    color: #6c757d;
-  }
-  
-  .btn-primary {
-    margin-bottom: 10px;
-  }
-  .transparent-img {
-    opacity: 0.5; /* Adjust the opacity value (0.0 to 1.0) */
-  }
-.breadcrumb {
-  background: none;
-  padding: 0;
-  margin-bottom: 0;
-}
-
-.breadcrumb-item a {
-  color: #007bff;
-}
-
-.breadcrumb-item.active {
-  color: #6c757d;
-}
-.card-title {
-  color: #000; /* Dark color */
-  font-weight: bold; /* Optional: to make it bold */
-}
-.btn-primary {
-  margin-bottom: 10px;
-}
-.transparent-img {
-  opacity: 0.5; /* Adjust the opacity value (0.0 to 1.0) */
-}

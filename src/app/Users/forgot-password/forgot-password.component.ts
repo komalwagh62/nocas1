@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-
-import { ActivatedRoute,Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-forgot-password',
@@ -15,7 +14,7 @@ export class ForgotPasswordComponent {
   confirmPassword: string ='';
   passwordsMatch: boolean = false;
 
-  constructor(private route: ActivatedRoute,private http: HttpClient,private router: Router) { }
+  constructor(private route: ActivatedRoute, private http: HttpClient, private router: Router) { }
 
   sendOTP() {
     const email = this.email;
@@ -23,69 +22,64 @@ export class ForgotPasswordComponent {
       .subscribe(
         response => {
           console.log(response);
-          this.showOTPForm();
+          alert("An OTP has been sent to your email address. Please check your email.");
+          this.showOTPForm(); // Show the OTP form
         },
         error => {
           console.error('Error sending OTP:', error);
+          alert("Failed to send OTP. Please check your email ID.");
         }
       );
   }
+  
 
   submitOTP() {
-    console.log("uhjnkm")
+    console.log("Submitting OTP...");
     this.http.post<any>('http://localhost:3001/api/otp/validateOtp', { email: this.email, otp: this.otp })
       .subscribe(
         response => {
           console.log(response);
           if (response.valid) {
+            alert("OTP validated successfully. Please set a new password.");
             this.showPasswordForm();
           } else {
+            alert("Invalid OTP. Please check the OTP and try again.");
             console.error('Invalid OTP');
           }
         },
         error => {
           console.error('Error validating OTP:', error);
+          alert("Failed to validate OTP. Please try again.");
+        }
+      );
+  }
+
+  validatePassword() {
+    // Check if the passwords match
+    this.passwordsMatch = this.newPassword === this.confirmPassword && !!this.newPassword;
+  }
+
+  submitNewPassword() {
+    const newPassword = this.newPassword; // Get the new password value from the component property
+  
+    this.http.post<any>('http://localhost:3001/api/user/updatePassword', { email: this.email, password: newPassword })
+      .subscribe(
+        response => {
+          console.log(response);
+          if (response.success) {
+            alert("Your password has been updated successfully. You will be redirected to the login page.");
+            this.router.navigate(['UsersLogin']);
+          } else {
+            alert("Failed to update password. Please try again.");
+          }
+        },
+        error => {
+          console.error('Error updating password:', error);
+          alert("Failed to update password. Please try again later.");
         }
       );
   }
   
-  validatePassword() {
-    // Check if the paswords match
-    this.passwordsMatch = this.newPassword  === this.confirmPassword  && !!this.newPassword ;
-}
-
-  
-  submitNewPassword() {
-    const newPassword = this.newPassword; // Get the new password value from the component property
-   
-    this.http.post<any>('http://localhost:3001/api/user/updatePassword', { email: this.email, password: this.newPassword })
-    .subscribe(
-      response => {
-        console.log(response);
-        if (response.success) {
-         alert(response.message)
-         this.router.navigate(['UserLogin']);
-        } else {
-          alert("something went wrong")
-          
-        }
-      },
-      error => {
-        console.error('Error validating OTP:', error);
-      }
-    );
-
-
-    
-  }
-
-
-
-
-
-
-
-
 
   showOTPForm() {
     const emailForm = document.getElementById('emailForm');

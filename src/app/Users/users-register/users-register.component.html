@@ -1,17 +1,22 @@
-<div class="container">
-    <div class="login-wrapper">
-        <div class="login-text">
-            <h1>Join Us</h1>
-            <p>It's not long before you embark on this journey!</p>
-            <form [formGroup]="SignupForm" (ngSubmit)="createUser()">
-                <div class="input-box">
-                    <label for="uname">Name</label>
-                    <div class="input">
-                        <input type="text" placeholder="Enter Your Name" (input)="onNameInput($event)" formControlName="uname" autocomplete="name" id="uname" required>
+<section>
+    <div class="container-fluid flex">
+        <div class="cognitive-page flex">
+            <div class="text">
+                <h1><small>Cognitive Navigation</small></h1>
+                <p>Aviation & Aerospace</p>
+                <p>Technology Solutions & Consulting.</p>
+            </div>
+            <form [formGroup]="SignupForm" (ngSubmit)="createUser()" novalidate>
+                <h2>Join Us</h2>
+                <span>It's not long before you embark on this journey!</span>
+                <div>
+                    <div class="input-container mt-4">
+                        <input type="text" placeholder="Enter Your Name" (input)="onNameInput($event)"
+                            formControlName="uname" autocomplete="name" id="uname" required>
                         <i class="bi bi-person-fill"></i>
                     </div>
                     <div *ngIf="SignupForm.get('uname').invalid && (SignupForm.get('uname').dirty || SignupForm.get('uname').touched)"
-                         class="alert alert-danger mt-2">
+                        class="alert alert-danger mt-2">
                         <div *ngIf="SignupForm.get('uname').errors.required">
                             Name is <strong>required.</strong>
                         </div>
@@ -20,70 +25,15 @@
                         </div>
                     </div>
                 </div>
-                
-
-                <div class="input-box">
-                    <label for="phone_number">Phone Number</label>
-                    <div class="input">
-                        <input type="tel" placeholder="Phone Number" formControlName="phone_number" (keypress)="onPhoneNumberKeyPress($event)"
-                               autocomplete="tel" id="phone_number" (change)="onPhoneNumberChange()" required>
-                        <i class="bi bi-telephone-fill"></i>
-                    </div>
-                    <div *ngIf="SignupForm.get('phone_number').invalid && (SignupForm.get('phone_number').dirty || SignupForm.get('phone_number').touched)"
-                         class="alert alert-danger mt-2">
-                        <div *ngIf="SignupForm.get('phone_number').errors.required">
-                            Phone Number is <strong>required.</strong>
-                        </div>
-                        <div *ngIf="SignupForm.get('phone_number').errors.pattern">
-                            Enter a valid <strong>Phone Number</strong>.
-                        </div>
-                    </div>
-                </div>
-
-                <div class="input-box" *ngIf="otpSent">
-                    <label for="otp">OTP</label>
-                    <div class="input">
-                        <input type="tel" placeholder="OTP" formControlName="otp"  (keypress)="onOtpKeyPress($event)"autocomplete="one-time-code" id="otp" required maxlength="4" pattern="[0-9]*">
-                        <button type="button" class="btn-link" (click)="regenerateOtp()">
-                            
-                        </button>
-                        <i class="bi bi-arrow-repeat" style="color: black;"></i>
-                    </div>
-                    <div *ngIf="SignupForm.get('otp').invalid && (SignupForm.get('otp').dirty || SignupForm.get('otp').touched)"
-                         class="alert alert-danger mt-2">
-                        <div *ngIf="SignupForm.get('otp').errors.required">
-                            OTP is <strong>required.</strong>
-                        </div>
-                        <div *ngIf="SignupForm.get('otp').errors.pattern">
-                            Only numeric characters are allowed for OTP.
-                        </div>
-                    </div>
-                </div>
-                
-                
-
-                <div class="input-box">
-                    <label for="address">Address</label>
-                    <div class="input">
-                        <input type="text" placeholder="Enter Your Address" formControlName="address" autocomplete="address" id="address" required>
-                        <i class="bi bi-house-fill"></i>
-                    </div>
-                    <div *ngIf="SignupForm.get('address').invalid && (SignupForm.get('address').dirty || SignupForm.get('address').touched)"
-                         class="alert alert-danger mt-2">
-                        <div *ngIf="SignupForm.get('address').errors.required">
-                            Address is <strong>required.</strong>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="input-box">
-                    <label for="email">E-mail</label>
-                    <div class="input">
-                        <input type="email" placeholder="name@abc.com" formControlName="email" autocomplete="email" id="email" required>
+                <div>
+                    <div class="input-container ">
+                        <input type="email" placeholder="name@abc.com" formControlName="email" autocomplete="email"
+                            id="email" required>
                         <i class="bi bi-envelope-fill"></i>
+ 
                     </div>
                     <div *ngIf="SignupForm.get('email').invalid && (SignupForm.get('email').dirty || SignupForm.get('email').touched)"
-                         class="alert alert-danger mt-2">
+                        class="alert alert-danger mt-2">
                         <div *ngIf="SignupForm.get('email').errors.required">
                             Email is <strong>required.</strong>
                         </div>
@@ -92,21 +42,69 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="input-box">
-                    <label for="password">Password</label>
-                    <div class="input">
-                        <input [type]="showPassword ? 'text' : 'password'" id="password"
-                               formControlName="password" placeholder="Enter Password" autocomplete="new-password">
-                        <span>
-                            <i class="bi" [ngClass]="{
-                                'bi-eye-slash-fill': !showPassword,
-                                'bi-eye-fill': showPassword
-                            }" (click)="togglePasswordVisibility()"></i>
-                        </span>
+ 
+ 
+                <div>
+                    <div class="input-container ">
+                        <input type="tel" placeholder="Phone Number" formControlName="phone_number"
+                            (keypress)="onPhoneNumberKeyPress($event)" autocomplete="tel" id="phone_number"
+                            (change)="onPhoneNumberChange()" required>
+                        <i class="bi bi-telephone-fill"></i>
+                    </div>
+                    <div *ngIf="SignupForm.get('phone_number').invalid && (SignupForm.get('phone_number').dirty || SignupForm.get('phone_number').touched)"
+                        class="alert alert-danger mt-2">
+                        <div *ngIf="SignupForm.get('phone_number').errors.required">
+                            Phone Number is <strong>required.</strong>
+                        </div>
+                        <div *ngIf="SignupForm.get('phone_number').errors.pattern">
+                            Enter a valid <strong>Phone Number</strong>.
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="otpSent">
+                    <div class="input-container ">
+                        <input type="tel" placeholder="OTP" formControlName="otp" (keypress)="onOtpKeyPress($event)"
+                            autocomplete="one-time-code" id="otp" required maxlength="4" pattern="[0-9]*">
+                        <button type="button" class="btn" (click)="regenerateOtp()">
+                            <i class="bi bi-arrow-repeat"></i>
+                        </button>
+                    </div>
+                    <div *ngIf="SignupForm.get('otp').invalid && (SignupForm.get('otp').dirty || SignupForm.get('otp').touched)"
+                        class="alert alert-danger mt-2">
+                        <div *ngIf="SignupForm.get('otp').errors.required">
+                            OTP is <strong>required</strong>
+                        </div>
+                        <div *ngIf="SignupForm.get('otp').errors.pattern">
+                            Only numeric characters are allowed for OTP
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="input-container ">
+                        <input type="text" placeholder="Enter Your Address" formControlName="address"
+                            autocomplete="address" id="address" required>
+                        <i class="bi bi-house-fill"></i>
+                    </div>
+                    <div *ngIf="SignupForm.get('address').invalid && (SignupForm.get('address').dirty || SignupForm.get('address').touched)"
+                        class="alert alert-danger mt-2">
+                        <div *ngIf="SignupForm.get('address').errors.required">
+                            Address is <strong>required.</strong>
+                        </div>
+                    </div>
+                </div>
+ 
+                <div>
+                    <div class="input-container">
+                        <input type="password" placeholder="Password" [type]="showPassword ? 'text' : 'password'"
+                            id="password" autocomplete="password" formControlName="password"
+                            placeholder="8+ (a, A, 1, #)">
+ 
+                        <i class="bi" [ngClass]="{'bi-eye-slash-fill': !showPassword, 'bi-eye-fill': showPassword}"
+                            (click)="togglePasswordVisibility()"></i>
+ 
                     </div>
                     <div *ngIf="SignupForm.get('password').invalid && (SignupForm.get('password').dirty || SignupForm.get('password').touched)"
-                         class="alert alert-danger mt-2">
+                        class="alert alert-danger mt-2">
                         <div *ngIf="SignupForm.get('password').errors.required">
                             Password is <strong>required.</strong>
                         </div>
@@ -114,16 +112,24 @@
                             Password must be at least <strong>8 characters</strong> long.
                         </div>
                         <div *ngIf="SignupForm.get('password').errors.pattern">
-                            Password must contain at least one <strong>letter</strong>, one <strong>number</strong>, and one <strong>special character</strong>.
+                            Password must contain at least one <strong>letter</strong>, one <strong>number</strong>,
+                            and
+                            one <strong>special character</strong>.
                         </div>
                     </div>
                 </div>
-
-                <button class="btn  btn-outline-primary rounded-5 py-2 px-4" type="submit">Join Us</button>
-                <div class="text-center text-muted mt-1 mb-0">
-                    <span>Already have an account? <a href="" class="fw-bold text-body" routerLink="/UsersLogin"><u>Log In here</u></a></span>
+ 
+                <div class="link">
+                    <button type="submit" class="btn btn-outline-primary btn-lg">Join Us</button>
                 </div>
+                <hr>
+ 
+                <div class="text-center">
+                    <span>Already have an account? <a href="#" routerLink="/UsersLogin"><u>Log
+                                In here</u></a></span>
+                </div>
+ 
             </form>
         </div>
     </div>
-</div>
+

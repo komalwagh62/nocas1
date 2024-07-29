@@ -1,17 +1,20 @@
-
- 
-<div class="container">
-    <div class="login-wrapper">
-        <div class="login-text">
-            <h1>Log In</h1>
-            <p>It's not long before you embark on this journey!</p>
- 
-            <form [formGroup]="LogInForm" (ngSubmit)="login()">
-                <div class="input-box">
-                    <label for="email">E-mail</label>
-                    <div class="input">
-                        <input type="email" placeholder="name@abc.com" id="email" formControlName="email" autocomplete="email" required>
+<section>
+    <div class="container-fluid flex">
+        <div class="cognitive-page flex">
+            <div class="text">
+                <h1><small>Cognitive Navigation</small></h1>
+                <p>Aviation & Aerospace</p>
+                <p>Technology Solutions & Consulting.</p>
+            </div>
+            <form [formGroup]="LogInForm" (ngSubmit)="login()" novalidate>
+                <h2>Log In</h2>
+                <span>It's not long before you embark on this journey! </span>
+                <div>
+                    <div class="input-container mt-4">
+                        <input type="email" placeholder="Email" formControlName="email" autocomplete="email" id="email"
+                            required>
                         <i class="bi bi-envelope-at-fill"></i>
+ 
                     </div>
                     <div *ngIf="LogInForm.get('email').invalid && (LogInForm.get('email').dirty || LogInForm.get('email').touched)"
                         class="alert alert-danger mt-2">
@@ -23,12 +26,15 @@
                         </div>
                     </div>
                 </div>
+                <div>
+                    <div class="input-container">
+                        <input type="password" placeholder="Password" [type]="showPassword ? 'text' : 'password'"
+                            id="password" autocomplete="password" formControlName="password"
+                            placeholder="8+ (a, A, 1, #)">
  
-                <div class="input-box">
-                    <label for="password">Password</label>
-                    <div class="input">
-                        <input type="password" [type]="showPassword ? 'text' : 'password'" id="password" formControlName="password" placeholder="Enter Password" autocomplete="current-password" required>
-                        <i class="bi" [ngClass]="{ 'bi-eye-slash-fill': !showPassword, 'bi-eye-fill': showPassword }" (click)="togglePasswordVisibility()"></i>
+                        <i class="bi" [ngClass]="{'bi-eye-slash-fill': !showPassword, 'bi-eye-fill': showPassword}"
+                            (click)="togglePasswordVisibility()"></i>
+ 
                     </div>
                     <div *ngIf="LogInForm.get('password').invalid && (LogInForm.get('password').dirty || LogInForm.get('password').touched)"
                         class="alert alert-danger mt-2">
@@ -36,18 +42,16 @@
                             Password is <strong>required.</strong>
                         </div>
                     </div>
-                    <div class="form-outline mt-2">
-                        <a href="forgot-pass" class="forgot-pass" routerLink="/forgot-pass">Forgot password?</a>
-                    </div>
                 </div>
- 
-                <button class="btn btn-outline-primary" type="submit">Log In</button>
-                <div class="text-center text-muted mt-1 mb-0">
-                    <span>Don't have an account? <a href="" routerLink="/UsersRegister" class="fw-bold text-body"><u>Signup here</u></a></span>
+                <div class="link">
+                    <button type="submit" class="btn btn-outline-primary btn-lg">Login</button>
+                    <a href="#" class="forgot" routerLink="/forgot-pass">Forgot password?</a>
+                </div>
+                <hr>
+                <div class="text-center">
+                    <span>Don't have an account? <a href="" routerLink="/UsersRegister" ><u>Signup here</u></a></span>
                 </div>
             </form>
         </div>
     </div>
-</div>
- 
- 
+</section>

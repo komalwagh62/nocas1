@@ -23,7 +23,7 @@ serviceDataSource = new MatTableDataSource<any>();
   @ViewChild('permissiblePaginator') permissiblePaginator!: MatPaginator;
   @ViewChild('servicePaginator') servicePaginator!: MatPaginator;
 
-  subscriptiondisplayedColumns: string[] = ['subscription_id', 'subscription_status', 'subscription_type', 'expand'];
+  subscriptiondisplayedColumns: string[] = ['subscription_id', 'subscription_status','createdAt', 'subscription_type', 'expand'];
   expandedElement: any | null;
   permissibleDisplayedColumns: string[] = [ 'city', 'airport_name','download', 'expand'];
 

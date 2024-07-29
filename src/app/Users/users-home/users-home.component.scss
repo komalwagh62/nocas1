@@ -1,390 +1,65 @@
-/* Dashboard Styles */
-.dashboard .filter {
-  position: absolute;
-  right: 0px;
-  top: 15px;
-}
-
-// example-sidenav-content[_ngcontent-ng-c3576681141] {
-//   height: 80vh;
-//   background-color: white;
-// }
-
-.parent-element {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  overflow: hidden;
-}
-
-.header {
-  height: 60px; /* Example header height */
-  background-color: lightgray;
-}
-
-example-sidenav-content[_ngcontent-ng-c3576681141] {
-  flex-grow: 1;
-  overflow: auto;
-  background-color: white;
-  margin: 0;
-  padding: 0;
-}
-
-example-sidenav-content[_ngcontent-ng-c3576681141] {
-  height: 100%;
-}
-
-.arrow-icon {
-  font-size: 30px;
-  width: 20px;
-  color: #000; /* Adjust the size as needed */
-}
-
-.dashboard .filter .icon {
-  color: #aab7cf;
-  padding-right: 20px;
-  padding-bottom: 5px;
-  transition: 0.3s;
-  font-size: 16px;
-}
-
-.dashboard .filter .icon:hover,
-.dashboard .filter .icon:focus {
-  color: #4154f1;
-}
-
-.dashboard .filter .dropdown-header {
-  padding: 8px 15px;
-}
-
-.dashboard .filter .dropdown-header h6 {
-  text-transform: uppercase;
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 1px;
-  color: #aab7cf;
-  margin-bottom: 0;
-  padding: 0;
-}
-
-.dashboard .filter .dropdown-item {
-  padding: 8px 15px;
-}
-
-/* Info Cards */
-.dashboard .info-card {
-  padding-bottom: 10px;
-}
-
-.dashboard .info-card h6 {
-  font-size: 28px;
-  color: #012970;
-  font-weight: 700;
-  margin: 0;
-  padding: 0;
-}
-
-.dashboard .card-icon {
-  font-size: 32px;
-  line-height: 0;
-  width: 64px;
-  height: 64px;
-  flex-shrink: 0;
-  flex-grow: 0;
-}
-
-.dashboard .sales-card .card-icon {
-  color: #4154f1;
-  background: #f6f6fe;
-}
-
-.dashboard .revenue-card .card-icon {
-  color: #2eca6a;
-  background: #e0f8e9;
-}
-
-.dashboard .customers-card .card-icon {
-  color: #ff771d;
-  background: #ffecdf;
-}
-
-.table-responsive {
-  padding-left: 15px;
-  padding-right: 15px;
-  overflow-x: auto;
-}
 
 
-.table th, .table td {
-  vertical-align: middle;
-}
-
-.table th {
-  background-color: #f8f9fa;
-}
-
-.table thead th {
-  border-bottom: 2px solid #dee2e6;
-}
-
-.table th, .table td {
-  white-space: nowrap;
-}
-
-.download-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  width: 32px;
-  height: 32px;
-  border: none;
-  background-color: transparent;
-}
-
-.download-btn img {
-  width: 16px;
-  height: 16px;
-}
-
-.status-active {
-  background-color: #28a745;
-  color: #fff;
-}
-
-.status-inactive {
-  background-color: #ffc107;
-  color: #fff;
-}
-
-.status-expired {
-  background-color: #dc3545;
-  color: #fff;
-}
-
-/* Main Styles */
-#main {
-  margin-top: 60px;
-  padding: 20px;
-  transition: all 0.3s;
-  // height: 90vh;
-}
-
-@media (max-width: 1199px) {
-  #main {
-    padding: 20px;
-  }
-}
-
-.pagetitle {
-  margin-bottom: 20px;
-}
-.expanded-details {
-  background-color: #f5f5f5;
-  padding: 10px;
-  border-top: 1px solid #ccc;
-  margin-top: -1px; /* Compensate for border */
-}
-
-/* dashboard.component.scss */
-.expanded-row {
-  &:hover {
-    background-color: #f5f5f5;
-  }
-}
-.card-title {
-  color: #000; /* Dark color */
-  font-weight: bold; /* Optional: to make it bold */
-}
-.mat-row.expanded-row {
-  & > .mat-cell {
-    padding-bottom: 0;
-  }
-}
-
-.mat-cell {
-  display: flex;
-  align-items: center;
-}
-
-button.mat-icon-button {
-  margin-left: auto;
-}
-
-/* Dashboard Styles */
-.dashboard .filter {
-    position: absolute;
-    right: 0px;
-    top: 15px;
-  }
-  
-  .arrow-icon {
-    font-size: 30px;
-    width: 20px;
-    color: #000; /* Adjust the size as needed */
-  }
-  
-  .dashboard .filter .icon {
-    color: #aab7cf;
-    padding-right: 20px;
-    padding-bottom: 5px;
-    transition: 0.3s;
-    font-size: 16px;
-  }
-  
-  .dashboard .filter .icon:hover,
-  .dashboard .filter .icon:focus {
-    color: #4154f1;
-  }
-  
-  .dashboard .filter .dropdown-header {
-    padding: 8px 15px;
-  }
-  .mat-table {
-    width: 100%;
-  
-    .mat-row,
-    .mat-header-row {
-      display: flex;
-      border-bottom-width: 0;
-    }
-  
-    .mat-cell,
-    .mat-header-cell {
-      flex: 1;
-      overflow: hidden;
-      word-wrap: break-word;
-    }
-  
-    .expanded-row-content {
-      padding: 16px;
-    }
-  }
-  
-  .dashboard .filter .dropdown-header h6 {
-    text-transform: uppercase;
-    font-size: 14px;
-    font-weight: 600;
-    letter-spacing: 1px;
-    color: #aab7cf;
-    margin-bottom: 0;
-    padding: 0;
-  }
-  
-  .dashboard .filter .dropdown-item {
-    padding: 8px 15px;
-  }
-  
-  /* Info Cards */
-  .dashboard .info-card {
-    padding-bottom: 10px;
-  }
-  
-  .dashboard .info-card h6 {
-    font-size: 28px;
-    color: #012970;
-    font-weight: 700;
-    margin: 0;
-    padding: 0;
-  }
-  
-  .dashboard .card-icon {
-    font-size: 32px;
-    line-height: 0;
-    width: 64px;
-    height: 64px;
-    flex-shrink: 0;
-    flex-grow: 0;
-  }
-  
-  .dashboard .sales-card .card-icon {
-    color: #4154f1;
-    background: #f6f6fe;
-  }
-  
-  .dashboard .revenue-card .card-icon {
-    color: #2eca6a;
-    background: #e0f8e9;
-  }
-  
-  .dashboard .customers-card .card-icon {
-    color: #ff771d;
-    background: #ffecdf;
-  }
-  
-  /* Table Styles */
-  .table-responsive {
-    overflow-x: auto;
-  }
-  
-  .table th, .table td {
-    vertical-align: middle;
-  }
-  
-  .table th {
-    background-color: #f8f9fa;
-  }
-  
-  .table thead th {
-    border-bottom: 2px solid #dee2e6;
-  }
-  
-  .table th, .table td {
-    white-space: nowrap;
-  }
-  
-  .download-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    width: 32px;
-    height: 32px;
-    border: none;
-    background-color: transparent;
-  }
-  
-  /* Structure */
 table {
   width: 100%;
 }
-
+ 
 .mat-mdc-form-field {
   font-size: 14px;
   width: 100%;
 }
-  .download-btn img {
-    width: 16px;
-    height: 16px;
-  }
-  
-  .status-active {
-    background-color: #28a745;
-    color: #fff;
-  }
-  
-  .status-inactive {
-    background-color: #ffc107;
-    color: #fff;
-  }
-  
-  .status-expired {
-    background-color: #dc3545;
-    color: #fff;
-  }
-  
-  /* Main Styles */
-  #main {
-    margin-top: 60px;
-    padding: 20px;
-    transition: all 0.3s;
-    // height: 90vh;
-  }
-  
-  @media (max-width: 1199px) {
-    #main {
-      padding: 20px;
-    }
-  }
-  
-  
+ 
+ 
+ 
+tr.example-detail-row {
+  height: 0;
+}
+ 
+tr.example-element-row:not(.example-expanded-row):hover {
+  background: whitesmoke;
+}
+ 
+tr.example-element-row:not(.example-expanded-row):active {
+  background: #efefef;
+}
+ 
+.example-element-row td {
+  border-bottom-width: 0;
+}
+ 
+.example-element-detail {
+  overflow: hidden;
+  display: flex;
+}
+ 
+.example-element-diagram {
+  min-width: 80px;
+  border: 2px solid black;
+  padding: 8px;
+  font-weight: lighter;
+  margin: 8px 0;
+  height: 104px;
+}
+ 
+.example-element-symbol {
+  font-weight: bold;
+  font-size: 40px;
+  line-height: normal;
+}
+ 
+.example-element-description {
+  padding: 16px;
+}
+ 
+.example-element-description-attribution {
+  opacity: 0.5;
+}
+ 
+.status-active {
+  color: rgb(0, 255, 0);
+}
+.status-inactive,
+.status-expired {
+  color: red;
+}
+ 

@@ -10,6 +10,7 @@ import { ForgotPasswordComponent } from './Users/forgot-password/forgot-password
 import { UsersrequestServiceComponent } from './Users/usersrequest-service/usersrequest-service.component';
 import { TransactionDetailsComponent } from './Users/transaction-details/transaction-details.component';
 import { FooterComponent } from './Users/Shared/footer/footer.component';
+import { FormsModule } from '@angular/forms'; // Import FormsModule
 
 const routes: Routes = [
   { path: '', redirectTo: 'UsersLogin', pathMatch: 'full' }, 
@@ -25,7 +26,7 @@ const routes: Routes = [
   { path: 'FooterComponent', component: FooterComponent },
 ];
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes),FormsModule],
   exports: [RouterModule]
 })
 export class AppRoutingModule { }

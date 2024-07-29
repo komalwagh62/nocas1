@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { RouterModule } from '@angular/router'; 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
@@ -22,7 +23,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { FooterComponent } from './Users/Shared/footer/footer.component';
 import { UsersHomeComponent } from './Users/users-home/users-home.component';
 import { UsersPricingPlansComponent } from './Users/users-pricing-plans/users-pricing-plans.component';
@@ -39,58 +40,57 @@ import { TransactionDetailsComponent } from './Users/transaction-details/transac
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginator,MatPaginatorModule } from '@angular/material/paginator';
 
-@NgModule({
-  declarations: [
-    AppComponent,
-    UsersProfileComponent,
-    UsersLoginComponent,
-    UsersRegisterComponent,
-    UsersSideNavComponent,
-    FooterComponent,
-    UsersHomeComponent,
-    UsersPricingPlansComponent,
-    UsersEditUpdateComponent,
-    UsersNOCASComponent,
-    ForgotPasswordComponent,
-    UsersrequestServiceComponent,
-    TransactionDetailsComponent,
-  ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    MatTabsModule,
-    MatDatepickerModule,
-    MatSidenavModule,
-    MatAutocompleteModule,
-    MatMenuModule,
-    MatButtonModule,
-    MatSlideToggleModule,
-    MatCommonModule,
-    MatNativeDateModule,
-    MatIconModule,
-    MatListModule,
-    MatToolbarModule,
-    FormsModule,
-    ReactiveFormsModule,
-    MatCardModule,
-    MatDialogModule,
-    MatInputModule,
-    MatSelectModule,
-    HttpClientModule,
-    MatFormFieldModule,
-    MatDividerModule,
-    MatRadioModule,
-    MatGridListModule,
-    MatTableModule, 
-    MatPaginator,
-    MatPaginatorModule,
-    
-  ],
-  providers: [
-    provideAnimationsAsync(),
-  ],
-  bootstrap: [AppComponent]
-})
+@NgModule({ declarations: [
+        AppComponent,
+        UsersProfileComponent,
+        UsersLoginComponent,
+        UsersRegisterComponent,
+        
+        FooterComponent,
+        UsersHomeComponent,
+        UsersPricingPlansComponent,
+        UsersEditUpdateComponent,
+        UsersNOCASComponent,
+        ForgotPasswordComponent,
+        UsersrequestServiceComponent,
+        TransactionDetailsComponent,
+        UsersSideNavComponent  
+    ],
+    bootstrap: [AppComponent], 
+    imports: [BrowserModule,
+       
+        RouterModule.forRoot([]),
+        AppRoutingModule,
+        MatTabsModule,
+        MatDatepickerModule,
+        MatSidenavModule,
+        MatAutocompleteModule,
+        MatMenuModule,
+        MatButtonModule,
+        MatSlideToggleModule,
+        MatCommonModule,
+        MatNativeDateModule,
+        MatIconModule,
+        MatListModule,
+        MatToolbarModule,
+        FormsModule,
+        ReactiveFormsModule,
+        MatCardModule,
+        MatDialogModule,
+        MatInputModule,
+        MatSelectModule,
+        MatFormFieldModule,
+        MatDividerModule,
+        MatRadioModule,
+        MatGridListModule,
+        MatTableModule,
+        MatPaginator,
+        MatPaginatorModule],
+        
+         providers: [
+        provideAnimationsAsync(),
+        provideHttpClient(withInterceptorsFromDi()),
+    ] })
 export class AppModule { }
 
 

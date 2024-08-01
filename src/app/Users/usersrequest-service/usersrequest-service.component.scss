@@ -1,190 +1,41 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
-.container h1 {
-  text-align: center;
-  margin-bottom: 50px;
-  font-weight: 600;
-  position: relative;
-}
-.container h1::after {
-  content: '';
-  background: #303ef7;
-  width: 100px;
-  height: 5px;
-  position: absolute;
-  bottom: -5px;
-  left: 50%;
-  transform: translateX(-50%);
-}
-.row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  grid-gap: 30px;
-}
-.service {
-  text-align: center;
-  padding: 25px 10px;
-  border-radius: 5px;
-  font-size: 14px;
-  cursor: pointer;
-  background: transparent;
-  transition: transform 0.5s, background 0.5s;
-}
-.service i {
-  font-size: 40px;
-  margin-bottom: 10px;
-  color: #303ef7;
-}
-.service h2 {
-  font-weight: 600;
-  margin-bottom: 8px;
-}
-.service:hover {
-  background: #303ef7;
-  color: #fff;
-  transform: scale(1.05);
-}
-.service:hover i {
-  color: #fff;
-}
-.field {
+
+  .background {
+    padding: 0 25px 25px;
     position: relative;
-}
-.eye-icon {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow-x: hidden;
+  }
+   
+  .background::after {
+    content: '';
+    background: #4682B4;
+    background: -moz-linear-gradient(top, #4682B4 0%, #4682B4 100%);
+    background: -webkit-linear-gradient(top, #4682B4 0%, #4682B4 100%);
+    background: linear-gradient(to bottom, #4682B4 0%, #4682B4 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#60a9ff', endColorstr='#4394f4', GradientType=0);
+    height: 350px;
+    left: 0;
     position: absolute;
-    top: 50%;
-    right: 10px;
-    transform: translateY(-50%);
-    cursor: pointer;
-}
-.eye-icon i {
-    font-size: 1rem; 
-    color: #777; 
-}
-.flex-r,
-.flex-c {
-  justify-content: center;
-  align-items: center;
-  display: flex;
-}
-.flex-c {
-  flex-direction: column;
-}
-.flex-r {
-  flex-direction: row;
-}
-.container1 {
-  width: 100%;
-  min-height: 80vh;
-  padding: 20px 10px;
-
-}
-.login-text {
-  max-width: 400px;
-  min-height: 500px;
-  border-radius: 10px;
-  padding: 10px 20px;
-}
-.logo span,
-.logo span i {
-  font-size: 25px;
-  color: #0d8aa7;
-}
-.login-text h1 {
-  font-size: 25px;
-}
-.login-text p {
-  font-size: 15px;
-  color: #000000b2;
-}
-form {
-  align-items: flex-start !important;
-  width: 100%;
-  margin-top: 10px;
-}
-.input-box {
-  margin: 10px 0px;
-  width: 100%;
-}
-.label {
-  font-size: 15px;
-  color: black;
-  margin-bottom: 3px;
-}
-.input {
-  background-color: #f6f6f6;
-  padding: 0px 5px;
-  border: 2px solid rgba(216, 216, 216, 1);
-  border-radius: 10px;
-  overflow: hidden;
-  justify-content: flex-start;
-}
-input {
-  border: none;
-  outline: none;
-  padding: 10px 5px;
-  background-color: #f6f6f6;
-  flex: 1;
-}
-.input i {
-  color: rgba(0, 0, 0, 0.4);
-}
-.check span {
-  color: #000000b2;
-  font-size: 15px;
-  font-weight: bold;
-  margin-left: 5px;
-}
-.btn1 {
-  color: #ffffff;
-  border-radius: 30px;
-  padding: 10px 15px;
-  background: linear-gradient(122.33deg, #68bed1 30.62%, #1e94e9 100%);
-  margin-top: 10px;
-  margin-bottom: 10px;
-  font-size: 16px;
-  transition: all 0.3s linear;
-}
-.btn1:hover {
-  transform: translateY(-2px);
-}
-.extra-line {
-  font-size: 15px;
-  font-weight: 600;
-}
-.extra-line a {
-  color: #0095b6;
-}
-img{
-    width: 15%;
-}
-.container {
-  padding: 20px;
-}
-.login-text {
-  max-width: 400px;
-  border-radius: 10px;
-  padding: 20px;
-  background-color: #f9f9f9;
-}
-.user-info {
-  margin-bottom: 20px;
-}
-.user-info .input {
-  align-items: center;
-}
-.user-info .input i {
-  margin-right: 10px;
-}
-.checkbox-item {
-  margin-bottom: 10px;
-}
-.checkbox-item input[type="checkbox"] {
-  margin-right: 10px;
-}
-.checkbox-label {
-  font-size: 16px;
-}
-.btn {
-  margin-top: 20px;
-}
-
+    top: 0;
+    width: 100%;
+    z-index: 1;
+  }
+   
+  .card {
+    z-index: 2;
+  }
+   
+  .checkbox-item {
+    margin-bottom: 10px;
+  }
+  .checkbox-item input[type="checkbox"] {
+    margin-right: 10px;
+  }
+  .checkbox-label {
+    font-size: 16px;
+  }
+  

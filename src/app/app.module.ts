@@ -27,7 +27,6 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { FooterComponent } from './Users/Shared/footer/footer.component';
 import { UsersHomeComponent } from './Users/users-home/users-home.component';
 import { UsersPricingPlansComponent } from './Users/users-pricing-plans/users-pricing-plans.component';
-import { UsersEditUpdateComponent } from './Users/users-edit-update/users-edit-update.component';
 import { UsersNOCASComponent } from './Users/users-nocas/users-nocas.component';
 import { ForgotPasswordComponent } from './Users/forgot-password/forgot-password.component';
 import { UsersrequestServiceComponent } from './Users/usersrequest-service/usersrequest-service.component';
@@ -45,11 +44,9 @@ import { MatPaginator,MatPaginatorModule } from '@angular/material/paginator';
         UsersProfileComponent,
         UsersLoginComponent,
         UsersRegisterComponent,
-        
         FooterComponent,
         UsersHomeComponent,
         UsersPricingPlansComponent,
-        UsersEditUpdateComponent,
         UsersNOCASComponent,
         ForgotPasswordComponent,
         UsersrequestServiceComponent,
@@ -86,7 +83,6 @@ import { MatPaginator,MatPaginatorModule } from '@angular/material/paginator';
         MatTableModule,
         MatPaginator,
         MatPaginatorModule],
-        
          providers: [
         provideAnimationsAsync(),
         provideHttpClient(withInterceptorsFromDi()),

@@ -29,10 +29,8 @@ export class TransactionDetailsComponent implements OnInit {
     'action'
   ];
   dataSource!: MatTableDataSource<any>;
- 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
- 
   constructor(
     private router: Router,
     private http: HttpClient,
@@ -41,21 +39,18 @@ export class TransactionDetailsComponent implements OnInit {
     const navigation = this.router.getCurrentNavigation();
     this.receiptDetails = navigation?.extras?.state?.['receiptDetails'];
   }
- 
   ngOnInit(): void {
     this.detailsOfSubscription();
     if (!this.receiptDetails) {
       this.router.navigate(['UsersPricingPlans']);
     }
   }
- 
   detailsOfSubscription() {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${this.apiservice.token}`);
     const user_id = this.apiservice.userData.id;
     this.http.get<any[]>(`http://localhost:3001/api/subscription/getAllsubscriptions?user_id=${user_id}`, { headers: headers })
       .subscribe(
         response => {
-          console.log('Subscription data:', response);
           this.subscriptionDetails = response.map(subscription => ({
             ...subscription,
             razorpay_payment_id: subscription.razorpay_payment_id.trim(),
@@ -74,8 +69,6 @@ export class TransactionDetailsComponent implements OnInit {
         }
       );
   }
- 
- 
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
@@ -84,12 +77,9 @@ export class TransactionDetailsComponent implements OnInit {
       this.dataSource.paginator.firstPage();
     }
   }
- 
   downloadReceipt(subscription: any) {
     this.selectedSubscription = subscription;
     this.showReceiptDetails = true;
- 
-    // Create PDF
     const doc = new jsPDF();
     const data = {
       applicant_name:this.apiservice.userData.uname,
@@ -102,11 +92,7 @@ export class TransactionDetailsComponent implements OnInit {
     };
  
     doc.text('Transaction Details', 10, 10);
- 
-    // Set table headers
     const headers = [['Detail', 'Value']];
- 
-    // Set table data
     const rows = [
       ['Subscription Price', data.price.toString()],
       ['Subscription ID', data.subscriptionId.toString()],
@@ -115,8 +101,6 @@ export class TransactionDetailsComponent implements OnInit {
       ['Subscription Type', data.subscriptionType.toString()],
       ['Razorpay Payment ID', data.razorpayPaymentId.toString()]
     ];
- 
-    // Add table to PDF
     (doc as any).autoTable({
       head: headers,
       body: rows,
@@ -133,8 +117,6 @@ export class TransactionDetailsComponent implements OnInit {
           1: { cellWidth: 'auto' }
       }
     });
- 
-    // Save PDF
     doc.save('receipt.pdf');
   }
 }

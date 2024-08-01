@@ -3,7 +3,6 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ApiService } from '../Shared/Api/api.service';
 import { Router } from '@angular/router';
-
 @Component({
   selector: 'app-usersrequest-service',
   templateUrl: './usersrequest-service.component.html',
@@ -13,7 +12,6 @@ export class UsersrequestServiceComponent implements OnInit {
   requestForm!: FormGroup;
   user: any = {};
   updatedUser: any = {};
-  
   constructor(
     private formBuilder: FormBuilder,
     private http: HttpClient,
@@ -39,13 +37,9 @@ export class UsersrequestServiceComponent implements OnInit {
         services: JSON.stringify(this.requestForm.value),
         user_id: this.apiService.userData.id
       };
-
-      console.log(this.requestForm.value,"dgtrf")
- 
       this.http.post<any>('http://localhost:3001/api/request/createRequest', requestData)
         .subscribe(
           (result) => {
-            console.log("Request creation response:", result);
             alert("Request created successfully");
           },
           (error) => {
@@ -57,7 +51,6 @@ export class UsersrequestServiceComponent implements OnInit {
       alert('Please select a service.');
     }
   }
-
   getUserDetails(): void {
     const headers = new HttpHeaders().set("Authorization", `Bearer ${this.apiService.token}`);
     this.http.post<any>('http://localhost:3001/api/user/myProfile', {}, { headers })

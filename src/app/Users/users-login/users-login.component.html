@@ -14,7 +14,6 @@
                         <input type="email" placeholder="Email" formControlName="email" autocomplete="email" id="email"
                             required>
                         <i class="bi bi-envelope-at-fill"></i>
- 
                     </div>
                     <div *ngIf="LogInForm.get('email').invalid && (LogInForm.get('email').dirty || LogInForm.get('email').touched)"
                         class="alert alert-danger mt-2">
@@ -31,10 +30,8 @@
                         <input type="password" placeholder="Password" [type]="showPassword ? 'text' : 'password'"
                             id="password" autocomplete="password" formControlName="password"
                             placeholder="8+ (a, A, 1, #)">
- 
                         <i class="bi" [ngClass]="{'bi-eye-slash-fill': !showPassword, 'bi-eye-fill': showPassword}"
                             (click)="togglePasswordVisibility()"></i>
- 
                     </div>
                     <div *ngIf="LogInForm.get('password').invalid && (LogInForm.get('password').dirty || LogInForm.get('password').touched)"
                         class="alert alert-danger mt-2">

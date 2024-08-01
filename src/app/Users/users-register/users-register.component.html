@@ -30,7 +30,6 @@
                         <input type="email" placeholder="name@abc.com" formControlName="email" autocomplete="email"
                             id="email" required>
                         <i class="bi bi-envelope-fill"></i>
- 
                     </div>
                     <div *ngIf="SignupForm.get('email').invalid && (SignupForm.get('email').dirty || SignupForm.get('email').touched)"
                         class="alert alert-danger mt-2">
@@ -42,8 +41,6 @@
                         </div>
                     </div>
                 </div>
- 
- 
                 <div>
                     <div class="input-container ">
                         <input type="tel" placeholder="Phone Number" formControlName="phone_number"
@@ -92,16 +89,13 @@
                         </div>
                     </div>
                 </div>
- 
                 <div>
                     <div class="input-container">
                         <input type="password" placeholder="Password" [type]="showPassword ? 'text' : 'password'"
                             id="password" autocomplete="password" formControlName="password"
                             placeholder="8+ (a, A, 1, #)">
- 
                         <i class="bi" [ngClass]="{'bi-eye-slash-fill': !showPassword, 'bi-eye-fill': showPassword}"
                             (click)="togglePasswordVisibility()"></i>
- 
                     </div>
                     <div *ngIf="SignupForm.get('password').invalid && (SignupForm.get('password').dirty || SignupForm.get('password').touched)"
                         class="alert alert-danger mt-2">
@@ -118,17 +112,14 @@
                         </div>
                     </div>
                 </div>
- 
                 <div class="link">
                     <button type="submit" class="btn btn-outline-primary btn-lg">Join Us</button>
                 </div>
                 <hr>
- 
                 <div class="text-center">
                     <span>Already have an account? <a href="#" routerLink="/UsersLogin"><u>Log
                                 In here</u></a></span>
                 </div>
- 
             </form>
         </div>
     </div>

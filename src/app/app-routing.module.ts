@@ -10,7 +10,7 @@ import { ForgotPasswordComponent } from './Users/forgot-password/forgot-password
 import { UsersrequestServiceComponent } from './Users/usersrequest-service/usersrequest-service.component';
 import { TransactionDetailsComponent } from './Users/transaction-details/transaction-details.component';
 import { FooterComponent } from './Users/Shared/footer/footer.component';
-import { FormsModule } from '@angular/forms'; // Import FormsModule
+import { FormsModule } from '@angular/forms';
 
 const routes: Routes = [
   { path: '', redirectTo: 'UsersLogin', pathMatch: 'full' }, 

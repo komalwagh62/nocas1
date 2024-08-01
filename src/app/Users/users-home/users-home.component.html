@@ -1,7 +1,6 @@
 <section>
   <div class="container-fluid">
     <div class="row mt-4">
-      <!-- Sales Card -->
       <div class="col-xxl-4 col-lg-4 col-md-6 mb-4">
         <div class="card ">
           <div class="text-end">
@@ -21,9 +20,6 @@
           </div>
         </div>
       </div>
-      <!-- End Sales Card -->
- 
-      <!-- Subscription Details Card -->
       <div class="col-xxl-4 col-lg-4 col-md-6 mb-4">
         <div class="card">
           <div class="text-end">
@@ -42,12 +38,9 @@
             </div>
           </div>
         </div>
-      </div><!-- End Subscription Details Card -->
- 
-      <!-- Customers Card -->
+      </div>
       <div class="col-xxl-4 col-lg-4 col-md-6 mb-4">
         <div class="card">
- 
           <div class="text-end">
             <img src="assets/arrow.png" (click)="detailsOfServices()" style="height: 63px; width: 63px">
             <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow"></ul>
@@ -64,38 +57,26 @@
             </div>
           </div>
         </div>
-      </div><!-- End Customers Card -->
- 
+      </div>
     </div>
   </div>
 </section>
- 
- 
 <section>
   <div class="container-fluid">
- 
-    <!-- Permissible Details -->
     <mat-form-field *ngIf="showPermissibleDetails">
       <mat-label>Filter Permissible Details</mat-label>
       <input matInput (keyup)="applyPermissibleFilter($event)" placeholder="Ex. city" #permissibleInput>
     </mat-form-field>
- 
     <div *ngIf="showPermissibleDetails">
       <mat-table [dataSource]="permissibleDataSource" class="mat-elevation-z8" multiTemplateDataRows>
-        <!-- Request ID Column -->
-        <!-- City Column -->
         <ng-container matColumnDef="city">
           <mat-header-cell *matHeaderCellDef> City </mat-header-cell>
           <mat-cell *matCellDef="let element"> {{element.city}} </mat-cell>
         </ng-container>
- 
-        <!-- Airport Name Column -->
         <ng-container matColumnDef="airport_name">
           <mat-header-cell *matHeaderCellDef> Airport Name </mat-header-cell>
           <mat-cell *matCellDef="let element"> {{element.airport_name}} </mat-cell>
         </ng-container>
- 
-        <!-- Expand Button Column -->
         <ng-container matColumnDef="expand">
           <mat-header-cell *matHeaderCellDef> </mat-header-cell>
           <mat-cell *matCellDef="let element">
@@ -104,8 +85,6 @@
             </button>
           </mat-cell>
         </ng-container>
- 
-        <!-- Download Button Column -->
         <ng-container matColumnDef="download">
           <mat-header-cell *matHeaderCellDef> Download </mat-header-cell>
           <mat-cell *matCellDef="let element">
@@ -114,12 +93,9 @@
             </button>
           </mat-cell>
         </ng-container>
- 
         <mat-header-row *matHeaderRowDef="permissibleDisplayedColumns"></mat-header-row>
         <mat-row *matRowDef="let row; columns: permissibleDisplayedColumns;"
           [class.expanded-row]="expandedElement === row"></mat-row>
- 
-        <!-- Expanded Row -->
         <ng-container matColumnDef="expandedDetail">
           <mat-cell *matCellDef="let element" [attr.colspan]="permissibleDisplayedColumns.length">
             <div *ngIf="expandedElement === element">
@@ -130,34 +106,24 @@
               <div><strong>Distance From ARP:</strong> {{element.distance}}</div>
               <div><strong>Permissible Height (AGL):</strong> {{element.permissible_height}}</div>
               <div><strong>Permissible Elevation (AMSL):</strong> {{element.permissible_elevation}}</div>
-              <!-- <div><img [src]="element.snapshot" alt="Snapshot Image" *ngIf="element.snapshot" width="400" /></div> -->
             </div>
           </mat-cell>
         </ng-container>
         <mat-row *matRowDef="let row; columns: ['expandedDetail'];" class="expanded-row"
           [style.display]="expandedElement === row ? 'table-row' : 'none'"></mat-row>
- 
       </mat-table>
- 
       <mat-paginator #permissiblePaginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
     </div>
-    <!-- Permissible Details -->
-     
-    <!-- Subscription Details -->
     <mat-form-field *ngIf="showSubscriptionDetails">
       <mat-label>Filter Subscriptions</mat-label>
       <input matInput (keyup)="applySubscriptionFilter($event)" placeholder="Ex. type" #subscriptionInput>
     </mat-form-field>
     <div class="mat-elevation-z8" *ngIf="showSubscriptionDetails">
       <mat-table [dataSource]="subscriptionDataSource" multiTemplateDataRows>
- 
-        <!-- Subscription ID Column -->
         <ng-container matColumnDef="subscription_id">
           <mat-header-cell *matHeaderCellDef> Subscription ID </mat-header-cell>
           <mat-cell *matCellDef="let element"> {{element.subscription_id}} </mat-cell>
         </ng-container>
- 
-        <!-- Subscription Status Column -->
         <ng-container matColumnDef="subscription_status">
           <mat-header-cell *matHeaderCellDef> Status </mat-header-cell>
           <mat-cell *matCellDef="let element" [ngClass]="{
@@ -172,8 +138,6 @@
           <mat-header-cell *matHeaderCellDef> Active Date </mat-header-cell>
           <mat-cell *matCellDef="let element"> {{element.createdAt}} </mat-cell>
         </ng-container>
-        
-        <!-- Expiry Date Column -->
         <ng-container matColumnDef="expiry_date">
           <mat-header-cell *matHeaderCellDef> Expiry Date </mat-header-cell>
           <mat-cell *matCellDef="let element"> {{element.expiry_date}} </mat-cell>
@@ -182,21 +146,16 @@
           <mat-header-cell *matHeaderCellDef> Price </mat-header-cell>
           <mat-cell *matCellDef="let element"> {{element.price}} </mat-cell>
         </ng-container>
-        <!-- Subscription Type Column -->
         <ng-container matColumnDef="subscription_type">
           <mat-header-cell *matHeaderCellDef> Type </mat-header-cell>
           <mat-cell *matCellDef="let element"> {{element.subscription_type}} </mat-cell>
         </ng-container>
- 
-        <!-- Row Definition -->
         <mat-header-row
           *matHeaderRowDef="['subscription_id', 'subscription_status','createdAt','expiry_date','price', 'subscription_type']"></mat-header-row>
         <mat-row
           *matRowDef="let row; columns: ['subscription_id', 'subscription_status','createdAt','expiry_date','price', 'subscription_type'];"></mat-row>
       </mat-table>
     </div>
-    <!-- Subscription Details -->
-    <!-- Cross Sale Form Details -->
     <mat-form-field *ngIf="showServiceDetails">
       <mat-label>Filter Service Details</mat-label>
       <input matInput (keyup)="applyServiceFilter($event)" placeholder="Ex. Name" #serviceInput>
@@ -227,8 +186,6 @@
           found.</div>
       </div>
     </div>
-    <!-- Cross Sale Form Details -->
- 
   </div>
 </section>
  

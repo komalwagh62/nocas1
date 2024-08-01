@@ -3,58 +3,43 @@
     <div class="row justify-content-center w-100">
       <div class="col-md-8">
         <div class="card" style="position: relative; z-index: 2; background-color: white;">
- 
           <div class="card-header pt-3">
-            <!-- Bordered Tabs -->
             <ul class="nav nav-tabs card-header-tabs">
- 
               <li class="nav-item">
                 <button class="nav-link active" data-bs-toggle="tab"
                   data-bs-target="#profile-overview">Overview</button>
               </li>
- 
               <li class="nav-item">
                 <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-edit">Edit Profile</button>
               </li>
- 
               <li class="nav-item">
                 <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-change-password">Change
                   Password</button>
               </li>
- 
             </ul>
           </div>
           <div class="card-body">
             <div class="tab-content pt-2">
- 
               <div class="tab-pane fade show active" id="profile-overview">
- 
                 <h5 class="card-title">Profile Details</h5>
- 
                 <div class="row mt-2">
                   <div class="col-lg-3 col-md-4 label">Full Name</div>
                   <div class="col-lg-9 col-md-8">{{this.user.uname}}</div>
                 </div>
- 
                 <div class="row mt-2">
                   <div class="col-lg-3 col-md-4 label">Address</div>
                   <div class="col-lg-9 col-md-8">{{this.user.address}}</div>
                 </div>
- 
                 <div class="row mt-2">
                   <div class="col-lg-3 col-md-4 label">Phone</div>
                   <div class="col-lg-9 col-md-8">{{this.user.phone_number}}</div>
                 </div>
- 
                 <div class="row mt-2">
                   <div class="col-lg-3 col-md-4 label">Email</div>
                   <div class="col-lg-9 col-md-8">{{this.user.email}}</div>
                 </div>
- 
               </div>
- 
               <div class="tab-pane fade pt-3" id="profile-edit">
- 
                 <form (ngSubmit)="saveChanges()">
                   <div class="row mb-3">
                     <label for="uname" class="col-md-4 col-lg-3 col-form-label">Name</label>
@@ -63,7 +48,6 @@
                         [(ngModel)]="this.updatedUser.uname">
                     </div>
                   </div>
- 
                   <div class="row mb-3">
                     <label for="address" class="col-md-4 col-lg-3 col-form-label">Address</label>
                     <div class="col-md-8 col-lg-9">
@@ -71,7 +55,6 @@
                         [(ngModel)]="this.updatedUser.address" required>
                     </div>
                   </div>
- 
                   <div class="row mb-3">
                     <label for="phone_number" class="col-md-4 col-lg-3 col-form-label">Phone Number</label>
                     <div class="col-md-8 col-lg-9">
@@ -79,7 +62,6 @@
                         [(ngModel)]="this.updatedUser.phone_number" readonly>
                     </div>
                   </div>
- 
                   <div class="row mb-3">
                     <label for="email" class="col-md-4 col-lg-3 col-form-label">Email</label>
                     <div class="col-md-8 col-lg-9">
@@ -87,19 +69,13 @@
                         [(ngModel)]="this.updatedUser.email" readonly>
                     </div>
                   </div>
- 
                   <div class="text-center">
                     <button type="submit" class="btn btn-primary">Save Changes</button>
                   </div>
- 
-                </form><!-- End Profile Edit Form -->
- 
+                </form>
               </div>
- 
               <div class="tab-pane fade pt-3" id="profile-change-password">
-                <!-- Change Password Form -->
                 <form (ngSubmit)="changePassword()">
- 
                   <div class="row mb-3">
                     <label for="currentPassword" class="col-md-4 col-lg-3 col-form-label">Current Password</label>
                     <div class="col-md-8 col-lg-9">
@@ -107,7 +83,6 @@
                         id="currentPassword">
                     </div>
                   </div>
- 
                   <div class="row mb-3">
                     <label for="newPassword" class="col-md-4 col-lg-3 col-form-label">New Password</label>
                     <div class="col-md-8 col-lg-9">
@@ -115,7 +90,6 @@
                         id="newPassword">
                     </div>
                   </div>
- 
                   <div class="row mb-3">
                     <label for="confirmPassword" class="col-md-4 col-lg-3 col-form-label">Re-enter New Password</label>
                     <div class="col-md-8 col-lg-9">
@@ -123,15 +97,12 @@
                         (input)="validatePassword()" id="confirmPassword">
                     </div>
                   </div>
- 
                   <div class="text-center">
                     <button type="submit" [disabled]="!passwordsMatch" class="btn btn-primary">Change Password</button>
                   </div>
-                </form><!-- End Change Password Form -->
- 
+                </form>
               </div>
- 
-            </div><!-- End Bordered Tabs -->
+            </div>
           </div>
         </div>
       </div>

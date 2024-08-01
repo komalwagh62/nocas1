@@ -1,13 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
-
-
 .container h1 {
   text-align: center;
   margin-bottom: 50px;
   font-weight: 600;
   position: relative;
 }
-
 .container h1::after {
   content: '';
   background: #303ef7;
@@ -18,13 +15,11 @@
   left: 50%;
   transform: translateX(-50%);
 }
-
 .row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   grid-gap: 30px;
 }
-
 .service {
   text-align: center;
   padding: 25px 10px;
@@ -34,48 +29,37 @@
   background: transparent;
   transition: transform 0.5s, background 0.5s;
 }
-
 .service i {
   font-size: 40px;
   margin-bottom: 10px;
   color: #303ef7;
 }
-
 .service h2 {
   font-weight: 600;
   margin-bottom: 8px;
 }
-
 .service:hover {
   background: #303ef7;
   color: #fff;
   transform: scale(1.05);
 }
-
 .service:hover i {
   color: #fff;
 }
-
-
-
 .field {
     position: relative;
 }
-
 .eye-icon {
     position: absolute;
     top: 50%;
-    right: 10px; /* Adjust the value as needed */
+    right: 10px;
     transform: translateY(-50%);
     cursor: pointer;
 }
-
 .eye-icon i {
-    font-size: 1rem; /* Adjust the font size as needed */
-    color: #777; /* Adjust the color as needed */
+    font-size: 1rem; 
+    color: #777; 
 }
-
-
 .flex-r,
 .flex-c {
   justify-content: center;
@@ -88,29 +72,23 @@
 .flex-r {
   flex-direction: row;
 }
-
 .container1 {
   width: 100%;
   min-height: 80vh;
   padding: 20px 10px;
 
 }
-
 .login-text {
-
   max-width: 400px;
   min-height: 500px;
   border-radius: 10px;
   padding: 10px 20px;
 }
-
-
 .logo span,
 .logo span i {
   font-size: 25px;
   color: #0d8aa7;
 }
-
 .login-text h1 {
   font-size: 25px;
 }
@@ -118,13 +96,11 @@
   font-size: 15px;
   color: #000000b2;
 }
-
 form {
   align-items: flex-start !important;
   width: 100%;
   margin-top: 10px;
 }
-
 .input-box {
   margin: 10px 0px;
   width: 100%;
@@ -142,7 +118,6 @@ form {
   overflow: hidden;
   justify-content: flex-start;
 }
-
 input {
   border: none;
   outline: none;
@@ -153,14 +128,12 @@ input {
 .input i {
   color: rgba(0, 0, 0, 0.4);
 }
-
 .check span {
   color: #000000b2;
   font-size: 15px;
   font-weight: bold;
   margin-left: 5px;
 }
-
 .btn1 {
   color: #ffffff;
   border-radius: 30px;
@@ -171,7 +144,6 @@ input {
   font-size: 16px;
   transition: all 0.3s linear;
 }
-
 .btn1:hover {
   transform: translateY(-2px);
 }
@@ -185,42 +157,33 @@ input {
 img{
     width: 15%;
 }
-
 .container {
   padding: 20px;
 }
-
 .login-text {
   max-width: 400px;
   border-radius: 10px;
   padding: 20px;
   background-color: #f9f9f9;
 }
-
 .user-info {
   margin-bottom: 20px;
 }
-
 .user-info .input {
   align-items: center;
 }
-
 .user-info .input i {
   margin-right: 10px;
 }
-
 .checkbox-item {
   margin-bottom: 10px;
 }
-
 .checkbox-item input[type="checkbox"] {
   margin-right: 10px;
 }
-
 .checkbox-label {
   font-size: 16px;
 }
-
 .btn {
   margin-top: 20px;
 }

@@ -74,7 +74,6 @@ export class UsersNOCASComponent implements OnInit {
         this.TopElevationForm.get('CITY')?.clearValidators();
         this.TopElevationForm.get('airportName')?.clearValidators();
       }
-
       if (selectionMode === 'manual') {
         this.TopElevationForm.patchValue({
           CITY: '',
@@ -83,7 +82,6 @@ export class UsersNOCASComponent implements OnInit {
       }
       this.TopElevationForm.get('CITY')?.updateValueAndValidity();
       this.TopElevationForm.get('airportName')?.updateValueAndValidity();
-
     });
     this.TopElevationForm.get('Latitude').valueChanges.subscribe((latitudeDMS: string) => {
       const lat = this.convertDMSStringToDD(latitudeDMS);
@@ -106,7 +104,7 @@ export class UsersNOCASComponent implements OnInit {
       this.selectedAirportName = selectedAirport ? selectedAirport.airport_name : '';
       this.selectedAirportIcao = selectedAirport ? selectedAirport.airport_icao : '';
       this.selectedAirportIATA = selectedAirport ? selectedAirport.airport_iata : '';
-      if (['Coimbatore', 'Mumbai', 'Puri', 'Ahmedabad', 'Akola', 'Chennai', 'Delhi', 'Guwahati', 'Hyderabad', 'Jaipur', 'Nagpur', 'Thiruvananthapuram', 'Vadodara', 'Varanasi', 'Agatti', 'Ambikapur', 'Aurangabad', 'Balurghat', 'Belgaum', 'Aligarh', 'Amritsar', 'Azamgarh', 'Baramati', 'Berhampur'].includes(city)) {
+      if (['Coimbatore', 'Mumbai', 'Puri', 'Ahmedabad', 'Akola', 'Chennai', 'Delhi', 'Guwahati', 'Hyderabad', 'Jaipur', 'Nagpur', 'Thiruvananthapuram', 'Vadodara', 'Varanasi', 'Agatti', 'Ambikapur', 'Aurangabad', 'Balurghat', 'Belgaum', 'Aligarh', 'Amritsar', 'Azamgarh', 'Baramati', 'Berhampur', 'Bial', 'Cochin', 'Bokaro', 'Birlamgram'].includes(city)) {
         this.loadGeoJSON(this.map);
       } else {
         if (this.geojsonLayer) {
@@ -279,48 +277,11 @@ export class UsersNOCASComponent implements OnInit {
     [26.06, 83.18, 'Azamgarh', 'Azamgarh Airport/Azamgarh/'],
     [18.16, 74.57, 'Baramati', 'Baramati Airport/Baramati/'],
     [19.31, 84.79, 'Berhampur', 'Berhampur Airport/Berhampur/'],
+    [13.1986, 77.7066, 'Bial', 'Kempegowda International Airport/Bial/BLR'],
+    [10.152, 76.4019, 'Cochin', 'Cochin International Airport/Cochin/COK'],
+    [23.2877, 86.3629, 'Bokaro', 'Bokaro Airport/Bokaro/IN-0191'],
+    [23.594, 75.948, 'Birlamgram', 'Birlamgram Airport/Birlamgram/IN-0130']
   ];
-
-  onElevationOptionChange() {
-    const elevationOptionControl = this.TopElevationForm.get('elevationOption');
-    let defaultElevation = null;
-    if (elevationOptionControl && elevationOptionControl.value === 'unknown') {
-      this.showAlert = true;
-      this.isDefaultElevationSelected = true;
-      const cityElevationMap: { [key: string]: number } = {
-        'Coimbatore': 10,
-        'Mumbai': 22,
-        'Puri': 22,
-        'Ahmedabad': 55,
-        'Akola': 308,
-        'Chennai': 16,
-        'Delhi': 239,
-        'Guwahati': 49,
-        'Hyderabad': 542,
-        'Jaipur': 390,
-        'Nagpur': 317,
-        'Thiruvananthapuram': 5,
-        'Vadodara': 39,
-        'Varanasi': 82,
-        'Agatti': 4,
-        'Ambikapur': 623,
-        'Aurangabad': 582,
-        'Balurghat': 25,
-        'Belgaum': 751,
-        'Aligarh': 178,
-        'Amritsar': 234,
-        'Azamgarh': 80,
-        'Baramati': 307,
-        'Berhampur': 9
-      };
-      defaultElevation = cityElevationMap[this.city] || 0;
-      this.TopElevationForm.patchValue({ Site_Elevation: defaultElevation });
-      alert("Users shall enter site elevation value received from WGS-84 survey report. Permissible height will be calculated based on site elevation entered by user. In absence of site elevation value from user, ARP (Airport) elevation value will be used as default.");
-    } else {
-      this.showAlert = false;
-      this.isDefaultElevationSelected = false;
-    }
-  }
 
   submitForm() {
     if (!this.apiservice.token) {
@@ -328,28 +289,17 @@ export class UsersNOCASComponent implements OnInit {
       this.router.navigate(['UsersLogin']);
       return;
     }
-
     if (!this.TopElevationForm.valid) {
       return;
     }
-
     const selectedAirportCITY = this.TopElevationForm.get('CITY')?.value;
-    const currentLat = this.TopElevationForm.get('Latitude')?.value;
-    const currentLng = this.TopElevationForm.get('Longitude')?.value;
-
-    // Convert coordinates if needed
     const nearestAirport = this.findNearestAirport(this.lat, this.long, 30); // 30 km
-    console.log('Nearest Airport:', nearestAirport);
-
-
     if (nearestAirport) {
       if (nearestAirport.airportCity !== selectedAirportCITY) {
-        console.log("erfgt")
         const updateConfirmation = confirm(
           `The selected airport (${selectedAirportCITY}) is different from the nearest airport (${nearestAirport.airportCity}).\n` +
           `Would you like to update to the nearest airport or continue with the current selection?`
         );
-
         if (updateConfirmation) {
           this.TopElevationForm.patchValue({
             CITY: nearestAirport.airportCity,
@@ -360,9 +310,6 @@ export class UsersNOCASComponent implements OnInit {
         }
       }
     }
-
-
-    // Confirm that the entered site information is correct
     const confirmation = confirm("Kindly confirm that the entered site information is correct or verify");
     if (confirmation) {
       this.captureScreenshot().then(() => {
@@ -371,8 +318,6 @@ export class UsersNOCASComponent implements OnInit {
       });
     }
   }
-
-
   findNearestAirport(lat: number, lng: number, radius: number): { airportCity: string; airportName: string; distance: number; elevation: number } | null {
     const airports = this.airportCoordinatesList;
     let closestAirport = null;
@@ -417,11 +362,14 @@ export class UsersNOCASComponent implements OnInit {
       'Amritsar': 234,
       'Azamgarh': 80,
       'Baramati': 307,
-      'Berhampur': 9
+      'Berhampur': 9,
+      'Bial': 915,
+      'Cochin': 9,
+      'Bokaro': 210,
+      'Birlamgram': 490
     };
     return cityElevationMap[city] || 0;
   }
-
 
   handleAirportModalOK() {
     let latitudeDD = this.convertDMSToDD(this.lat, true);
@@ -446,7 +394,47 @@ export class UsersNOCASComponent implements OnInit {
       this.closeModal('airportModal')
     }
   }
-
+  onElevationOptionChange() {
+    const elevationOptionControl = this.TopElevationForm.get('elevationOption');
+    let defaultElevation = null;
+    if (elevationOptionControl && elevationOptionControl.value === 'unknown') {
+      this.showAlert = true;
+      if (this.city === 'Coimbatore') {
+        defaultElevation = 10;
+      } else if (this.city === 'Mumbai') {
+        defaultElevation = 22;
+      } else if (this.city === 'Puri') {
+        defaultElevation = 22;
+      } else if (this.city === 'Ahmedabad') {
+        defaultElevation = 55;
+      } else if (this.city === 'Akola') {
+        defaultElevation = 308;
+      } else if (this.city === 'Chennai') {
+        defaultElevation = 16;
+      } else if (this.city === 'Delhi') {
+        defaultElevation = 239;
+      } else if (this.city === 'Guwahati') {
+        defaultElevation = 49;
+      } else if (this.city === 'Hyderabad') {
+        defaultElevation = 542;
+      } else if (this.city === 'Jaipur') {
+        defaultElevation = 390;
+      } else if (this.city === 'Nagpur') {
+        defaultElevation = 317;
+      } else if (this.city === 'Thiruvananthapuram') {
+        defaultElevation = 5;
+      } else if (this.city === 'Vadodara') {
+        defaultElevation = 39;
+      } else if (this.city === 'Varanasi') {
+        defaultElevation = 82;
+      }
+      this.TopElevationForm.patchValue({ Site_Elevation: defaultElevation });
+      alert("Users shall enter site elevation value received from WGS-84 survey report. Permissible height will be calculated based on site elevation entered by user. In absense of site elevation value from user, ARP (Airport) elevation value will be used as default.")
+    }
+    else {
+      this.showAlert = false;
+    }
+  }
   async createNocas(subscription_id: string = "") {
     if (this.TopElevationForm.valid) {
       try {
@@ -601,8 +589,6 @@ export class UsersNOCASComponent implements OnInit {
     }
   }
 
-
-
   showDefaultMap() {
     const defaultLat = 0.0;
     const defaultLong = 0.0;
@@ -612,7 +598,6 @@ export class UsersNOCASComponent implements OnInit {
   }
 
   showMap(lat: number, lng: number) {
-    // Initialize the map
     this.map = L.map('map').setView([19.794444, 85.751111], 5);
     const streets = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
       subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
@@ -648,56 +633,43 @@ export class UsersNOCASComponent implements OnInit {
     L.control.layers(baseMaps, overlayMaps).addTo(this.map);
     streets.addTo(this.map);
     L.control.scale().addTo(this.map);
-
-    // Create or update the marker
     if (this.marker) {
       this.marker.setLatLng([lat, lng]);
     } else {
       this.marker = L.marker([lat, lng], { draggable: true }).addTo(this.map);
     }
-
-    // Handle map click event
     this.map.on('click', (e: any) => {
       const { lat, lng } = e.latlng;
       this.lat = lat;
       this.long = lng;
       this.latitudeDMS = this.convertDDtoDMS(lat, true);
       this.longitudeDMS = this.convertDDtoDMS(lng, false);
-
       const selectionMode = this.TopElevationForm.get('selectionMode')?.value;
-
       if (selectionMode === 'manual') {
         this.TopElevationForm.patchValue({
           CITY: '',
           AIRPORT_NAME: ''
         });
       } else {
-        const nearestAirport = this.findNearestAirport(lat, lng, 30); // 30 km
+        const nearestAirport = this.findNearestAirport(lat, lng, 30);
         if (nearestAirport) {
-          console.log('Nearest Airport Data:', nearestAirport);
           this.TopElevationForm.patchValue({
             CITY: nearestAirport.airportCity,
             AIRPORT_NAME: nearestAirport.airportName
           });
           this.loadNearestAirportGeoJSON(nearestAirport.airportCity, nearestAirport.distance, this.map);
-        } else {
-          console.log('Nearest airport is more than 30 km away.');
         }
       }
-
       this.TopElevationForm.patchValue({
         Latitude: this.latitudeDMS,
         Longitude: this.longitudeDMS
       });
-
       if (this.marker) {
         this.marker.setLatLng([lat, lng]);
         const popupContent = `Site Location : <br> Site Latitude: ${this.latitudeDMS}, Site Longitude: ${this.longitudeDMS}`;
         this.marker.bindPopup(popupContent).openPopup();
       }
     });
-
-    // Handle marker drag end event
     this.marker.on('dragend', (e: any) => {
       const position = this.marker.getLatLng();
       this.lat = position.lat;
@@ -705,55 +677,37 @@ export class UsersNOCASComponent implements OnInit {
       this.latitudeDMS = this.convertDDtoDMS(position.lat, true);
       this.longitudeDMS = this.convertDDtoDMS(position.lng, false);
       const selectionMode = this.TopElevationForm.get('selectionMode')?.value;
-
       if (selectionMode === 'manual') {
-        // Manually input city logic
         const manualCity = this.TopElevationForm.get('CITY')?.value;
-        const cityLocation = this.getCityLocation(manualCity); // Implement this method to get lat/lng of the city
-
+        const cityLocation = this.getCityLocation(manualCity);
         if (cityLocation) {
           const distance = this.calculateDistance(position.lat, position.lng, cityLocation.lat, cityLocation.lng);
-          console.log(`Distance to ${manualCity}: ${distance.toFixed(2)} km`);
           this.TopElevationForm.patchValue({
             CITY: manualCity,
             AIRPORT_NAME: `Nearest city: ${manualCity} (${distance.toFixed(2)} km away)`
           });
-        } else {
-          console.log('City location not found.');
         }
       } else {
         const nearestAirport = this.findNearestAirport(position.lat, position.lng, 30); // 30 km
         if (nearestAirport) {
-          console.log('Nearest Airport Data:', nearestAirport);
           this.TopElevationForm.patchValue({
             CITY: nearestAirport.airportCity,
             AIRPORT_NAME: nearestAirport.airportName
           });
         }
       }
-
       this.TopElevationForm.patchValue({
         Latitude: this.latitudeDMS,
         Longitude: this.longitudeDMS
       });
-
       const popupContent = `Site Location : <br> Site Latitude: ${this.latitudeDMS}, Site Longitude: ${this.longitudeDMS}`;
       this.marker.bindPopup(popupContent).openPopup();
     });
   }
 
   getCityLocation(cityName: string): { lat: number, lng: number } | null {
-    // Implement this function to return the latitude and longitude of the city
-    // For example, you might use a city lookup API or a predefined list of city coordinates
-    // Example: return { lat: 40.712776, lng: -74.005974 }; // Coordinates for New York City
-    return null; // Placeholder return
+    return null;
   }
-
-
-
-
-
-
 
   updateMarkerPopupContent(lat: number, lng: number) {
     this.latitudeDMS = this.convertDDtoDMS(lat, true);
@@ -794,6 +748,10 @@ export class UsersNOCASComponent implements OnInit {
       map.removeLayer(this.geojsonLayer);
       this.geojsonLayer.clearLayers();
       this.geojsonLayer = null;
+    }
+    if (this.marker2) {
+      map.removeLayer(this.marker2);
+      this.marker2 = null;
     }
     const selectedAirportCITY = this.TopElevationForm.get('CITY')?.value;
     if (this.marker) {
@@ -899,6 +857,22 @@ export class UsersNOCASComponent implements OnInit {
           airportGeoJSONPath = 'assets/GeoJson/Berhampur.geojson';
           this.airportCoordinates = [19.32, 84.80];
           break;
+        case 'Bial':
+          airportGeoJSONPath = 'assets/GeoJson/Bial.geojson';
+          this.airportCoordinates = [13.21, 77.71];
+          break;
+        case 'Cochin':
+          airportGeoJSONPath = 'assets/GeoJson/Cochin.geojson';
+          this.airportCoordinates = [9.93, 76.27];
+          break;
+        case 'Bokaro':
+          airportGeoJSONPath = 'assets/GeoJson/Bokaro.geojson';
+          this.airportCoordinates = [23.47, 85.98];
+          break;
+        case 'Birlamgram':
+          airportGeoJSONPath = 'assets/GeoJson/Birlamgram.geojson';
+          this.airportCoordinates = [25.33, 85.40];
+          break;
         default:
           console.error("Invalid airport city name.");
           return;
@@ -944,6 +918,7 @@ export class UsersNOCASComponent implements OnInit {
               const popupContent = `Site Location : <br> Site Latitude: ${this.latitudeDMS}, Site Longitude: ${this.longitudeDMS}`;
               this.marker.bindPopup(popupContent).openPopup();
             }
+
             const nearestAirport = this.findNearestAirport(lat, lng, 30); // 30 km
             if (nearestAirport) {
               if (nearestAirport.distance <= 30) {
@@ -969,12 +944,15 @@ export class UsersNOCASComponent implements OnInit {
       map.removeLayer(this.nearestAirportGeoJSONLayer);
       this.nearestAirportGeoJSONLayer = null;
     }
+    if (this.marker2) {
+      map.removeLayer(this.marker2);
+      this.marker2 = null;
+    }
     map.eachLayer((layer: any) => {
       if (layer instanceof L.GeoJSON) {
         map.removeLayer(layer);
       }
     });
-    
     fetch(airportGeoJSONPath)
       .then(response => response.json())
       .then(geojsonData => {
@@ -986,7 +964,7 @@ export class UsersNOCASComponent implements OnInit {
         const geojsonLayer = L.geoJSON(features, { style: style });
         geojsonLayer.addTo(map);
         this.nearestAirportGeoJSONLayer = geojsonLayer;
-        
+
         const selectionMode = this.TopElevationForm.get('selectionMode')?.value;
         if (selectionMode === 'default') {
           this.TopElevationForm.patchValue({
@@ -1000,8 +978,6 @@ export class UsersNOCASComponent implements OnInit {
         Latitude: ${features[0].geometry.coordinates[1].toFixed(2)}
         Longitude: ${features[0].geometry.coordinates[0].toFixed(2)}`;
         this.marker2.bindPopup(popupContent).openPopup();
-
-
       })
       .catch(error => {
         // console.error("Error fetching GeoJSON data:", error);
@@ -1032,7 +1008,6 @@ export class UsersNOCASComponent implements OnInit {
         if (res && res.airports) {
           this.airports = res.airports;
         } else {
-          // console.error('Unexpected response structure:', res);
         }
       },
       error: (err) => {
@@ -1052,33 +1027,23 @@ export class UsersNOCASComponent implements OnInit {
   updateMarkersPosition(lat: number, lng: number): void {
     this.lat = lat;
     this.long = lng;
-
-    // Update marker position
     this.updateMarkerPosition();
-
-    // Fetch nearest airport data and update form
     this.updateNearestAirportData();
   }
 
-  // Update marker position
   updateMarkerPosition() {
     if (this.marker) {
       this.latitudeDMS = this.convertDDtoDMS(this.lat, true);
       this.longitudeDMS = this.convertDDtoDMS(this.long, false);
       this.marker.setLatLng([this.lat, this.long]);
-
       const popupContent = `Site Location : <br> Site Latitude: ${this.latitudeDMS}, Site Longitude: ${this.longitudeDMS}`;
       this.marker.bindPopup(popupContent).openPopup();
     }
   }
-
-  // Fetch nearest airport data and update form
   updateNearestAirportData() {
     const nearestAirport = this.findNearestAirport(this.lat, this.long, 30); // 30 km
     if (nearestAirport) {
       this.loadNearestAirportGeoJSON(nearestAirport.airportCity, nearestAirport.distance, this.map);
-
-      // Update form with nearest airport data
       this.TopElevationForm.patchValue({
         CITY: nearestAirport.airportCity,
         AIRPORT_NAME: nearestAirport.airportName

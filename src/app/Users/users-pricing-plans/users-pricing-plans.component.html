@@ -1,9 +1,6 @@
-
-
 <div class="background">
   <div class="container">
     <div class="panel pricing-table">
-      
       <div class="pricing-plan">
         <img src="assets/free.png" alt="" class="pricing-img">
         <h2 class="pricing-header">Free</h2>
@@ -12,29 +9,20 @@
           <h2 class="pricing-features-items">30 days</h2>
           <h2 class="pricing-features-item">3 Free Requests</h2>
           <h2 class="pricing-features-items">+1 Hr free consultation monthly</h2>
-          
         </ul>
-        
         <button class="pricing-button is-featured" (click)="freetrial()">Free trial</button>
       </div>
-
       <div class="pricing-plan">
         <img src="assets/icon/badge.png" alt="" class="pricing-img">
-
         <h2 class="pricing-header">Basic</h2>
         <span class="pricing-price">₹ 100</span>
         <ul class="pricing-features">
           <h2 class="pricing-features-item">30 days</h2>
           <h2 class="pricing-features-item">Unlimited Request</h2>
           <h2 class="pricing-features-items">+1 Hr free consultation monthly</h2>
-          
         </ul>
-        
         <button class="pricing-button is-featured "  (click)="handlePayment('Basic', 100)" >Buy Now</button>
       </div>
-      
-      
-      
       <div class="pricing-plan">
         <img src="assets/icon/value.png" alt="" class="pricing-img">
         <h2 class="pricing-header">Standard</h2>
@@ -43,12 +31,9 @@
           <h2 class="pricing-features-item">6 Month</h2>
           <h2 class="pricing-features-item">Unlimited Request</h2>
           <h2 class="pricing-features-items">+1 Hr free consultation monthly</h2>
-          
         </ul>
-        
         <button  class="pricing-button is-featured"(click)="handlePayment('Standard', 300)" >Buy Now</button>
       </div>
-      
       <div class="pricing-plan">
         <img src="assets/icon/coin.png" alt="" class="pricing-img">
         <h2 class="pricing-header">Advance</h2>
@@ -57,15 +42,12 @@
           <h2 class="pricing-features-item">1 year</h2>
           <h2 class="pricing-features-item">Unlimited Request</h2>
           <h2 class="pricing-features-item">+1 Hr free consultation monthly</h2>
-          
         </ul>
         <button  class="pricing-button is-featured" (click)="handlePayment('Advance', 500)">Buy Now </button>
       </div>
-
     </div>
     <div *ngIf="transactionId">
       <p>Payment was successful. If you want to see payment details, please <a [href]="'/subscription-details/' + transactionId">click here</a>.</p>
     </div>
-  
   </div>
 </div>

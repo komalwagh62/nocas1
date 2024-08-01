@@ -6,67 +6,47 @@
           <input matInput (keyup)="applyFilter($event)" placeholder="Ex. Active">
         </mat-form-field>
         <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8" *ngIf="subscriptionDetails && subscriptionDetails.length > 0">
-     
-          <!-- Applicant Name Column -->
           <ng-container matColumnDef="applicantName">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Applicant Name </th>
             <td mat-cell *matCellDef="let subscription"> {{ this.apiservice.userData.uname }} </td>
           </ng-container>
-     
-          <!-- Transaction ID Column -->
           <ng-container matColumnDef="transactionID">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Transaction ID </th>
             <td mat-cell *matCellDef="let subscription"> {{ subscription.razorpay_payment_id }} </td>
           </ng-container>
-     
-          <!-- Transaction Date Column -->
           <ng-container matColumnDef="transactionDate">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Transaction Date </th>
             <td mat-cell *matCellDef="let subscription"> {{ subscription.createdAt  | date}} </td>
           </ng-container>
-     
-          <!-- Transaction Status Column -->
           <ng-container matColumnDef="transactionStatus">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Transaction Status </th>
             <td mat-cell *matCellDef="let subscription" [ngStyle]="{'color': subscription.subscription_status === 'Active' ? 'green' : ''}">
               {{ subscription.subscription_status }}
             </td>
           </ng-container>
-     
-          <!-- Expiry Date Column -->
           <ng-container matColumnDef="expiryDate">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Expiry Date </th>
             <td mat-cell *matCellDef="let subscription"> {{ subscription.expiry_date  | date }} </td>
           </ng-container>
-     
-          <!-- Subscription Type Column -->
           <ng-container matColumnDef="subscriptionType">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Subscription Type </th>
             <td mat-cell *matCellDef="let subscription"> {{ subscription.subscription_type }} </td>
           </ng-container>
-     
-          <!-- Price Column -->
           <ng-container matColumnDef="price">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Price </th>
             <td mat-cell *matCellDef="let subscription"> {{ subscription.price }} </td>
           </ng-container>
-     
-          <!-- Action Column -->
           <ng-container matColumnDef="action">
             <th mat-header-cell *matHeaderCellDef> Action </th>
             <td mat-cell *matCellDef="let subscription">
               <button mat-raised-button color="primary" (click)="downloadReceipt(subscription)">Download</button>
             </td>
           </ng-container>
-     
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
           <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
         </table>
-     
         <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" showFirstLastButtons></mat-paginator>
       </div>
-     
-      <!-- Message if no subscriptions are available -->
       <div *ngIf="subscriptionDetails && subscriptionDetails.length === 0" class="alert alert-warning" role="alert">
         No subscription details available.
       </div>

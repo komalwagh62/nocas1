@@ -8,7 +8,6 @@
   justify-content: center;
   overflow-x: hidden;
 }
- 
 .background::after {
   content: '';
   background: #4682B4;
@@ -23,7 +22,6 @@
   width: 100%;
   z-index: 1;
 }
- 
 .card {
   background-color: white;
   z-index: 2;

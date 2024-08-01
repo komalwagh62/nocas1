@@ -28,7 +28,6 @@
             </mat-form-field>
           </div>
         </div>
-
         <div class="form-group">
           <label>Select Nearest Airport</label>
           <mat-radio-group formControlName="selectionMode">
@@ -50,7 +49,6 @@
               <mat-icon matSuffix color="primary">location_city</mat-icon>
             </mat-form-field>
           </div>
-          
           <div class="form-group">
             <label for="airportName">Airport Name</label>
             <mat-form-field appearance="outline">
@@ -59,7 +57,6 @@
             </mat-form-field>
           </div>
         </div>
-
         <div class="form-group">
           <label>Select Site Elevation (meter)</label><br>
           <mat-radio-group formControlName="elevationOption" (change)="onElevationOptionChange()">
@@ -67,7 +64,6 @@
             <mat-radio-button value="known" class="red-radio">Enter Site Elevation</mat-radio-button>
           </mat-radio-group>
         </div>
-
         <div class="form-group" *ngIf="TopElevationForm.get('elevationOption')?.value === 'known'">
           <label for="Site_Elevation">Site Elevation</label>
           <mat-form-field appearance="outline">
@@ -75,13 +71,11 @@
             <mat-icon matSuffix color="primary">edit</mat-icon>
           </mat-form-field>
         </div>
-
         <div class="d-grid gap-2 button-Top">
           <button type="submit" class="btn btn-outline-primary rounded-5 py-2 px-4" (click)="submitForm()">Submit</button>
         </div>
       </form>
     </div>
-
     <div class="col-lg-10">
       <div class="map-container">
         <div id="map" style="height: 90vh; width: 100%;"></div>
@@ -90,7 +84,6 @@
   </div>
 </div>
 
-<!-- Modal -->
 <div class="modal" id="airportModal" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -116,7 +109,6 @@
   </div>
 </div>
 
-<!-- Inside Map Data Modal -->
 <div class="modal" id="insideMapData" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -164,7 +156,6 @@
   </div>
 </div>
 
-<!-- Outside Map Data Modal -->
 <div class="modal" id="outsideMapData" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">

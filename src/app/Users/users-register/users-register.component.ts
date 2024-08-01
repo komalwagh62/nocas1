@@ -2,27 +2,21 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-// import { ToastrService } from 'ngx-toastr';
-
 @Component({
   selector: 'app-users-register',
   templateUrl: './users-register.component.html',
-  styleUrls: ['./users-register.component.scss'] 
+  styleUrls: ['./users-register.component.scss']
 })
-
 export class UsersRegisterComponent implements OnInit {
-
   SignupForm: FormGroup | any;
   otpSent: boolean = false;
   constructor(
     private http: HttpClient,
     private formBuilder: FormBuilder,
-    // private toastr: ToastrService,
     private router: Router
   ) { }
   public showPassword: boolean = false;
   generatedOTP: string | undefined;
-
   ngOnInit(): void {
     this.SignupForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
@@ -34,29 +28,24 @@ export class UsersRegisterComponent implements OnInit {
     });
   }
   onOtpKeyPress(event: KeyboardEvent) {
-    // Check if the pressed key is a number
     const charCode = event.which ? event.which : event.keyCode;
     if (charCode < 48 || charCode > 57) {
-        event.preventDefault();
-    }
-}
-onNameInput(event: any): void {
-  const input = event.target.value;
-  const regex = /^[a-zA-Z\s]*$/;
-  if (!regex.test(input)) {
-    event.target.value = input.replace(/[^a-zA-Z\s]/g, '');
-  }
-}
-
-
-onPhoneNumberKeyPress(event: KeyboardEvent) {
-  // Check if the pressed key is a number
-  const charCode = event.which ? event.which : event.keyCode;
-  if (charCode < 48 || charCode > 57) {
       event.preventDefault();
+    }
   }
-}
-
+  onNameInput(event: any): void {
+    const input = event.target.value;
+    const regex = /^[a-zA-Z\s]*$/;
+    if (!regex.test(input)) {
+      event.target.value = input.replace(/[^a-zA-Z\s]/g, '');
+    }
+  }
+  onPhoneNumberKeyPress(event: KeyboardEvent) {
+    const charCode = event.which ? event.which : event.keyCode;
+    if (charCode < 48 || charCode > 57) {
+      event.preventDefault();
+    }
+  }
   public togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
   }

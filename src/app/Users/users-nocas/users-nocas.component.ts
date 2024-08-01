@@ -5,9 +5,7 @@ import * as L from 'leaflet';
 import { ApiService } from '../Shared/Api/api.service';
 import { Router } from '@angular/router';
 import * as domtoimage from 'dom-to-image';
-import { NgModule } from '@angular/core';
 declare var Razorpay: any;
-
 @Component({
   selector: 'app-users-nocas',
   templateUrl: './users-nocas.component.html',
@@ -53,6 +51,7 @@ export class UsersNOCASComponent implements OnInit {
   airportName!: string;
   distance!: number;
   isDefaultElevationSelected: boolean = false;
+  autoSelectAirportCity: boolean = false; // Define the variable here
   constructor(public apiservice: ApiService, private formbuilder: FormBuilder, private http: HttpClient, private router: Router) { }
 
   ngOnInit(): void {
@@ -60,21 +59,31 @@ export class UsersNOCASComponent implements OnInit {
       Latitude: [''],
       Longitude: [''],
       CITY: [''],
-      location: ['manual'],
+      location: [''],
       Site_Elevation: new FormControl('', [Validators.required, Validators.pattern(/^[0-5]+(?:\.[0-5]+)?$/)]),
-      elevationOption: ['known', Validators.required],
+      elevationOption: ['', Validators.required],
       snapshot: [''],
       airportName: [''],
       selectionMode: ['']
     });
     this.TopElevationForm.get('selectionMode')?.valueChanges.subscribe((selectionMode: string) => {
-      if (selectionMode === 'manual') {
-        this.TopElevationForm.addControl('CITY', new FormControl('', Validators.required));
-        this.TopElevationForm.addControl('airportName', new FormControl(''));
-      } else if (selectionMode === 'default') {
-        this.TopElevationForm.addControl('CITY', new FormControl('', Validators.required));
-        this.TopElevationForm.addControl('airportName', new FormControl(''));
+      if (selectionMode === 'manual' || selectionMode === 'default') {
+        this.TopElevationForm.get('CITY')?.setValidators([Validators.required]);
+        this.TopElevationForm.get('airportName')?.setValidators([]);
+      } else {
+        this.TopElevationForm.get('CITY')?.clearValidators();
+        this.TopElevationForm.get('airportName')?.clearValidators();
       }
+
+      if (selectionMode === 'manual') {
+        this.TopElevationForm.patchValue({
+          CITY: '',
+          AIRPORT_NAME: ''
+        });
+      }
+      this.TopElevationForm.get('CITY')?.updateValueAndValidity();
+      this.TopElevationForm.get('airportName')?.updateValueAndValidity();
+
     });
     this.TopElevationForm.get('Latitude').valueChanges.subscribe((latitudeDMS: string) => {
       const lat = this.convertDMSStringToDD(latitudeDMS);
@@ -319,27 +328,41 @@ export class UsersNOCASComponent implements OnInit {
       this.router.navigate(['UsersLogin']);
       return;
     }
+
     if (!this.TopElevationForm.valid) {
       return;
     }
+
     const selectedAirportCITY = this.TopElevationForm.get('CITY')?.value;
     const currentLat = this.TopElevationForm.get('Latitude')?.value;
     const currentLng = this.TopElevationForm.get('Longitude')?.value;
-    const nearestAirport = this.findNearestAirport(currentLat, currentLng, 30); // 30 km
-    if (nearestAirport && nearestAirport.airportCity !== selectedAirportCITY) {
-      const updateConfirmation = confirm(
-        `The selected airport (${selectedAirportCITY}) is different from the nearest airport (${nearestAirport.airportCity}).\n` +
-        `Would you like to update to the nearest airport or continue with the current selection?`
-      );
-      if (updateConfirmation) {
-        this.TopElevationForm.patchValue({
-          CITY: nearestAirport.airportCity,
-          Site_Elevation: this.isDefaultElevationSelected ? nearestAirport.elevation : this.TopElevationForm.get('Site_Elevation')?.value // Update only if default elevation is selected
-        });
-        this.selectedAirportName = nearestAirport.airportName;
-        this.loadNearestAirportGeoJSON(nearestAirport.airportCity, nearestAirport.distance, this.map);
+
+    // Convert coordinates if needed
+    const nearestAirport = this.findNearestAirport(this.lat, this.long, 30); // 30 km
+    console.log('Nearest Airport:', nearestAirport);
+
+
+    if (nearestAirport) {
+      if (nearestAirport.airportCity !== selectedAirportCITY) {
+        console.log("erfgt")
+        const updateConfirmation = confirm(
+          `The selected airport (${selectedAirportCITY}) is different from the nearest airport (${nearestAirport.airportCity}).\n` +
+          `Would you like to update to the nearest airport or continue with the current selection?`
+        );
+
+        if (updateConfirmation) {
+          this.TopElevationForm.patchValue({
+            CITY: nearestAirport.airportCity,
+            Site_Elevation: this.isDefaultElevationSelected ? nearestAirport.elevation : this.TopElevationForm.get('Site_Elevation')?.value
+          });
+          this.selectedAirportName = nearestAirport.airportName;
+          this.loadNearestAirportGeoJSON(nearestAirport.airportCity, nearestAirport.distance, this.map);
+        }
       }
     }
+
+
+    // Confirm that the entered site information is correct
     const confirmation = confirm("Kindly confirm that the entered site information is correct or verify");
     if (confirmation) {
       this.captureScreenshot().then(() => {
@@ -348,6 +371,7 @@ export class UsersNOCASComponent implements OnInit {
       });
     }
   }
+
 
   findNearestAirport(lat: number, lng: number, radius: number): { airportCity: string; airportName: string; distance: number; elevation: number } | null {
     const airports = this.airportCoordinatesList;
@@ -397,6 +421,7 @@ export class UsersNOCASComponent implements OnInit {
     };
     return cityElevationMap[city] || 0;
   }
+
 
   handleAirportModalOK() {
     let latitudeDD = this.convertDMSToDD(this.lat, true);
@@ -463,10 +488,10 @@ export class UsersNOCASComponent implements OnInit {
               }
             },
             (error: any) => {
-                alert("Session expired. Please log in again.");
-                localStorage.removeItem('userData');
-                localStorage.removeItem('token');
-                this.router.navigate(['UsersLogin']);
+              alert("Session Expired.Please Login..");
+              localStorage.removeItem('userData');
+              localStorage.removeItem('token');
+              this.router.navigate(['UsersLogin']);
             }
           );
       } catch (error) {
@@ -576,17 +601,7 @@ export class UsersNOCASComponent implements OnInit {
     }
   }
 
-  updateMarkerPosition() {
-    if (this.marker) {
-      this.latitudeDMS = this.convertDDtoDMS(this.lat, true);
-      this.longitudeDMS = this.convertDDtoDMS(this.long, false);
-      this.marker.setLatLng([this.lat, this.long]);
-    }
-    const nearestAirport = this.findNearestAirport(this.lat, this.long, 30); // 30 km
-    if (nearestAirport) {
-      this.loadNearestAirportGeoJSON(nearestAirport.airportCity, nearestAirport.distance, this.map);
-    }
-  }
+
 
   showDefaultMap() {
     const defaultLat = 0.0;
@@ -597,11 +612,12 @@ export class UsersNOCASComponent implements OnInit {
   }
 
   showMap(lat: number, lng: number) {
+    // Initialize the map
     this.map = L.map('map').setView([19.794444, 85.751111], 5);
     const streets = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
       subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
     });
-    const DarkMatter = L.tileLayer('  https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {});
+    const DarkMatter = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {});
     const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {});
     const Navigation = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
       attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
@@ -628,53 +644,116 @@ export class UsersNOCASComponent implements OnInit {
       'Terrain': googleTerrain,
       'Dark': DarkMatter
     };
-    const overlayMaps = {
-    };
+    const overlayMaps = {};
     L.control.layers(baseMaps, overlayMaps).addTo(this.map);
     streets.addTo(this.map);
     L.control.scale().addTo(this.map);
-    this.marker = L.marker([lat, lng], { draggable: true }).addTo(this.map);
+
+    // Create or update the marker
+    if (this.marker) {
+      this.marker.setLatLng([lat, lng]);
+    } else {
+      this.marker = L.marker([lat, lng], { draggable: true }).addTo(this.map);
+    }
+
+    // Handle map click event
     this.map.on('click', (e: any) => {
       const { lat, lng } = e.latlng;
-      this.lat = lat;
       this.lat = lat;
       this.long = lng;
       this.latitudeDMS = this.convertDDtoDMS(lat, true);
       this.longitudeDMS = this.convertDDtoDMS(lng, false);
-      this.updateMarkerPosition();
-      const nearestAirport = this.findNearestAirport(lat, lng, 30); // 30 km
-      if (nearestAirport) {
-        console.log(`Nearest Airport: ${nearestAirport.airportCity}, Distance: ${nearestAirport.distance}`);
-        if (nearestAirport.distance <= 30) {
+
+      const selectionMode = this.TopElevationForm.get('selectionMode')?.value;
+
+      if (selectionMode === 'manual') {
+        this.TopElevationForm.patchValue({
+          CITY: '',
+          AIRPORT_NAME: ''
+        });
+      } else {
+        const nearestAirport = this.findNearestAirport(lat, lng, 30); // 30 km
+        if (nearestAirport) {
+          console.log('Nearest Airport Data:', nearestAirport);
+          this.TopElevationForm.patchValue({
+            CITY: nearestAirport.airportCity,
+            AIRPORT_NAME: nearestAirport.airportName
+          });
           this.loadNearestAirportGeoJSON(nearestAirport.airportCity, nearestAirport.distance, this.map);
         } else {
           console.log('Nearest airport is more than 30 km away.');
         }
       }
+
       this.TopElevationForm.patchValue({
         Latitude: this.latitudeDMS,
         Longitude: this.longitudeDMS
       });
+
       if (this.marker) {
         this.marker.setLatLng([lat, lng]);
         const popupContent = `Site Location : <br> Site Latitude: ${this.latitudeDMS}, Site Longitude: ${this.longitudeDMS}`;
         this.marker.bindPopup(popupContent).openPopup();
       }
     });
+
+    // Handle marker drag end event
     this.marker.on('dragend', (e: any) => {
-      this.updateMarkerPopupContent(lat, lng);
       const position = this.marker.getLatLng();
       this.lat = position.lat;
       this.long = position.lng;
       this.latitudeDMS = this.convertDDtoDMS(position.lat, true);
       this.longitudeDMS = this.convertDDtoDMS(position.lng, false);
+      const selectionMode = this.TopElevationForm.get('selectionMode')?.value;
+
+      if (selectionMode === 'manual') {
+        // Manually input city logic
+        const manualCity = this.TopElevationForm.get('CITY')?.value;
+        const cityLocation = this.getCityLocation(manualCity); // Implement this method to get lat/lng of the city
+
+        if (cityLocation) {
+          const distance = this.calculateDistance(position.lat, position.lng, cityLocation.lat, cityLocation.lng);
+          console.log(`Distance to ${manualCity}: ${distance.toFixed(2)} km`);
+          this.TopElevationForm.patchValue({
+            CITY: manualCity,
+            AIRPORT_NAME: `Nearest city: ${manualCity} (${distance.toFixed(2)} km away)`
+          });
+        } else {
+          console.log('City location not found.');
+        }
+      } else {
+        const nearestAirport = this.findNearestAirport(position.lat, position.lng, 30); // 30 km
+        if (nearestAirport) {
+          console.log('Nearest Airport Data:', nearestAirport);
+          this.TopElevationForm.patchValue({
+            CITY: nearestAirport.airportCity,
+            AIRPORT_NAME: nearestAirport.airportName
+          });
+        }
+      }
+
       this.TopElevationForm.patchValue({
         Latitude: this.latitudeDMS,
         Longitude: this.longitudeDMS
       });
-      this.updateMarkerPosition();
+
+      const popupContent = `Site Location : <br> Site Latitude: ${this.latitudeDMS}, Site Longitude: ${this.longitudeDMS}`;
+      this.marker.bindPopup(popupContent).openPopup();
     });
   }
+
+  getCityLocation(cityName: string): { lat: number, lng: number } | null {
+    // Implement this function to return the latitude and longitude of the city
+    // For example, you might use a city lookup API or a predefined list of city coordinates
+    // Example: return { lat: 40.712776, lng: -74.005974 }; // Coordinates for New York City
+    return null; // Placeholder return
+  }
+
+
+
+
+
+
 
   updateMarkerPopupContent(lat: number, lng: number) {
     this.latitudeDMS = this.convertDDtoDMS(lat, true);
@@ -685,7 +764,8 @@ export class UsersNOCASComponent implements OnInit {
     if (nearestAirport) {
       if (nearestAirport.distance <= 30) {
         this.loadNearestAirportGeoJSON(nearestAirport.airportCity, nearestAirport.distance, this.map);
-      } 
+      } else {
+      }
     }
   }
 
@@ -859,7 +939,6 @@ export class UsersNOCASComponent implements OnInit {
               Latitude: lat,
               Longitude: lng
             });
-            
             if (this.marker) {
               this.marker.setLatLng([lat, lng]);
               const popupContent = `Site Location : <br> Site Latitude: ${this.latitudeDMS}, Site Longitude: ${this.longitudeDMS}`;
@@ -883,62 +962,54 @@ export class UsersNOCASComponent implements OnInit {
   loadNearestAirportGeoJSON(airportCity: string, distance: number, map: any) {
     const airportGeoJSONPath = `assets/GeoJson/${airportCity}.geojson`;
     if (this.isFetchingGeoJSON) {
-        return;
+      return;
     }
     this.isFetchingGeoJSON = true;
     if (this.nearestAirportGeoJSONLayer) {
-        map.removeLayer(this.nearestAirportGeoJSONLayer);
-        this.nearestAirportGeoJSONLayer = null;
+      map.removeLayer(this.nearestAirportGeoJSONLayer);
+      this.nearestAirportGeoJSONLayer = null;
     }
-
+    map.eachLayer((layer: any) => {
+      if (layer instanceof L.GeoJSON) {
+        map.removeLayer(layer);
+      }
+    });
+    
     fetch(airportGeoJSONPath)
-        .then(response => response.json())
-        .then(geojsonData => {
-            const features = geojsonData.features;
-            if (!features || features.length === 0) {
-                console.error("No features found in GeoJSON data.");
-                return;
-            }
-            
-            const style = (feature: any) => {
-                const color = feature.properties.Color;
-                return { fillColor: color, weight: 1 };
-            };
-            const geojsonLayer = L.geoJSON(features, { style: style });
-            geojsonLayer.addTo(map);
-            this.nearestAirportGeoJSONLayer = geojsonLayer;
-            
-            const [lng, lat] = features[0].geometry.coordinates;
-            console.log(`Setting marker2 at coordinates: Latitude: ${lat}, Longitude: ${lng}`);
-            
-            if (this.marker2) {
-                this.marker2.setLatLng([lat, lng]);
-                const popupContent = `ARP:
-                <p>${airportCity} Airport</p><br>
-                Latitude: ${lat.toFixed(2)}
-                Longitude: ${lng.toFixed(2)}`;
-                this.marker2.bindPopup(popupContent).openPopup();
-            } else {
-                console.error("marker2 is not initialized.");
-            }
-
-            const selectionMode = this.TopElevationForm.get('selectionMode')?.value;
-            if (selectionMode === 'default') {
-                this.TopElevationForm.patchValue({
-                    CITY: airportCity,
-                    AIRPORT_NAME: features[0].properties.AirportName
-                });
-            }
-        })
-        .catch(error => {
-            console.error("Error fetching GeoJSON data:", error);
-        })
-        .finally(() => {
-            this.isFetchingGeoJSON = false;
-        });
-}
+      .then(response => response.json())
+      .then(geojsonData => {
+        const features = geojsonData.features;
+        const style = (feature: any) => {
+          const color = feature.properties.Color;
+          return { fillColor: color, weight: 1 };
+        };
+        const geojsonLayer = L.geoJSON(features, { style: style });
+        geojsonLayer.addTo(map);
+        this.nearestAirportGeoJSONLayer = geojsonLayer;
+        
+        const selectionMode = this.TopElevationForm.get('selectionMode')?.value;
+        if (selectionMode === 'default') {
+          this.TopElevationForm.patchValue({
+            CITY: airportCity,
+            AIRPORT_NAME: features[0].properties.AirportName
+          });
+        }
+        this.marker2.setLatLng([features[0].geometry.coordinates[1], features[0].geometry.coordinates[0]]);
+        const popupContent = `ARP:
+        <p>${airportCity} Airport</p><br>
+        Latitude: ${features[0].geometry.coordinates[1].toFixed(2)}
+        Longitude: ${features[0].geometry.coordinates[0].toFixed(2)}`;
+        this.marker2.bindPopup(popupContent).openPopup();
 
 
+      })
+      .catch(error => {
+        // console.error("Error fetching GeoJSON data:", error);
+      })
+      .finally(() => {
+        this.isFetchingGeoJSON = false;
+      });
+  }
 
   calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
     const R = 6371;
@@ -981,9 +1052,38 @@ export class UsersNOCASComponent implements OnInit {
   updateMarkersPosition(lat: number, lng: number): void {
     this.lat = lat;
     this.long = lng;
+
+    // Update marker position
     this.updateMarkerPosition();
-    const popupContent = `Site Location : <br> Site Latitude: ${this.latitudeDMS}, Site Longitude: ${this.longitudeDMS}`;
-    this.marker.bindPopup(popupContent).openPopup();
+
+    // Fetch nearest airport data and update form
+    this.updateNearestAirportData();
+  }
+
+  // Update marker position
+  updateMarkerPosition() {
+    if (this.marker) {
+      this.latitudeDMS = this.convertDDtoDMS(this.lat, true);
+      this.longitudeDMS = this.convertDDtoDMS(this.long, false);
+      this.marker.setLatLng([this.lat, this.long]);
+
+      const popupContent = `Site Location : <br> Site Latitude: ${this.latitudeDMS}, Site Longitude: ${this.longitudeDMS}`;
+      this.marker.bindPopup(popupContent).openPopup();
+    }
+  }
+
+  // Fetch nearest airport data and update form
+  updateNearestAirportData() {
+    const nearestAirport = this.findNearestAirport(this.lat, this.long, 30); // 30 km
+    if (nearestAirport) {
+      this.loadNearestAirportGeoJSON(nearestAirport.airportCity, nearestAirport.distance, this.map);
+
+      // Update form with nearest airport data
+      this.TopElevationForm.patchValue({
+        CITY: nearestAirport.airportCity,
+        AIRPORT_NAME: nearestAirport.airportName
+      });
+    }
   }
 }
 

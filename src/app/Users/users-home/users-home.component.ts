@@ -1,5 +1,5 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { AfterViewInit, Component,OnInit, ViewChild,ViewEncapsulation } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { ApiService } from '../Shared/Api/api.service';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
@@ -17,13 +17,13 @@ import { MatPaginator } from '@angular/material/paginator';
 export class UsersHomeComponent implements OnInit {
   subscriptionDataSource = new MatTableDataSource<any>();
   permissibleDataSource = new MatTableDataSource<any>();
-serviceDataSource = new MatTableDataSource<any>();
+  serviceDataSource = new MatTableDataSource<any>();
 
   @ViewChild('subscriptionPaginator') subscriptionPaginator!: MatPaginator;
   @ViewChild('permissiblePaginator') permissiblePaginator!: MatPaginator;
   @ViewChild('servicePaginator') servicePaginator!: MatPaginator;
 
-  subscriptiondisplayedColumns: string[] = ['subscription_id', 'subscription_status','createdAt', 'subscription_type', 'expand'];
+  subscriptiondisplayedColumns: string[] = ['subscription_id', 'subscription_status', 'createdAt', 'expiry_date', 'subscription_type', 'price', 'expand'];
   expandedElement: any | null;
   permissibleDisplayedColumns: string[] = [ 'city', 'airport_name','download', 'expand'];
 
@@ -54,11 +54,11 @@ serviceDataSource = new MatTableDataSource<any>();
     service4: 'Aeronautical Study / Shielding Benefits Study',
     service5: 'Documents & Process Management'
   };
-nocas: any;
-airport: any;
-request: any;
+  nocas: any;
+  airport: any;
+  request: any;
 
-  constructor(private http: HttpClient, public apiservice: ApiService,private datePipe: DatePipe) { }
+  constructor(private http: HttpClient, public apiservice: ApiService, private datePipe: DatePipe) { }
 
   ngOnInit(): void {
     this.detailsOfPermissible();
@@ -66,9 +66,11 @@ request: any;
     // this.detailsOfSubscription();
     // this.detailsOfServices();
   }
+
   bufferToBase64(buffer: any) {
     return btoa(new Uint8Array(buffer).reduce((data, byte) => data + String.fromCharCode(byte), ''));
   }
+
   detailsOfSubscription() {
     // Show only subscription details section
     this.showSubscriptionDetails = true;
@@ -90,6 +92,7 @@ request: any;
 
                 response.forEach((subscription, index) => {
                     subscription.expiry_date = this.datePipe.transform(subscription.expiry_date, 'dd/MM/yyyy');
+                    subscription.createdAt = this.datePipe.transform(subscription.createdAt, 'dd/MM/yyyy');
 
                     const price = Number(subscription.price);
                     if (!isNaN(price)) {
@@ -113,7 +116,7 @@ request: any;
                 console.error('Failed to fetch subscription data:', error);
             }
         );
-}
+  }
 
   
 

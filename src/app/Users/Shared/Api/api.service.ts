@@ -10,6 +10,7 @@ import { UsersPricingPlansComponent } from '../../users-pricing-plans/users-pric
   providedIn: 'root'
 })
 export class ApiService {
+  [x: string]: any;
   isAuthenticated: boolean = false;
   public baseUrl: string = 'http://localhost:3001/api';
   public loginUserId: string = '';

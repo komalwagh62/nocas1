@@ -172,12 +172,16 @@
           <mat-header-cell *matHeaderCellDef> Active Date </mat-header-cell>
           <mat-cell *matCellDef="let element"> {{element.createdAt}} </mat-cell>
         </ng-container>
+        
         <!-- Expiry Date Column -->
         <ng-container matColumnDef="expiry_date">
           <mat-header-cell *matHeaderCellDef> Expiry Date </mat-header-cell>
           <mat-cell *matCellDef="let element"> {{element.expiry_date}} </mat-cell>
         </ng-container>
- 
+        <ng-container matColumnDef="price">
+          <mat-header-cell *matHeaderCellDef> Price </mat-header-cell>
+          <mat-cell *matCellDef="let element"> {{element.price}} </mat-cell>
+        </ng-container>
         <!-- Subscription Type Column -->
         <ng-container matColumnDef="subscription_type">
           <mat-header-cell *matHeaderCellDef> Type </mat-header-cell>
@@ -186,9 +190,9 @@
  
         <!-- Row Definition -->
         <mat-header-row
-          *matHeaderRowDef="['subscription_id', 'subscription_status', 'expiry_date', 'subscription_type']"></mat-header-row>
+          *matHeaderRowDef="['subscription_id', 'subscription_status','createdAt','expiry_date','price', 'subscription_type']"></mat-header-row>
         <mat-row
-          *matRowDef="let row; columns: ['subscription_id', 'subscription_status', 'expiry_date', 'subscription_type'];"></mat-row>
+          *matRowDef="let row; columns: ['subscription_id', 'subscription_status','createdAt','expiry_date','price', 'subscription_type'];"></mat-row>
       </mat-table>
     </div>
     <!-- Subscription Details -->

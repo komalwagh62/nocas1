@@ -1,222 +1,31 @@
-/*--------------------------------------------------------------
-# Icons list page
---------------------------------------------------------------*/
-.iconslist {
-    display: grid;
-    max-width: 100%;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 1.25rem;
-    padding-top: 15px;
-  }
-  .readonly-input {
-    background-color: #f8f9fa; /* Change this to the desired color */
-    /* Add any other styles you want for readonly inputs */
-  }
-  
-  
-  .iconslist .icon {
-    background-color: #fff;
-    border-radius: 0.25rem;
-    text-align: center;
-    color: #012970;
-    padding: 15px 0;
-  }
-  
-  .iconslist i {
-    margin: 0.25rem;
-    font-size: 2.5rem;
-  }
-  
-  .iconslist .label {
-    font-family: var(--bs-font-monospace);
-    display: inline-block;
-    width: 100%;
-    overflow: hidden;
-    padding: 0.25rem;
-    font-size: 12px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    color: #666;
-  }
-  
-  /* Card */
-  .card {
-      margin-bottom: 30px;
-      border: none;
-      border-radius: 5px;
-      box-shadow: 0px 0 30px rgba(1, 41, 112, 0.1);
-    }
-    
-    .card-header,
-    .card-footer {
-      border-color: #ebeef4;
-      background-color: #fff;
-      color: #798eb3;
-      padding: 15px;
-    }
-    .example-sidenav-content[_ngcontent-ng-c3760549634] {
-      height: 74vh;
-      background-color: white;
-  }
+.background {
+  padding: 0 25px 25px;
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-x: hidden;
+}
  
-    .card-title {
-      padding: 20px 0 15px 0;
-      font-size: 18px;
-      font-weight: 500;
-      color: #012970;
-      font-family: "Poppins", sans-serif;
-    }
-    
-    .card-title span {
-      color: #899bbd;
-      font-size: 14px;
-      font-weight: 400;
-    }
-    
-    .card-body {
-      padding: 0 20px 20px 20px;
-    }
-    
-    .card-img-overlay {
-      background-color: rgba(255, 255, 255, 0.6);
-    }
-    
-    /* Alerts */
-    .alert-heading {
-      font-weight: 500;
-      font-family: "Poppins", sans-serif;
-      font-size: 20px;
-    }
-    
-    /* Close Button */
-    .btn-close {
-      background-size: 25%;
-    }
-    
-    .btn-close:focus {
-      outline: 0;
-      box-shadow: none;
-    }
-  
-    
-  
-    /*--------------------------------------------------------------
-  # Profie Page
-  --------------------------------------------------------------*/
-  .profile .profile-card img {
-    max-width: 120px;
-  }
-  
-  .profile .profile-card h2 {
-    font-size: 24px;
-    font-weight: 700;
-    color: #2c384e;
-    margin: 10px 0 0 0;
-  }
-  
-  .profile .profile-card h3 {
-    font-size: 18px;
-  }
-  
-  .profile .profile-card .social-links a {
-    font-size: 20px;
-    display: inline-block;
-    color: rgba(1, 41, 112, 0.5);
-    line-height: 0;
-    margin-right: 10px;
-    transition: 0.3s;
-  }
-  
-  .profile .profile-card .social-links a:hover {
-    color: #012970;
-  }
-  
-  .profile .profile-overview .row {
-    margin-bottom: 20px;
-    font-size: 15px;
-  }
-  
-  .profile .profile-overview .card-title {
-    color: #012970;
-  }
-  
-  .profile .profile-overview .label {
-    font-weight: 600;
-    color: rgba(1, 41, 112, 0.6);
-  }
-  
-  .profile .profile-edit label {
-    font-weight: 600;
-    color: rgba(1, 41, 112, 0.6);
-  }
-  
-  .profile .profile-edit img {
-    max-width: 120px;
-  }
-  
-  
-  
-  
-  
-  
-  p {
-    font-family: Lato;
-  }
-  
-  img {
-    height: 100%;
-    width: 100%;
-    border-radius: 50%;
-  }
-  .hoverable{
-    position: relative;
-    display: block;
-    cursor: pointer;
-    height: 200px;
-    width: 200px;
-    border: 1px solid #9e98ff50;
-    border-radius: 50%;
-  }
-  .hoverable .hover-text{
-    position: absolute;
-    display: none;
-    top: 50%;
-    left:  50%;
-    transform: translate(-50%,-50%);   
-    z-index: 2;
-  }
-  .hoverable .background{
-    position: absolute;
-    display: none;
-    top: 0;
-    left:  0;
-    bottom: 0;
-    right: 0;
-    background-color:rgba(255, 255, 255, 0.5);
-    pointer-events: none;
-    border-radius: 50%;
-    z-index: 1;
-  }
-  .hoverable:hover .hover-text{
-    display: block;
-  }
-  .hoverable:hover .background{
-    display: block;
-  }
-  
-  #fileInput{
-    display: none;
-  }
-
-
-  // .profile {
-  //   padding: 20px;
-  // }
-
-  // .profile .col-2 {
-  //   margin-right: 30px;
-  // }
-
-  .profile .card {
-    margin-left: 40px;
-  }
+.background::after {
+  content: '';
+  background: #4682B4;
+  background: -moz-linear-gradient(top, #4682B4 0%, #4682B4 100%);
+  background: -webkit-linear-gradient(top, #4682B4 0%, #4682B4 100%);
+  background: linear-gradient(to bottom, #4682B4 0%, #4682B4 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#60a9ff', endColorstr='#4394f4', GradientType=0);
+  height: 350px;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  z-index: 1;
+}
+ 
+.card {
+  background-color: white;
+  z-index: 2;
+}
+ 

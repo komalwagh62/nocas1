@@ -657,6 +657,10 @@ export class UsersNOCASComponent implements OnInit {
             CITY: nearestAirport.airportCity,
             AIRPORT_NAME: nearestAirport.airportName
           });
+          if (this.marker2) {
+            this.map.removeLayer(this.marker2);
+            this.marker2 = null;
+          }
           this.loadNearestAirportGeoJSON(nearestAirport.airportCity, nearestAirport.distance, this.map);
         }
       }
@@ -717,6 +721,10 @@ export class UsersNOCASComponent implements OnInit {
     const nearestAirport = this.findNearestAirport(lat, lng, 30); // 30 km
     if (nearestAirport) {
       if (nearestAirport.distance <= 30) {
+        if (this.marker2) {
+          this.map.removeLayer(this.marker2);
+          this.marker2 = null;
+        }
         this.loadNearestAirportGeoJSON(nearestAirport.airportCity, nearestAirport.distance, this.map);
       } else {
       }
@@ -902,12 +910,14 @@ export class UsersNOCASComponent implements OnInit {
             Latitude: ${this.airportCoordinates[0].toFixed(2)}
             Longitude: ${this.airportCoordinates[1].toFixed(2)}`;
           this.marker2.bindPopup(popupContent).openPopup();
+          
           if (this.marker) {
             map.removeLayer(this.marker);
             this.marker = null;
           }
           this.marker = L.marker([this.lat, this.long]).addTo(map);
           map.on('click', (e: any) => {
+            
             const { lat, lng } = e.latlng;
             this.TopElevationForm.patchValue({
               Latitude: lat,
@@ -1027,7 +1037,7 @@ export class UsersNOCASComponent implements OnInit {
   updateMarkersPosition(lat: number, lng: number): void {
     this.lat = lat;
     this.long = lng;
-    this.updateMarkerPosition();
+    // this.updateMarkerPosition();
     this.updateNearestAirportData();
   }
 

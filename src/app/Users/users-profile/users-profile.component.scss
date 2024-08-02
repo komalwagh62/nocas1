@@ -1,29 +1,110 @@
-.background {
-  padding: 0 25px 25px;
-  position: relative;
-  width: 100%;
-  height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow-x: hidden;
-}
-.background::after {
+
+.section.profile::before {
   content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 50%;
   background: #4682B4;
   background: -moz-linear-gradient(top, #4682B4 0%, #4682B4 100%);
   background: -webkit-linear-gradient(top, #4682B4 0%, #4682B4 100%);
   background: linear-gradient(to bottom, #4682B4 0%, #4682B4 100%);
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#60a9ff', endColorstr='#4394f4', GradientType=0);
-  height: 350px;
-  left: 0;
-  position: absolute;
-  top: 0;
-  width: 100%;
-  z-index: 1;
+  z-index: -1; /* Place it behind the content */
 }
-.card {
+.card{
+  margin-top: 250px;
+}
+.profile-card {
+  width: 100%; /* Adjust as needed */
+  max-width: 600px; /* Set a maximum width */
+  margin: 0 auto; /* Center horizontally */
+  border: none;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   background-color: white;
-  z-index: 2;
+  position: relative; /* Positioning for card content */
+  padding: 20px; /* Add padding inside the card */
+  margin-top: 250px;
+  height: 340px;
+  
 }
- 
+
+.profile-card .hoverable {
+  display: block;
+  cursor: pointer;
+  position: relative;
+}
+
+.profile-card .hover-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: none;
+  text-align: center;
+}
+
+.profile-card:hover .hover-text {
+  display: block;
+}
+
+.profile-card img {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  margin-bottom: 20px;
+}
+
+.profile-card h5, .profile-card h3 {
+  margin: 0;
+}
+
+.nav-tabs {
+  margin-bottom: 20px;
+}
+
+.nav-tabs .nav-item {
+  margin-bottom: -1px;
+}
+
+.nav-tabs .nav-link {
+  border: 1px solid transparent;
+  border-top-left-radius: .25rem;
+  border-top-right-radius: .25rem;
+}
+
+.nav-tabs .nav-link.active {
+  color: #495057;
+  background-color: #fff;
+  border-color: #dee2e6 #dee2e6 #fff;
+}
+
+.card-title {
+  margin-bottom: 15px;
+  
+}
+
+label.label {
+  font-weight: bold;
+}
+
+.row {
+  margin-bottom: 10px;
+}
+
+input.form-control, .form-check-input {
+  border-radius: .25rem;
+}
+
+button.btn {
+  border-radius: .25rem;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.mt-3 {
+  margin-top: 1rem;
+}

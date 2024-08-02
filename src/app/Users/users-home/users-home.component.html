@@ -8,7 +8,7 @@
             <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow"></ul>
           </div>
           <div class="card-body">
-            <h3 class="card-title">Permissible Details</h3>
+            <h3 class="card-title">User Requests</h3>
             <div class="d-flex align-items-center">
               <div class="d-flex align-items-center justify-content-center">
                 <img src="assets/construction.png" alt="" class="construction-img" style="height: 63px; width: 63px">
@@ -64,7 +64,7 @@
 <section>
   <div class="container-fluid">
     <mat-form-field *ngIf="showPermissibleDetails">
-      <mat-label>Filter Permissible Details</mat-label>
+      <mat-label>Filter User Requests</mat-label>
       <input matInput (keyup)="applyPermissibleFilter($event)" placeholder="Ex. city" #permissibleInput>
     </mat-form-field>
     <div *ngIf="showPermissibleDetails">

@@ -2,8 +2,8 @@
   <div class="row">
     <div class="col-lg-2">
       <form [formGroup]="TopElevationForm" autocomplete="on" novalidate>
-        <div class="form-group">
-          <label>Select Site Location</label><br>
+        <div>
+          <mat-label>Select Site Location</mat-label>
           <mat-radio-group formControlName="location">
             <mat-radio-button value="currentLocation" (click)="getLocation()" class="red-radio">
               Use current location
@@ -13,32 +13,32 @@
             </mat-radio-button>
           </mat-radio-group>
         </div>
-        <br>
+   
         <div *ngIf="TopElevationForm.get('location')?.value === 'manual'">
-          <div class="form-group">
-            <label for="Site_latitude">Site Latitude</label>
+          <div>
+            <mat-label for="Site_latitude">Site Latitude</mat-label>
             <mat-form-field appearance="outline">
               <input matInput type="text" [value]="latitudeDMS" name="Latitude" formControlName="Latitude" id="Latitude" placeholder="Latitude">
             </mat-form-field>
           </div>
-          <div class="form-group">
-            <label for="Site_longitude">Site Longitude</label>
+          <div>
+            <mat-label for="Site_longitude">Site Longitude</mat-label>
             <mat-form-field appearance="outline">
               <input matInput type="text" [value]="longitudeDMS" name="Longitude" formControlName="Longitude" id="Longitude" placeholder="Longitude">
             </mat-form-field>
           </div>
         </div>
-        <div class="form-group">
-          <label>Select Nearest Airport</label>
+        <div>
+          <mat-label>Select Nearest Airport</mat-label>
           <mat-radio-group formControlName="selectionMode">
-            <br>
-            <mat-radio-button value="default" >Auto-Select</mat-radio-button>
+         
+            <mat-radio-button value="default">Auto-Select</mat-radio-button>
             <mat-radio-button value="manual">Enter nearest Airport</mat-radio-button>
           </mat-radio-group>
         </div>
         <div *ngIf="TopElevationForm.get('selectionMode')?.value === 'manual'">
-          <div class="form-group">
-            <label for="airportCITY">City</label>
+          <div>
+            <mat-label for="airportCITY">City</mat-label>
             <mat-form-field appearance="outline">
               <mat-select id="airportCITY" formControlName="CITY">
                 <mat-option value="" disabled>Select a City</mat-option>
@@ -49,23 +49,23 @@
               <mat-icon matSuffix color="primary">location_city</mat-icon>
             </mat-form-field>
           </div>
-          <div class="form-group">
-            <label for="airportName">Airport Name</label>
+          <div>
+            <mat-label for="airportName">Airport Name</mat-label>
             <mat-form-field appearance="outline">
               <input matInput type="text" name="airportName" id="airportName" [value]="selectedAirportName" placeholder="Airport Name" readonly>
               <mat-icon matSuffix color="primary">local_airport</mat-icon>
             </mat-form-field>
           </div>
         </div>
-        <div class="form-group">
-          <label>Select Site Elevation (meter)</label><br>
+        <div>
+          <mat-label>Select Site Elevation (meter)</mat-label>
           <mat-radio-group formControlName="elevationOption" (change)="onElevationOptionChange()">
             <mat-radio-button value="unknown" class="red-radio">Auto-Select (Default Airport Elevation)</mat-radio-button>
             <mat-radio-button value="known" class="red-radio">Enter Site Elevation</mat-radio-button>
           </mat-radio-group>
         </div>
-        <div class="form-group" *ngIf="TopElevationForm.get('elevationOption')?.value === 'known'">
-          <label for="Site_Elevation">Site Elevation</label>
+        <div *ngIf="TopElevationForm.get('elevationOption')?.value === 'known'">
+          <mat-label for="Site_Elevation">Site Elevation</mat-label>
           <mat-form-field appearance="outline">
             <input matInput type="number" name="Site_Elevation" id="Site_Elevation" formControlName="Site_Elevation" placeholder="Site Elevation">
             <mat-icon matSuffix color="primary">edit</mat-icon>
@@ -75,6 +75,7 @@
           <button type="submit" class="btn btn-outline-primary rounded-5 py-2 px-4" (click)="submitForm()">Submit</button>
         </div>
       </form>
+     
     </div>
     <div class="col-lg-10">
       <div class="map-container">
@@ -83,7 +84,7 @@
     </div>
   </div>
 </div>
-
+ 
 <div class="modal" id="airportModal" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -108,7 +109,7 @@
     </div>
   </div>
 </div>
-
+ 
 <div class="modal" id="insideMapData" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -155,7 +156,7 @@
     </div>
   </div>
 </div>
-
+ 
 <div class="modal" id="outsideMapData" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">

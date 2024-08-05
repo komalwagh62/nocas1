@@ -51,7 +51,7 @@ export class UsersNOCASComponent implements OnInit {
   airportName!: string;
   distance!: number;
   isDefaultElevationSelected: boolean = false;
-  autoSelectAirportCity: boolean = false; // Define the variable here
+  autoSelectAirportCity: boolean = false;
   constructor(public apiservice: ApiService, private formbuilder: FormBuilder, private http: HttpClient, private router: Router) { }
 
   ngOnInit(): void {
@@ -67,7 +67,7 @@ export class UsersNOCASComponent implements OnInit {
       selectionMode: ['']
     });
     this.TopElevationForm.get('selectionMode')?.valueChanges.subscribe((selectionMode: string) => {
-      if (selectionMode === 'manual' || selectionMode === 'default') {
+      if (selectionMode === 'manual') {
         this.TopElevationForm.get('CITY')?.setValidators([Validators.required]);
         this.TopElevationForm.get('airportName')?.setValidators([]);
       } else {
@@ -93,6 +93,7 @@ export class UsersNOCASComponent implements OnInit {
     });
     this.TopElevationForm.get('CITY').valueChanges.subscribe((city: string) => {
       this.city = city;
+      
       this.filteredAirports = this.airports.filter(airport => airport.airport_city === city);
       if (this.filteredAirports.length > 1) {
         this.TopElevationForm.addControl('airportName', new FormControl('', Validators.required));
@@ -394,6 +395,7 @@ export class UsersNOCASComponent implements OnInit {
       this.closeModal('airportModal')
     }
   }
+
   onElevationOptionChange() {
     const elevationOptionControl = this.TopElevationForm.get('elevationOption');
     let defaultElevation = null;
@@ -435,6 +437,7 @@ export class UsersNOCASComponent implements OnInit {
       this.showAlert = false;
     }
   }
+
   async createNocas(subscription_id: string = "") {
     if (this.TopElevationForm.valid) {
       try {
@@ -598,7 +601,10 @@ export class UsersNOCASComponent implements OnInit {
   }
 
   showMap(lat: number, lng: number) {
+    // Initialize the map and set the initial view
     this.map = L.map('map').setView([19.794444, 85.751111], 5);
+
+    // Define tile layers for different map views
     const streets = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
       subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
     });
@@ -620,6 +626,8 @@ export class UsersNOCASComponent implements OnInit {
       maxZoom: 20,
       subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
     });
+
+    // Add base map layers
     const baseMaps = {
       'Streets': streets,
       'Satellite': satellite,
@@ -629,84 +637,54 @@ export class UsersNOCASComponent implements OnInit {
       'Terrain': googleTerrain,
       'Dark': DarkMatter
     };
-    const overlayMaps = {};
-    L.control.layers(baseMaps, overlayMaps).addTo(this.map);
-    streets.addTo(this.map);
+
+    L.control.layers(baseMaps).addTo(this.map);
+    streets.addTo(this.map); // Default layer
     L.control.scale().addTo(this.map);
-    if (this.marker) {
-      this.marker.setLatLng([lat, lng]);
-    } else {
-      this.marker = L.marker([lat, lng], { draggable: true }).addTo(this.map);
-    }
+
+    // Add a draggable marker and update the popup content
+    this.marker = L.marker([lat, lng], { draggable: true }).addTo(this.map);
+    this.updateMarkerPopupContent(lat, lng);
+
+    // Handle map click events
     this.map.on('click', (e: any) => {
       const { lat, lng } = e.latlng;
-      this.lat = lat;
-      this.long = lng;
-      this.latitudeDMS = this.convertDDtoDMS(lat, true);
-      this.longitudeDMS = this.convertDDtoDMS(lng, false);
-      const selectionMode = this.TopElevationForm.get('selectionMode')?.value;
-      if (selectionMode === 'manual') {
+      this.handleLocationUpdate(lat, lng);
+    });
+  }
+
+  handleLocationUpdate(lat: number, lng: number) {
+    this.latitudeDMS = this.convertDDtoDMS(lat, true);
+    this.longitudeDMS = this.convertDDtoDMS(lng, false);
+
+    const selectionMode = this.TopElevationForm.get('selectionMode')?.value;
+
+    if (selectionMode === 'manual') {
+      this.TopElevationForm.patchValue({
+        CITY: '',
+        AIRPORT_NAME: ''
+      });
+    } else if (selectionMode === 'default') {
+      const nearestAirport = this.findNearestAirport(lat, lng, 30);
+      if (nearestAirport) {
         this.TopElevationForm.patchValue({
-          CITY: '',
-          AIRPORT_NAME: ''
+          CITY: nearestAirport.airportCity,
+          AIRPORT_NAME: nearestAirport.airportName
         });
-      } else {
-        const nearestAirport = this.findNearestAirport(lat, lng, 30);
-        if (nearestAirport) {
-          this.TopElevationForm.patchValue({
-            CITY: nearestAirport.airportCity,
-            AIRPORT_NAME: nearestAirport.airportName
-          });
-          if (this.marker2) {
-            this.map.removeLayer(this.marker2);
-            this.marker2 = null;
-          }
-          this.loadNearestAirportGeoJSON(nearestAirport.airportCity, nearestAirport.distance, this.map);
-        }
+        this.loadNearestAirportGeoJSON(nearestAirport.airportCity, nearestAirport.distance, this.map);
       }
-      this.TopElevationForm.patchValue({
-        Latitude: this.latitudeDMS,
-        Longitude: this.longitudeDMS
-      });
-      if (this.marker) {
-        this.marker.setLatLng([lat, lng]);
-        const popupContent = `Site Location : <br> Site Latitude: ${this.latitudeDMS}, Site Longitude: ${this.longitudeDMS}`;
-        this.marker.bindPopup(popupContent).openPopup();
-      }
+    }
+
+    this.TopElevationForm.patchValue({
+      Latitude: this.latitudeDMS,
+      Longitude: this.longitudeDMS
     });
-    this.marker.on('dragend', (e: any) => {
-      const position = this.marker.getLatLng();
-      this.lat = position.lat;
-      this.long = position.lng;
-      this.latitudeDMS = this.convertDDtoDMS(position.lat, true);
-      this.longitudeDMS = this.convertDDtoDMS(position.lng, false);
-      const selectionMode = this.TopElevationForm.get('selectionMode')?.value;
-      if (selectionMode === 'manual') {
-        const manualCity = this.TopElevationForm.get('CITY')?.value;
-        const cityLocation = this.getCityLocation(manualCity);
-        if (cityLocation) {
-          const distance = this.calculateDistance(position.lat, position.lng, cityLocation.lat, cityLocation.lng);
-          this.TopElevationForm.patchValue({
-            CITY: manualCity,
-            AIRPORT_NAME: `Nearest city: ${manualCity} (${distance.toFixed(2)} km away)`
-          });
-        }
-      } else {
-        const nearestAirport = this.findNearestAirport(position.lat, position.lng, 30); // 30 km
-        if (nearestAirport) {
-          this.TopElevationForm.patchValue({
-            CITY: nearestAirport.airportCity,
-            AIRPORT_NAME: nearestAirport.airportName
-          });
-        }
-      }
-      this.TopElevationForm.patchValue({
-        Latitude: this.latitudeDMS,
-        Longitude: this.longitudeDMS
-      });
-      const popupContent = `Site Location : <br> Site Latitude: ${this.latitudeDMS}, Site Longitude: ${this.longitudeDMS}`;
+
+    if (this.marker) {
+      this.marker.setLatLng([lat, lng]);
+      const popupContent = `Site Location: <br> Site Latitude: ${this.latitudeDMS}, Site Longitude: ${this.longitudeDMS}`;
       this.marker.bindPopup(popupContent).openPopup();
-    });
+    }
   }
 
   getCityLocation(cityName: string): { lat: number, lng: number } | null {
@@ -714,10 +692,10 @@ export class UsersNOCASComponent implements OnInit {
   }
 
   updateMarkerPopupContent(lat: number, lng: number) {
-    this.latitudeDMS = this.convertDDtoDMS(lat, true);
-    this.longitudeDMS = this.convertDDtoDMS(lng, false);
-    const popupContent = `Site Location : <br> Site Latitude: ${this.latitudeDMS}, Site Longitude: ${this.longitudeDMS}`;
-    this.marker.bindPopup(popupContent).openPopup();
+    // this.latitudeDMS = this.convertDDtoDMS(lat, true);
+    // this.longitudeDMS = this.convertDDtoDMS(lng, false);
+    // const popupContent = `Site Location : <br> Site Latitude: ${this.latitudeDMS}, Site Longitude: ${this.longitudeDMS}`;
+    // this.marker.bindPopup(popupContent).openPopup();
     const nearestAirport = this.findNearestAirport(lat, lng, 30); // 30 km
     if (nearestAirport) {
       if (nearestAirport.distance <= 30) {
@@ -725,7 +703,7 @@ export class UsersNOCASComponent implements OnInit {
           this.map.removeLayer(this.marker2);
           this.marker2 = null;
         }
-        this.loadNearestAirportGeoJSON(nearestAirport.airportCity, nearestAirport.distance, this.map);
+        // this.loadNearestAirportGeoJSON(nearestAirport.airportCity, nearestAirport.distance, this.map);
       } else {
       }
     }
@@ -910,29 +888,29 @@ export class UsersNOCASComponent implements OnInit {
             Latitude: ${this.airportCoordinates[0].toFixed(2)}
             Longitude: ${this.airportCoordinates[1].toFixed(2)}`;
           this.marker2.bindPopup(popupContent).openPopup();
-          
+
           if (this.marker) {
             map.removeLayer(this.marker);
             this.marker = null;
           }
           this.marker = L.marker([this.lat, this.long]).addTo(map);
           map.on('click', (e: any) => {
-            
+
             const { lat, lng } = e.latlng;
-            this.TopElevationForm.patchValue({
-              Latitude: lat,
-              Longitude: lng
-            });
+
             if (this.marker) {
               this.marker.setLatLng([lat, lng]);
               const popupContent = `Site Location : <br> Site Latitude: ${this.latitudeDMS}, Site Longitude: ${this.longitudeDMS}`;
               this.marker.bindPopup(popupContent).openPopup();
             }
+            const selectionMode = this.TopElevationForm.get('selectionMode')?.value;
+            if (selectionMode === 'default') {
 
-            const nearestAirport = this.findNearestAirport(lat, lng, 30); // 30 km
-            if (nearestAirport) {
-              if (nearestAirport.distance <= 30) {
-                this.loadNearestAirportGeoJSON(nearestAirport.airportCity, nearestAirport.distance, map);
+              const nearestAirport = this.findNearestAirport(lat, lng, 30); // 30 km
+              if (nearestAirport) {
+                if (nearestAirport.distance <= 30) {
+                  this.loadNearestAirportGeoJSON(nearestAirport.airportCity, nearestAirport.distance, map);
+                }
               } else {
               }
             }
@@ -982,6 +960,29 @@ export class UsersNOCASComponent implements OnInit {
             AIRPORT_NAME: features[0].properties.AirportName
           });
         }
+        map.on('click', (e: any) => {
+          const { lat, lng } = e.latlng;
+          if (this.marker) {
+            this.marker.setLatLng([lat, lng]);
+            const popupContent = `Site Location : <br> Site Latitude: ${this.latitudeDMS}, Site Longitude: ${this.longitudeDMS}`;
+            this.marker.bindPopup(popupContent).openPopup();
+          }
+          const selectionMode = this.TopElevationForm.get('selectionMode')?.value;
+          if (selectionMode === 'default') {
+
+
+            const nearestAirport = this.findNearestAirport(lat, lng, 30);
+            if (nearestAirport && nearestAirport.distance < 30) {
+              // If a nearest airport is found within 30 km, reload the GeoJSON
+              this.loadNearestAirportGeoJSON(nearestAirport.airportCity, nearestAirport.distance, map);
+            }
+          }
+          else {
+            // No nearest airport within 30 km, clear the map and form
+            this.clearMapAndForm();
+          }
+        });
+
         this.marker2.setLatLng([features[0].geometry.coordinates[1], features[0].geometry.coordinates[0]]);
         const popupContent = `ARP:
         <p>${airportCity} Airport</p><br>
@@ -996,7 +997,23 @@ export class UsersNOCASComponent implements OnInit {
         this.isFetchingGeoJSON = false;
       });
   }
+  clearMapAndForm = () => {
+    if (this.nearestAirportGeoJSONLayer) {
+      this.map.removeLayer(this.nearestAirportGeoJSONLayer);
+      this.nearestAirportGeoJSONLayer = null;
+    }
+    if (this.marker2) {
+      this.map.removeLayer(this.marker2);
+      this.marker2 = null;
+    }
+    // Remove all GeoJSON layers
+    this.map.eachLayer((layer: any) => {
+      if (layer instanceof L.GeoJSON) {
+        this.map.removeLayer(layer);
+      }
+    });
 
+  };
   calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
     const R = 6371;
     const dLat = this.degreesToRadians(lat2 - lat1);
@@ -1037,7 +1054,7 @@ export class UsersNOCASComponent implements OnInit {
   updateMarkersPosition(lat: number, lng: number): void {
     this.lat = lat;
     this.long = lng;
-    // this.updateMarkerPosition();
+    this.updateMarkerPosition();
     this.updateNearestAirportData();
   }
 
@@ -1051,15 +1068,24 @@ export class UsersNOCASComponent implements OnInit {
     }
   }
   updateNearestAirportData() {
-    const nearestAirport = this.findNearestAirport(this.lat, this.long, 30); // 30 km
-    if (nearestAirport) {
-      this.loadNearestAirportGeoJSON(nearestAirport.airportCity, nearestAirport.distance, this.map);
-      this.TopElevationForm.patchValue({
-        CITY: nearestAirport.airportCity,
-        AIRPORT_NAME: nearestAirport.airportName
-      });
-    }
+    const selectionMode = this.TopElevationForm.get('selectionMode')?.value;
+  
+    if (selectionMode === 'default') {
+      const nearestAirport = this.findNearestAirport(this.lat, this.long, 30);
+  
+      if (nearestAirport) {
+        this.TopElevationForm.patchValue({
+          CITY: nearestAirport.airportCity,
+          airportName: nearestAirport.airportName // Correct form control name
+        });
+  
+        this.city = nearestAirport.airportCity; // Update selectedCity to trigger GeoJSON load
+        this.loadGeoJSON(this.city); // Load GeoJSON for the nearest airport city
+      } else {
+        this.clearMapAndForm(); // Clear the form and map if no nearest airport is found
+      }
+    
+  }
+  
   }
 }
-
-

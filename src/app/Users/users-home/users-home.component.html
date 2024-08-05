@@ -114,6 +114,7 @@
       </mat-table>
       <mat-paginator #permissiblePaginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
     </div>
+ 
     <mat-form-field *ngIf="showSubscriptionDetails">
       <mat-label>Filter Subscriptions</mat-label>
       <input matInput (keyup)="applySubscriptionFilter($event)" placeholder="Ex. type" #subscriptionInput>
@@ -156,39 +157,40 @@
           *matRowDef="let row; columns: ['subscription_id', 'subscription_status','createdAt','expiry_date','price', 'subscription_type'];"></mat-row>
       </mat-table>
     </div>
+ 
+ 
     <mat-form-field *ngIf="showServiceDetails">
       <mat-label>Filter Service Details</mat-label>
       <input matInput (keyup)="applyServiceFilter($event)" placeholder="Ex. Name" #serviceInput>
     </mat-form-field>
-    <div *ngIf="showServiceDetails">
-      <div class="table-responsive">
-        <table *ngIf="serviceDetails && serviceDetails.length > 0" class="table table-striped">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Service Name</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let request of serviceDetails">
-              <td>{{ this.apiservice.userData.uname }}</td>
-              <td>
-                <ul>
-                  <li *ngFor="let serviceKey of getServiceKeys(request.services)">
-                    {{ serviceNames[serviceKey] }}
-                  </li>
-                </ul>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <div *ngIf="serviceDetails && serviceDetails.length === 0" class="alert alert-warning" role="alert">No services
-          found.</div>
+ 
+    <div *ngIf="showServiceDetails" class="mat-elevation-z8">
+      <mat-table [dataSource]="serviceDetails" multiTemplateDataRows>
+ 
+        <ng-container matColumnDef="name">
+          <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
+          <mat-cell *matCellDef="let element"> {{apiservice.userData.uname}} </mat-cell>
+        </ng-container>
+ 
+        <ng-container matColumnDef="services">
+          <mat-header-cell *matHeaderCellDef> Service Name </mat-header-cell>
+          <mat-cell *matCellDef="let element">
+            <ul>
+              <li *ngFor="let serviceKey of getServiceKeys(element.services)">
+                {{ serviceNames[serviceKey] }}
+              </li>
+            </ul>
+          </mat-cell>
+        </ng-container>
+ 
+        <mat-header-row *matHeaderRowDef="['name', 'services']"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: ['name', 'services']"></mat-row>
+      </mat-table>
+ 
+      <div *ngIf="serviceDetails && serviceDetails.length === 0" class="alert alert-warning" role="alert">
+        No services found.
       </div>
     </div>
+ 
   </div>
 </section>
- 
- 
- 
- 

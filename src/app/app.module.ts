@@ -38,6 +38,8 @@ import { UsersRegisterComponent } from './Users/users-register/users-register.co
 import { TransactionDetailsComponent } from './Users/transaction-details/transaction-details.component';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginator,MatPaginatorModule } from '@angular/material/paginator';
+import {MatSortModule} from '@angular/material/sort';
+import { ToastrModule } from 'ngx-toastr';
 
 @NgModule({ declarations: [
         AppComponent,
@@ -82,7 +84,11 @@ import { MatPaginator,MatPaginatorModule } from '@angular/material/paginator';
         MatGridListModule,
         MatTableModule,
         MatPaginator,
-        MatPaginatorModule],
+        MatPaginatorModule,
+        MatSortModule,
+        MatTableModule,
+        ToastrModule.forRoot()
+    ],
          providers: [
         provideAnimationsAsync(),
         provideHttpClient(withInterceptorsFromDi()),

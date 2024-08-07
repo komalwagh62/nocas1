@@ -1,21 +1,22 @@
 /* You can add global styles to this file, and also import other style files */
 @import '@angular/material/prebuilt-themes/indigo-pink.css';
-
+ 
 html,
 body {
     margin: 0;
     padding: 0;
-    height: 100vh;
+    height: 100%;
     font-family: Roboto, "Helvetica Neue", sans-serif;
 }
-
+ 
+ 
 /* You can add global styles to this file, and also import other style files */
-
+ 
 .modal-backdrop {
     /* bug fix - no overlay */    
     display: none;    
   }
-
+ 
 .loader {
     text-align: center;
     width: 100%;
@@ -25,11 +26,11 @@ body {
     height: 30rem;
     margin: 0 auto;
 }
-
+ 
 .wait {
     margin: 5rem 0;
 }
-
+ 
 .iata_code {
     font-size: 6rem;
     opacity: 0.3;
@@ -37,54 +38,54 @@ body {
     position: absolute;
     color: #0099cc;
 }
-
+ 
 .departure_city {
     left: 0;
 }
-
+ 
 .arrival_city {
     right: 1.5rem;
 }
-
+ 
 .plane {
     position: absolute;
     margin: 0 auto;
     width: 100%;
 }
-
+ 
 .plane-img {
     -webkit-animation: spin 2.5s linear infinite;
     -moz-animation: spin 2.5s linear infinite;
     animation: spin 2.5s linear infinite;
 }
-
+ 
 @-moz-keyframes spin {
     100% {
         -moz-transform: rotate(360deg);
     }
 }
-
+ 
 @-webkit-keyframes spin {
     100% {
         -webkit-transform: rotate(360deg);
     }
 }
-
+ 
 @keyframes spin {
     100% {
         -webkit-transform: rotate(360deg);
         transform: rotate(360deg);
     }
 }
-
-
+ 
+ 
 .earth-wrapper {
     position: absolute;
     margin: 0 auto;
     width: 100%;
     padding-top: 2.7rem;
 }
-
+ 
 .earth {
     width: 160px;
     height: 160px;
@@ -95,17 +96,17 @@ body {
     margin: 0 auto;
     border: 1px solid #CDD1D3;
 }
-
+ 
 @keyframes earthAnim {
     0% {
         background-position-x: 0;
     }
-
+ 
     100% {
         background-position-x: -340px;
     }
 }
-
+ 
 @media screen and (max-width: 420px) {
     .departure_city {
         left: 0;
@@ -114,7 +115,7 @@ body {
         position: absolute;
         margin: 0 auto;
     }
-
+ 
     .arrival_city {
         left: 0;
         right: 0;
@@ -122,8 +123,7 @@ body {
         position: absolute;
         margin: 0 auto;
     }
-
-
+ 
+ 
 }
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+ 

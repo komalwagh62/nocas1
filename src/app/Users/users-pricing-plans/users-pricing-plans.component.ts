@@ -29,7 +29,7 @@ export class UsersPricingPlansComponent implements OnInit {
       return;
     }
     const RazorpayOptions = {
-      key: 'rzp_test_IScA4BP8ntHVNp',
+      key: 'rzp_live_7iwvKtQ79rijv2',
       amount: planAmount * 100,
       currency: 'INR',
       name: 'Cognitive Navigation Pvt. Ltd',
@@ -46,17 +46,13 @@ export class UsersPricingPlansComponent implements OnInit {
           razorpay_payment_id: response.razorpay_payment_id,
           amount: planAmount * 100,
           description: `${planName} Plan Subscription`,
-          name: this.apiService.userData.uname,
-          email: this.apiService.userData.email,
-          contact: this.apiService.userData.phone_number
+          // name: this.apiService.userData.uname,
+          // email: this.apiService.userData.email,
+          // contact: this.apiService.userData.phone_number
         });
         this.router.navigate(['TransactionDetails'], { state: { receiptDetails: this.receiptDetails } });
       },
-      prefill: {
-        name: this.apiService.userData.uname,
-        email: this.apiService.userData.email,
-        contact: this.apiService.userData.phone_number
-      },
+      
       theme: {
         color: '#528FF0'
       },

@@ -286,6 +286,7 @@ export class UsersNOCASComponent implements OnInit {
             const color = feature.properties.Color;
             return { fillColor: color, weight: 2 };
           };
+          this.isDefaultElevationSelected
           const geojsonLayer = L.geoJSON(features, { style: style });
           geojsonLayer.addTo(map);
           this.geojsonLayer = geojsonLayer;
@@ -309,25 +310,7 @@ export class UsersNOCASComponent implements OnInit {
             this.marker = null;
           }
           this.marker = L.marker([this.lat, this.long]).addTo(map);
-          map.on('click', (e: any) => {
-
-            const { lat, lng } = e.latlng;
-
-            if (this.marker) {
-              this.marker.setLatLng([lat, lng]);
-              const popupContent = `Site Location : <br> Site Latitude: ${this.latitudeDMS}, Site Longitude: ${this.longitudeDMS}`;
-              this.marker.bindPopup(popupContent).openPopup();
-            }
-
-            const nearestAirport = this.findNearestAirport(lat, lng, 30);
-            if (nearestAirport) {
-              if (nearestAirport.distance <= 30) {
-                this.loadNearestAirportGeoJSON(nearestAirport.airportCity, nearestAirport.distance, map);
-              } else {
-              }
-            }
-          });
-        })
+                  })
         .catch(error => {
           // console.error("Error fetching GeoJSON data:", error);
         });
@@ -418,7 +401,7 @@ export class UsersNOCASComponent implements OnInit {
       return;
     }
     const selectedAirportCITY = this.TopElevationForm.get('CITY')?.value;
-    const nearestAirport = this.findNearestAirport(this.lat, this.long, 30); // 30 km
+    const nearestAirport = this.findNearestAirport(this.lat, this.long, 30);
     if (nearestAirport) {
       if (nearestAirport.airportCity !== selectedAirportCITY) {
         const updateConfirmation = confirm(
@@ -428,8 +411,9 @@ export class UsersNOCASComponent implements OnInit {
         if (updateConfirmation) {
           this.TopElevationForm.patchValue({
             CITY: nearestAirport.airportCity,
-            Site_Elevation: this.isDefaultElevationSelected ? nearestAirport.elevation : this.TopElevationForm.get('Site_Elevation')?.value
+            elevation: this.isDefaultElevationSelected ? nearestAirport.elevation : this.TopElevationForm.get('Site_Elevation')?.value
           });
+
           this.selectedAirportName = nearestAirport.airportName;
           this.loadNearestAirportGeoJSON(nearestAirport.airportCity, nearestAirport.distance, this.map);
         }
@@ -736,143 +720,147 @@ export class UsersNOCASComponent implements OnInit {
 
   getElevationForCity(city: string): number {
     const cityElevationMap: { [key: string]: number } = {
-      'Dessa': 0,          // Example elevation, please verify
-      'Dilburgarh': 360,      // Example elevation, please verify
-      'Diu': 0,             // Example elevation, please verify
-      'Hubli': 2195,          // Example elevation, please verify
-      'Jewer': 0,          // Example elevation, please verify
-      'Jogbani': 0,         // Example elevation, please verify
-      'Kandla': 97,           // Example elevation, please verify
-      'Puri': 22,
-      'Coimbatore': 10,
-      'Mumbai': 40,
-      'Ahmedabad': 189,
-      'Akola': 308,
-      'Chennai': 54,
-      'Delhi': 778,
-      'Guwahati': 163,
-      'Hyderabad': 542,
-      'Jaipur': 1268,
-      'Nagpur': 1033,
-      'Thiruvananthapuram': 17,
-      'Vadodara': 131,
-      'Varanasi': 270,
-      'Agatti': 12,
+      'Dessa': 0, // Example elevation, please verify
+      'Dilburgarh': this.feetToMeters(360), // Example elevation, please verify
+      'Diu': 0, // Example elevation, please verify
+      'Hubli': this.feetToMeters(2195), // Example elevation, please verify
+      'Jewer': 0, // Example elevation, please verify
+      'Jogbani': 0, // Example elevation, please verify
+      'Kandla': this.feetToMeters(97), // Example elevation, please verify
+      'Puri': this.feetToMeters(22),
+      'Coimbatore': this.feetToMeters(10),
+      'Mumbai': this.feetToMeters(40),
+      'Ahmedabad': this.feetToMeters(189),
+      'Akola': this.feetToMeters(308),
+      'Chennai': this.feetToMeters(54),
+      'Delhi': this.feetToMeters(778),
+      'Guwahati': this.feetToMeters(163),
+      'Hyderabad': this.feetToMeters(542),
+      'Jaipur': this.feetToMeters(1268),
+      'Nagpur': this.feetToMeters(1033),
+      'Thiruvananthapuram': this.feetToMeters(17),
+      'Vadodara': this.feetToMeters(131),
+      'Varanasi': this.feetToMeters(270),
+      'Agatti': this.feetToMeters(12),
       'Ambikapur': 0, // Elevation data not available, set to 0
-      'Aurangabad': 1917,
+      'Aurangabad': this.feetToMeters(1917),
       'Balurghat': 0, // Elevation data not available, set to 0
       'Belgaum': 0, // Elevation data not available, set to 0
       'Aligarh': 0, // Elevation data not available, set to 0
-      'Amritsar': 760,
+      'Amritsar': this.feetToMeters(760),
       'Azamgarh': 0, // Elevation data not available, set to 0
       'Baramati': 0, // Elevation data not available, set to 0
       'Berhampur': 0, // Elevation data not available, set to 0
-      'Bial': 2912, // Kempegowda International Airport
-      'Cochin': 30,
+      'Bial': this.feetToMeters(2912), // Kempegowda International Airport
+      'Cochin': this.feetToMeters(30),
       'Bokaro': 0, // Elevation data not available, set to 0
       'Birlamgram': 0, // Elevation data not available, set to 0
-      'Bhopal': 1721,
-      'Bhavnagar': 43,
-      'Daman': 42,
-      'Gondia': 994,
-      'Rajkot INTL': 650,
-      'Indore': 1854,
-      'Jabalpur': 1626,
-      'Juhu': 17,
-      'Jalgaon': 842,
-      'Kondla': 97,
-      'Kolhapur': 2001,
-      'Keshod': 168,
-      'Mundra': 17,
-      'Ozar': 1995,
-      'Pune': 1943,
-      'Porbandar': 26,
-      'Shirdi': 1938,
-      'Surat': 25,
-      'Udaipur': 1690,
-      'Agartala': 56,
-      'Ayodhya': 329,
-      'Barapani': 2926,
-      'Bagdogra': 414,
-      'Bhubaneswar': 141,
-      'Bilaspur': 907,
-      'Kolkata': 20,
-      'Cooch-Behar': 141,
-      'Durgapur': 302,
-      'Gorakhpur': 260,
-      'Deoghar': 802,
-      'Gaya': 383,
-      'Hollongi': 351,
-      'Imphal': 2544,
-      'Jagdalpur': 1842,
-      'Jamshedpur': 481,
-      'Jharsuguda': 757,
-      'Jorhat': 299,
-      'Kushinagar': 263,
-      'Khajuraho': 731,
-      'Lengpui': 1406,
-      'Lilabari': 331,
-      'Dibrugarh': 360,
-      'Dimapur': 493,
-      'Patna': 175,
-      'Pakyong': 4646,
-      'Ranchi': 2150,
-      'Rourkela': 673,
-      'Raipur': 1044,
-      'Rupsi': 139,
-      'Tezu': 770,
-      'Agra': 550,
-      'Kullu Manali': 3571,
-      'Bareilly': 571,
-      'Chandigarh': 1032,
-      'Safdarjung': 696,
-      'Dehradun': 1857,
-      'Hindan': 703,
-      'Kangra': 2527,
-      'Hisar': 701,
-      'Jodhpur': 712,
-      'Jammu': 956,
-      'Kishangarh': 1478,
-      'Ludhiana': 834,
-      'Leh': 10839,
-      'Lucknow': 406,
-      'Pithoragarh': 4967,
-      'Pantnagar': 772,
-      'Shimla': 5073,
-      'Uttarlai': 505,
-      'Bengaluru (HAL)': 2912,
-      'Bengaluru (KIA)': 3002,
-      'Belagavi': 2489,
-      'Bidar': 2179,
-      'Vijaywada': 83,
-      'Calicut': 343,
-      'Kadapa': 444,
-      'Mopa': 564,
-      'Kalaburagi': 1567,
-      'Goa': 188,
-      'Hubballi': 2195,
-      'Shamshabad (RGI)': 2030,
-      'Begumpet': 1744,
-      'Jindal Vijayanagar': 1686,
-      'Kannur': 344,
-      'Kurnool': 1129,
-      'Madurai': 466,
-      'Mangaluru': 318,
-      'Mysuru': 2397,
-      'Portblair': 93,
-      'Puducherry': 141,
-      'Puttaparthi': 1569,
-      'Rajahmundry': 156,
-      'Salem': 1008,
-      'Shivamogga': 2069,
-      'Sindhudurg': 226,
-      'Tuticorin': 85,
-      'Tirupati': 352,
-      'Tiruchirappalli': 292,
-      'Visakhapatnam': 21
+      'Bhopal': this.feetToMeters(1721),
+      'Bhavnagar': this.feetToMeters(43),
+      'Daman': this.feetToMeters(42),
+      'Gondia': this.feetToMeters(994),
+      'Rajkot INTL': this.feetToMeters(650),
+      'Indore': this.feetToMeters(1854),
+      'Jabalpur': this.feetToMeters(1626),
+      'Juhu': this.feetToMeters(17),
+      'Jalgaon': this.feetToMeters(842),
+      'Kondla': this.feetToMeters(97),
+      'Kolhapur': this.feetToMeters(2001),
+      'Keshod': this.feetToMeters(168),
+      'Mundra': this.feetToMeters(17),
+      'Ozar': this.feetToMeters(1995),
+      'Pune': this.feetToMeters(1943),
+      'Porbandar': this.feetToMeters(26),
+      'Shirdi': this.feetToMeters(1938),
+      'Surat': this.feetToMeters(25),
+      'Udaipur': this.feetToMeters(1690),
+      'Agartala': this.feetToMeters(56),
+      'Ayodhya': this.feetToMeters(329),
+      'Barapani': this.feetToMeters(2926),
+      'Bagdogra': this.feetToMeters(414),
+      'Bhubaneswar': this.feetToMeters(141),
+      'Bilaspur': this.feetToMeters(907),
+      'Kolkata': this.feetToMeters(20),
+      'Cooch-Behar': this.feetToMeters(141),
+      'Durgapur': this.feetToMeters(302),
+      'Gorakhpur': this.feetToMeters(260),
+      'Deoghar': this.feetToMeters(802),
+      'Gaya': this.feetToMeters(383),
+      'Hollongi': this.feetToMeters(351),
+      'Imphal': this.feetToMeters(2544),
+      'Jagdalpur': this.feetToMeters(1842),
+      'Jamshedpur': this.feetToMeters(481),
+      'Jharsuguda': this.feetToMeters(757),
+      'Jorhat': this.feetToMeters(299),
+      'Kushinagar': this.feetToMeters(263),
+      'Khajuraho': this.feetToMeters(731),
+      'Lengpui': this.feetToMeters(1406),
+      'Lilabari': this.feetToMeters(331),
+      'Dibrugarh': this.feetToMeters(360),
+      'Dimapur': this.feetToMeters(493),
+      'Patna': this.feetToMeters(175),
+      'Pakyong': this.feetToMeters(4646),
+      'Ranchi': this.feetToMeters(2150),
+      'Rourkela': this.feetToMeters(673),
+      'Raipur': this.feetToMeters(1044),
+      'Rupsi': this.feetToMeters(139),
+      'Tezu': this.feetToMeters(770),
+      'Agra': this.feetToMeters(550),
+      'Kullu Manali': this.feetToMeters(3571),
+      'Bareilly': this.feetToMeters(571),
+      'Chandigarh': this.feetToMeters(1032),
+      'Safdarjung': this.feetToMeters(696),
+      'Dehradun': this.feetToMeters(1857),
+      'Hindan': this.feetToMeters(703),
+      'Kangra': this.feetToMeters(2527),
+      'Hisar': this.feetToMeters(701),
+      'Jodhpur': this.feetToMeters(712),
+      'Jammu': this.feetToMeters(956),
+      'Kishangarh': this.feetToMeters(1478),
+      'Ludhiana': this.feetToMeters(834),
+      'Leh': this.feetToMeters(10839),
+      'Lucknow': this.feetToMeters(406),
+      'Pithoragarh': this.feetToMeters(4967),
+      'Pantnagar': this.feetToMeters(772),
+      'Shimla': this.feetToMeters(5073),
+      'Uttarlai': this.feetToMeters(505),
+      'Bengaluru (HAL)': this.feetToMeters(2912),
+      'Bengaluru (KIA)': this.feetToMeters(3002),
+      'Belagavi': this.feetToMeters(2489),
+      'Bidar': this.feetToMeters(2179),
+      'Vijaywada': this.feetToMeters(83),
+      'Calicut': this.feetToMeters(343),
+      'Kadapa': this.feetToMeters(444),
+      'Mopa': this.feetToMeters(564),
+      'Kalaburagi': this.feetToMeters(1567),
+      'Goa': this.feetToMeters(188),
+      'Hubballi': this.feetToMeters(2195),
+      'Shamshabad (RGI)': this.feetToMeters(2030),
+      'Begumpet': this.feetToMeters(1744),
+      'Jindal Vijayanagar': this.feetToMeters(1686),
+      'Kannur': this.feetToMeters(344),
+      'Kurnool': this.feetToMeters(1129),
+      'Madurai': this.feetToMeters(466),
+      'Mangaluru': this.feetToMeters(318),
+      'Mysuru': this.feetToMeters(2397),
+      'Portblair': this.feetToMeters(93),
+      'Puducherry': this.feetToMeters(141),
+      'Puttaparthi': this.feetToMeters(1569),
+      'Rajahmundry': this.feetToMeters(156),
+      'Salem': this.feetToMeters(1008),
+      'Shivamogga': this.feetToMeters(2069),
+      'Sindhudurg': this.feetToMeters(226),
+      'Tuticorin': this.feetToMeters(85),
+      'Tirupati': this.feetToMeters(352),
+      'Tiruchirappalli': this.feetToMeters(292),
+      'Visakhapatnam': this.feetToMeters(21)
     };
 
     return cityElevationMap[city] || 0;
+  }
+
+  feetToMeters(feet: number): number {
+    return feet * 0.3048;
   }
 
 
@@ -902,354 +890,263 @@ export class UsersNOCASComponent implements OnInit {
   onElevationOptionChange() {
     const elevationOptionControl = this.TopElevationForm.get('elevationOption');
     let defaultElevation = null;
+
     if (elevationOptionControl && elevationOptionControl.value === 'unknown') {
       this.showAlert = true;
       if (this.city === 'Coimbatore') {
-        defaultElevation = 10;
+        defaultElevation = this.feetToMeters(10);
       } else if (this.city === 'Mumbai') {
-        defaultElevation = 40;
+        defaultElevation = this.feetToMeters(40);
       } else if (this.city === 'Puri') {
-        defaultElevation = 22;
+        defaultElevation = this.feetToMeters(22);
       } else if (this.city === 'Ahmedabad') {
-        defaultElevation = 189;
+        defaultElevation = this.feetToMeters(189);
       } else if (this.city === 'Akola') {
-        defaultElevation = 308;
+        defaultElevation = this.feetToMeters(308);
       } else if (this.city === 'Chennai') {
-        defaultElevation = 54;
+        defaultElevation = this.feetToMeters(54);
       } else if (this.city === 'Delhi') {
-        defaultElevation = 778;
+        defaultElevation = this.feetToMeters(778);
       } else if (this.city === 'Guwahati') {
-        defaultElevation = 163;
+        defaultElevation = this.feetToMeters(163);
       } else if (this.city === 'Hyderabad') {
-        defaultElevation = 542;
+        defaultElevation = this.feetToMeters(542);
       } else if (this.city === 'Jaipur') {
-        defaultElevation = 1268;
+        defaultElevation = this.feetToMeters(1268);
       } else if (this.city === 'Nagpur') {
-        defaultElevation = 1033;
+        defaultElevation = this.feetToMeters(1033);
       } else if (this.city === 'Thiruvananthapuram') {
-        defaultElevation = 17;
+        defaultElevation = this.feetToMeters(17);
       } else if (this.city === 'Vadodara') {
-        defaultElevation = 131;
+        defaultElevation = this.feetToMeters(131);
       } else if (this.city === 'Varanasi') {
-        defaultElevation = 270;
-      }
-      else if (this.city === 'Aurangabad') {
-        defaultElevation = 1917;
-      }
-      else if (this.city === 'Bhopal') {
-        defaultElevation = 1721;
-      }
-      else if (this.city === 'Bhavnagar') {
-        defaultElevation = 43;
-      }
-      else if (this.city === 'Daman') {
-        defaultElevation = 42;
-      }
-      else if (this.city === 'Gondia') {
-        defaultElevation = 994;
-      }
-      else if (this.city === 'Rajkot INTL') {
-        defaultElevation = 650;
-      }
-      else if (this.city === 'Indore') {
-        defaultElevation = 1854;
-      }
-      else if (this.city === 'Jabalpur') {
-        defaultElevation = 1626;
-      }
-      else if (this.city === 'Juhu') {
-        defaultElevation = 17;
-      }
-      else if (this.city === 'Jalgaon') {
-        defaultElevation = 842;
-      }
-      else if (this.city === 'Kondla') {
-        defaultElevation = 97;
-      }
-      else if (this.city === 'Kolhapur') {
-        defaultElevation = 2001;
-      }
-      else if (this.city === 'Keshod') {
-        defaultElevation = 168;
-      }
-      else if (this.city === 'Mundra') {
-        defaultElevation = 17;
-      }
-      else if (this.city === 'Ozar') {
-        defaultElevation = 1995;
-      }
-      else if (this.city === 'Pune') {
-        defaultElevation = 1943;
-      }
-      else if (this.city === 'Porbandar') {
-        defaultElevation = 26;
-      }
-      else if (this.city === 'Shirdi') {
-        defaultElevation = 1938;
-      }
-      else if (this.city === 'Surat') {
-        defaultElevation = 25;
-      }
-      else if (this.city === 'Udaipur') {
-        defaultElevation = 1690;
-      }
-      else if (this.city === 'Agartala') {
-        defaultElevation = 56;
-      }
-      else if (this.city === 'Ayodhya') {
-        defaultElevation = 329;
-      }
-      else if (this.city === 'Barapani') {
-        defaultElevation = 2926;
-      }
-      else if (this.city === 'Bagdogra') {
-        defaultElevation = 414;
-      }
-      else if (this.city === 'Bhubaneswar') {
-        defaultElevation = 141;
-      }
-      else if (this.city === 'Bilaspur') {
-        defaultElevation = 907;
-      }
-      else if (this.city === 'Kolkata') {
-        defaultElevation = 20;
-      }
-      else if (this.city === 'Cooch-Behar') {
-        defaultElevation = 141;
-      }
-      else if (this.city === 'Durgapur') {
-        defaultElevation = 302;
-      }
-      else if (this.city === 'Gorakhpur') {
-        defaultElevation = 260;
-      }
-      else if (this.city === 'Deoghar') {
-        defaultElevation = 802;
-      }
-
-      else if (this.city === 'Gaya') {
-        defaultElevation = 383;
-      }
-      else if (this.city === 'Hollongi') {
-        defaultElevation = 351;
-      }
-      else if (this.city === 'Imphal') {
-        defaultElevation = 2544;
-      }
-      else if (this.city === 'Jagdalpur') {
-        defaultElevation = 1842;
-      }
-      else if (this.city === 'Jamshedpur') {
-        defaultElevation = 481;
-      }
-      else if (this.city === 'Jharsuguda') {
-        defaultElevation = 757;
-      }
-      else if (this.city === 'Jorhat') {
-        defaultElevation = 299;
-      }
-      else if (this.city === 'Kushinagar') {
-        defaultElevation = 263;
-      }
-      else if (this.city === 'Khajuraho') {
-        defaultElevation = 731;
-      }
-      else if (this.city === 'Lengpui') {
-        defaultElevation = 1406;
-      }
-      else if (this.city === 'Lilabari') {
-        defaultElevation = 331;
-      }
-      else if (this.city === 'Dibrugarh') {
-        defaultElevation = 360;
-      }
-      else if (this.city === 'Dimapur') {
-        defaultElevation = 493;
-      }
-      else if (this.city === 'Patna') {
-        defaultElevation = 175;
-      }
-      else if (this.city === 'Pakyong') {
-        defaultElevation = 4646;
-      }
-      else if (this.city === 'Ranchi') {
-        defaultElevation = 2150;
-      }
-      else if (this.city === 'Rourkela') {
-        defaultElevation = 673;
-      }
-      else if (this.city === 'Raipur') {
-        defaultElevation = 1044;
-      }
-      else if (this.city === 'Rupsi') {
-        defaultElevation = 139;
-      }
-      else if (this.city === 'Tezu') {
-        defaultElevation = 770;
-      }
-      else if (this.city === 'Agra') {
-        defaultElevation = 550;
-      }
-      else if (this.city === 'Amritsar') {
-        defaultElevation = 760;
-      }
-      else if (this.city === 'Kullu Manali') {
-        defaultElevation = 3571;
-      }
-      else if (this.city === 'Bareilly') {
-        defaultElevation = 571;
-      }
-      else if (this.city === 'Chandigarh') {
-        defaultElevation = 1032;
-      }
-      else if (this.city === 'Safdarjung') {
-        defaultElevation = 696;
-      }
-      else if (this.city === 'Dehradun') {
-        defaultElevation = 1857;
-      }
-      else if (this.city === 'Hindan') {
-        defaultElevation = 703;
-      }
-      else if (this.city === 'Kangra') {
-        defaultElevation = 2527;
-      }
-      else if (this.city === 'Hisar') {
-        defaultElevation = 701;
-      }
-      else if (this.city === 'Jodhpur') {
-        defaultElevation = 712;
-      }
-      else if (this.city === 'Jammu') {
-        defaultElevation = 956;
-      }
-      else if (this.city === 'Kishangarh') {
-        defaultElevation = 1478;
-      }
-      else if (this.city === 'Ludhiana') {
-        defaultElevation = 834;
-      }
-      else if (this.city === 'Leh') {
-        defaultElevation = 10839;
-      }
-      else if (this.city === 'Lucknow') {
-        defaultElevation = 406;
-      }
-      else if (this.city === 'Pithoragarh') {
-        defaultElevation = 4967;
-      }
-      else if (this.city === 'Pantnagar') {
-        defaultElevation = 772;
-      }
-      else if (this.city === 'Shimla') {
-        defaultElevation = 5073;
-      }
-      else if (this.city === 'Uttarlai') {
-        defaultElevation = 505;
-      }
-      else if (this.city === 'Agatti') {
-        defaultElevation = 12;
-      }
-      else if (this.city === 'Bengaluru (HAL)') {
-        defaultElevation = 2912;
-      }
-      else if (this.city === 'Bengaluru (KIA)') {
-        defaultElevation = 3002;
-      }
-      else if (this.city === 'Belagavi') {
-        defaultElevation = 2489;
-      }
-      else if (this.city === 'Bidar') {
-        defaultElevation = 2179;
-      }
-      else if (this.city === 'Vijaywada') {
-        defaultElevation = 83;
-      }
-      else if (this.city === 'Cochin') {
-        defaultElevation = 30;
-      }
-      else if (this.city === 'Calicut') {
-        defaultElevation = 343;
-      }
-      else if (this.city === 'Kadapa') {
-        defaultElevation = 444;
-      }
-      else if (this.city === 'Mopa') {
-        defaultElevation = 564;
-      }
-      else if (this.city === 'Kalaburagi') {
-        defaultElevation = 1567;
-      }
-      else if (this.city === 'Goa') {
-        defaultElevation = 188;
-      }
-      else if (this.city === 'Hubballi') {
-        defaultElevation = 2195;
-      }
-      else if (this.city === 'Shamshabad (RGI)') {
-        defaultElevation = 2030;
-      }
-      else if (this.city === 'Begumpet') {
-        defaultElevation = 1744;
-      }
-      else if (this.city === 'Jindal Vijayanagar') {
-        defaultElevation = 1686;
-      }
-      else if (this.city === 'Kannur') {
-        defaultElevation = 344;
-      }
-      else if (this.city === 'Kurnool') {
-        defaultElevation = 1129;
-      }
-      else if (this.city === 'Madurai') {
-        defaultElevation = 466;
-      }
-      else if (this.city === 'Mangaluru') {
-        defaultElevation = 318;
-      }
-      else if (this.city === 'Mysuru') {
-        defaultElevation = 2397;
-      }
-      else if (this.city === 'Portblair') {
-        defaultElevation = 93;
-      }
-      else if (this.city === 'Puducherry') {
-        defaultElevation = 141;
-      }
-      else if (this.city === 'Puttaparthi') {
-        defaultElevation = 1569;
-      }
-      else if (this.city === 'Rajahmundry') {
-        defaultElevation = 156;
-      }
-      else if (this.city === 'Salem') {
-        defaultElevation = 1008;
-      }
-      else if (this.city === 'Shivamogga') {
-        defaultElevation = 2069;
-      }
-      else if (this.city === 'Sindhudurg') {
-        defaultElevation = 226;
-      }
-      else if (this.city === 'Tuticorin') {
-        defaultElevation = 85;
-      }
-      else if (this.city === 'Tirupati') {
-        defaultElevation = 352;
-      }
-      else if (this.city === 'Tiruchirappalli') {
-        defaultElevation = 292;
-      }
-      else if (this.city === 'Visakhapatnam') {
-        defaultElevation = 21;
+        defaultElevation = this.feetToMeters(270);
+      } else if (this.city === 'Aurangabad') {
+        defaultElevation = this.feetToMeters(1917);
+      } else if (this.city === 'Bhopal') {
+        defaultElevation = this.feetToMeters(1721);
+      } else if (this.city === 'Bhavnagar') {
+        defaultElevation = this.feetToMeters(43);
+      } else if (this.city === 'Daman') {
+        defaultElevation = this.feetToMeters(42);
+      } else if (this.city === 'Gondia') {
+        defaultElevation = this.feetToMeters(994);
+      } else if (this.city === 'Rajkot INTL') {
+        defaultElevation = this.feetToMeters(650);
+      } else if (this.city === 'Indore') {
+        defaultElevation = this.feetToMeters(1854);
+      } else if (this.city === 'Jabalpur') {
+        defaultElevation = this.feetToMeters(1626);
+      } else if (this.city === 'Juhu') {
+        defaultElevation = this.feetToMeters(17);
+      } else if (this.city === 'Jalgaon') {
+        defaultElevation = this.feetToMeters(842);
+      } else if (this.city === 'Kondla') {
+        defaultElevation = this.feetToMeters(97);
+      } else if (this.city === 'Kolhapur') {
+        defaultElevation = this.feetToMeters(2001);
+      } else if (this.city === 'Keshod') {
+        defaultElevation = this.feetToMeters(168);
+      } else if (this.city === 'Mundra') {
+        defaultElevation = this.feetToMeters(17);
+      } else if (this.city === 'Ozar') {
+        defaultElevation = this.feetToMeters(1995);
+      } else if (this.city === 'Pune') {
+        defaultElevation = this.feetToMeters(1943);
+      } else if (this.city === 'Porbandar') {
+        defaultElevation = this.feetToMeters(26);
+      } else if (this.city === 'Shirdi') {
+        defaultElevation = this.feetToMeters(1938);
+      } else if (this.city === 'Surat') {
+        defaultElevation = this.feetToMeters(25);
+      } else if (this.city === 'Udaipur') {
+        defaultElevation = this.feetToMeters(1690);
+      } else if (this.city === 'Agartala') {
+        defaultElevation = this.feetToMeters(56);
+      } else if (this.city === 'Ayodhya') {
+        defaultElevation = this.feetToMeters(329);
+      } else if (this.city === 'Barapani') {
+        defaultElevation = this.feetToMeters(2926);
+      } else if (this.city === 'Bagdogra') {
+        defaultElevation = this.feetToMeters(414);
+      } else if (this.city === 'Bhubaneswar') {
+        defaultElevation = this.feetToMeters(141);
+      } else if (this.city === 'Bilaspur') {
+        defaultElevation = this.feetToMeters(907);
+      } else if (this.city === 'Kolkata') {
+        defaultElevation = this.feetToMeters(20);
+      } else if (this.city === 'Cooch-Behar') {
+        defaultElevation = this.feetToMeters(141);
+      } else if (this.city === 'Durgapur') {
+        defaultElevation = this.feetToMeters(302);
+      } else if (this.city === 'Gorakhpur') {
+        defaultElevation = this.feetToMeters(260);
+      } else if (this.city === 'Deoghar') {
+        defaultElevation = this.feetToMeters(802);
+      } else if (this.city === 'Gaya') {
+        defaultElevation = this.feetToMeters(383);
+      } else if (this.city === 'Hollongi') {
+        defaultElevation = this.feetToMeters(351);
+      } else if (this.city === 'Imphal') {
+        defaultElevation = this.feetToMeters(2544);
+      } else if (this.city === 'Jagdalpur') {
+        defaultElevation = this.feetToMeters(1842);
+      } else if (this.city === 'Jamshedpur') {
+        defaultElevation = this.feetToMeters(481);
+      } else if (this.city === 'Jharsuguda') {
+        defaultElevation = this.feetToMeters(757);
+      } else if (this.city === 'Jorhat') {
+        defaultElevation = this.feetToMeters(299);
+      } else if (this.city === 'Kushinagar') {
+        defaultElevation = this.feetToMeters(263);
+      } else if (this.city === 'Khajuraho') {
+        defaultElevation = this.feetToMeters(731);
+      } else if (this.city === 'Lengpui') {
+        defaultElevation = this.feetToMeters(1406);
+      } else if (this.city === 'Lilabari') {
+        defaultElevation = this.feetToMeters(331);
+      } else if (this.city === 'Dibrugarh') {
+        defaultElevation = this.feetToMeters(360);
+      } else if (this.city === 'Dimapur') {
+        defaultElevation = this.feetToMeters(493);
+      } else if (this.city === 'Patna') {
+        defaultElevation = this.feetToMeters(175);
+      } else if (this.city === 'Pakyong') {
+        defaultElevation = this.feetToMeters(4646);
+      } else if (this.city === 'Ranchi') {
+        defaultElevation = this.feetToMeters(2150);
+      } else if (this.city === 'Rourkela') {
+        defaultElevation = this.feetToMeters(673);
+      } else if (this.city === 'Raipur') {
+        defaultElevation = this.feetToMeters(1044);
+      } else if (this.city === 'Rupsi') {
+        defaultElevation = this.feetToMeters(139);
+      } else if (this.city === 'Tezu') {
+        defaultElevation = this.feetToMeters(770);
+      } else if (this.city === 'Agra') {
+        defaultElevation = this.feetToMeters(550);
+      } else if (this.city === 'Amritsar') {
+        defaultElevation = this.feetToMeters(760);
+      } else if (this.city === 'Kullu Manali') {
+        defaultElevation = this.feetToMeters(3571);
+      } else if (this.city === 'Bareilly') {
+        defaultElevation = this.feetToMeters(571);
+      } else if (this.city === 'Chandigarh') {
+        defaultElevation = this.feetToMeters(1032);
+      } else if (this.city === 'Safdarjung') {
+        defaultElevation = this.feetToMeters(696);
+      } else if (this.city === 'Dehradun') {
+        defaultElevation = this.feetToMeters(1857);
+      } else if (this.city === 'Hindan') {
+        defaultElevation = this.feetToMeters(703);
+      } else if (this.city === 'Kangra') {
+        defaultElevation = this.feetToMeters(2527);
+      } else if (this.city === 'Hisar') {
+        defaultElevation = this.feetToMeters(701);
+      } else if (this.city === 'Jodhpur') {
+        defaultElevation = this.feetToMeters(712);
+      } else if (this.city === 'Jammu') {
+        defaultElevation = this.feetToMeters(956);
+      } else if (this.city === 'Kishangarh') {
+        defaultElevation = this.feetToMeters(1478);
+      } else if (this.city === 'Ludhiana') {
+        defaultElevation = this.feetToMeters(834);
+      } else if (this.city === 'Leh') {
+        defaultElevation = this.feetToMeters(10839);
+      } else if (this.city === 'Lucknow') {
+        defaultElevation = this.feetToMeters(406);
+      } else if (this.city === 'Pithoragarh') {
+        defaultElevation = this.feetToMeters(5050);
+      } else if (this.city === 'Pantnagar') {
+        defaultElevation = this.feetToMeters(764);
+      } else if (this.city === 'Shimla') {
+        defaultElevation = this.feetToMeters(5065);
+      } else if (this.city === 'Srinagar') {
+        defaultElevation = this.feetToMeters(5451);
+      } else if (this.city === 'Uttarlai') {
+        defaultElevation = this.feetToMeters(500);
+      } else if (this.city === 'Agatti') {
+        defaultElevation = this.feetToMeters(14);
+      } else if (this.city === 'Bengaluru HAL') {
+        defaultElevation = this.feetToMeters(2914);
+      } else if (this.city === 'Bengaluru KIA') {
+        defaultElevation = this.feetToMeters(2907);
+      } else if (this.city === 'Belagavi') {
+        defaultElevation = this.feetToMeters(2499);
+      } else if (this.city === 'Bidar') {
+        defaultElevation = this.feetToMeters(2100);
+      } else if (this.city === 'Vijaywada') {
+        defaultElevation = this.feetToMeters(82);
+      } else if (this.city === 'Cochin') {
+        defaultElevation = this.feetToMeters(9);
+      } else if (this.city === 'Calicut') {
+        defaultElevation = this.feetToMeters(342);
+      } else if (this.city === 'Kadapa') {
+        defaultElevation = this.feetToMeters(430);
+      } else if (this.city === 'Mopa') {
+        defaultElevation = this.feetToMeters(243);
+      } else if (this.city === 'Kalaburagi') {
+        defaultElevation = this.feetToMeters(1521);
+      } else if (this.city === 'Goa') {
+        defaultElevation = this.feetToMeters(187);
+      } else if (this.city === 'Hubballi') {
+        defaultElevation = this.feetToMeters(2171);
+      } else if (this.city === 'Shamshabad RGI') {
+        defaultElevation = this.feetToMeters(2021);
+      } else if (this.city === 'Begumpet') {
+        defaultElevation = this.feetToMeters(1740);
+      } else if (this.city === 'Jindal Vijayanagar') {
+        defaultElevation = this.feetToMeters(1910);
+      } else if (this.city === 'Kannur') {
+        defaultElevation = this.feetToMeters(256);
+      } else if (this.city === 'Kurnool') {
+        defaultElevation = this.feetToMeters(906);
+      } else if (this.city === 'Madurai') {
+        defaultElevation = this.feetToMeters(459);
+      } else if (this.city === 'Mangaluru') {
+        defaultElevation = this.feetToMeters(338);
+      } else if (this.city === 'Mysuru') {
+        defaultElevation = this.feetToMeters(2398);
+      } else if (this.city === 'Portblair') {
+        defaultElevation = this.feetToMeters(13);
+      } else if (this.city === 'Puducherry') {
+        defaultElevation = this.feetToMeters(118);
+      } else if (this.city === 'Puttaparthi') {
+        defaultElevation = this.feetToMeters(1248);
+      } else if (this.city === 'Rajahmundry') {
+        defaultElevation = this.feetToMeters(151);
+      } else if (this.city === 'Salem') {
+        defaultElevation = this.feetToMeters(1033);
+      } else if (this.city === 'Shivamogga') {
+        defaultElevation = this.feetToMeters(1841);
+      } else if (this.city === 'Sindhudurg') {
+        defaultElevation = this.feetToMeters(198);
+      } else if (this.city === 'Tuticorin') {
+        defaultElevation = this.feetToMeters(14);
+      } else if (this.city === 'Tirupati') {
+        defaultElevation = this.feetToMeters(355);
+      } else if (this.city === 'Tiruchirappalli') {
+        defaultElevation = this.feetToMeters(288);
+      } else if (this.city === 'Visakhapatnam') {
+        defaultElevation = this.feetToMeters(15);
+      } else if (this.city === 'Jeypore') {
+        defaultElevation = this.feetToMeters(660);
+      } else if (this.city === 'Bhawanipatna') {
+        defaultElevation = this.feetToMeters(661);
+      } else if (this.city === 'Utkela') {
+        defaultElevation = this.feetToMeters(686);
       }
       this.TopElevationForm.patchValue({ Site_Elevation: defaultElevation });
       alert("Users shall enter site elevation value received from WGS-84 survey report. Permissible height will be calculated based on site elevation entered by user. In absense of site elevation value from user, ARP (Airport) elevation value will be used as default.")
+
     }
     else {
       this.showAlert = false;
     }
+
+
   }
+
 
   async createNocas(subscription_id: string = "") {
     if (this.TopElevationForm.valid) {
@@ -1349,12 +1246,16 @@ export class UsersNOCASComponent implements OnInit {
     this.airportName = airportName;
     this.distance = distance;
     const airport = this.airportCoordinatesList.find(airport => airport[3] === airportName);
-    if (airport) {
-      this.TopElevationForm.patchValue({
-        CITY: airportCity,
-      });
-      this.selectedAirportName = airportName;
-      this['selectedAirportCoordinates'] = [airport[0], airport[1]];
+    const selectionMode = this.TopElevationForm.get('selectionMode')?.value;
+    if (selectionMode === 'manual') {
+      
+      if (airport) {
+        this.TopElevationForm.patchValue({
+          CITY: airportCity,
+        });
+        this.selectedAirportName = airportName;
+        this['selectedAirportCoordinates'] = [airport[0], airport[1]];
+      }
     }
   }
 
@@ -1470,74 +1371,7 @@ export class UsersNOCASComponent implements OnInit {
       this.map.removeLayer(this.nearestAirportGeoJSONLayer);
       this.nearestAirportGeoJSONLayer = null;
     }
-    this.map.on('click', (e: any) => {
-      const { lat, lng } = e.latlng;
-      this.lat = lat;
-      this.long = lng;
-      this.latitudeDMS = this.convertDDtoDMS(lat, true);
-      this.longitudeDMS = this.convertDDtoDMS(lng, false);
-
-      const selectionMode = this.TopElevationForm.get('selectionMode')?.value;
-      if (selectionMode === 'manual') {
-        this.TopElevationForm.patchValue({
-          CITY: '',
-          AIRPORT_NAME: ''
-        });
-      } else {
-        const nearestAirport = this.findNearestAirport(lat, lng, 30); // 30 km
-        if (nearestAirport) {
-          this.TopElevationForm.patchValue({
-            CITY: nearestAirport.airportCity,
-            AIRPORT_NAME: nearestAirport.airportName
-          });
-          if (this.marker2) {
-            this.map.removeLayer(this.marker2);
-            this.marker2 = null;
-          }
-          this.loadNearestAirportGeoJSON(nearestAirport.airportCity, nearestAirport.distance, this.map);
-        } else {
-          alert('No airport found within 30 km.');
-          if (this.nearestAirportGeoJSONLayer) {
-            this.map.removeLayer(this.nearestAirportGeoJSONLayer);
-            this.nearestAirportGeoJSONLayer = null;
-          }
-          if (this.geojsonLayer) {
-            this.map.removeLayer(this.geojsonLayer);
-            this.geojsonLayer.clearLayers();
-            this.geojsonLayer = null;
-          }
-          if (this.marker2) {
-            this.map.removeLayer(this.marker2);
-            this.marker2 = null;
-          }
-          if (this.nearestAirportGeoJSONLayer) {
-            this.map.removeLayer(this.nearestAirportGeoJSONLayer);
-            this.nearestAirportGeoJSONLayer = null;
-          }
-          this.map.eachLayer((layer: any) => {
-            if (layer instanceof L.GeoJSON) {
-              this.map.removeLayer(layer);
-            }
-          });
-
-          this.TopElevationForm.patchValue({
-            CITY: '',
-            AIRPORT_NAME: ''
-          });
-        }
-      }
-
-      this.TopElevationForm.patchValue({
-        Latitude: this.latitudeDMS,
-        Longitude: this.longitudeDMS
-      });
-
-      if (this.marker) {
-        this.marker.setLatLng([lat, lng]);
-        const popupContent = `Site Location : <br> Site Latitude: ${this.latitudeDMS}, Site Longitude: ${this.longitudeDMS}`;
-        this.marker.bindPopup(popupContent).openPopup();
-      }
-    });
+    
 
     this.marker.on('dragend', (e: any) => {
       const position = this.marker.getLatLng();
@@ -1588,7 +1422,7 @@ export class UsersNOCASComponent implements OnInit {
               this.map.removeLayer(layer);
             }
           });
-          
+
         }
       }
 

@@ -32,7 +32,7 @@
           <mat-label>Select Nearest Airport</mat-label>
           <mat-radio-group formControlName="selectionMode">
          
-            <mat-radio-button value="default">Auto-Select</mat-radio-button>
+            <mat-radio-button value="default" (click) = "updateNearestAirportData()">Auto-Select</mat-radio-button>
             <mat-radio-button value="manual">Enter nearest Airport</mat-radio-button>
           </mat-radio-group>
         </div>

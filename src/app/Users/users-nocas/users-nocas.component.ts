@@ -70,7 +70,7 @@ export class UsersNOCASComponent implements OnInit {
       selectionMode: ['']
     });
     this.TopElevationForm.get('selectionMode')?.valueChanges.subscribe((selectionMode: string) => {
-      if (selectionMode === 'manual' || selectionMode === 'default') {
+      if ( selectionMode=== 'manual' || selectionMode === 'default') {
         this.TopElevationForm.get('CITY')?.setValidators([Validators.required]);
         this.TopElevationForm.get('airportName')?.setValidators([]);
       } else {
@@ -286,7 +286,7 @@ export class UsersNOCASComponent implements OnInit {
             const color = feature.properties.Color;
             return { fillColor: color, weight: 2 };
           };
-          this.isDefaultElevationSelected
+          
           const geojsonLayer = L.geoJSON(features, { style: style });
           geojsonLayer.addTo(map);
           this.geojsonLayer = geojsonLayer;
@@ -397,11 +397,10 @@ export class UsersNOCASComponent implements OnInit {
       return;
     }
     if (!this.TopElevationForm.valid) {
-      this.showMissingFieldsAlert();
       return;
     }
     const selectedAirportCITY = this.TopElevationForm.get('CITY')?.value;
-    const nearestAirport = this.findNearestAirport(this.lat, this.long, 30);
+    const nearestAirport = this.findNearestAirport(this.lat, this.long, 30); // 30 km
     if (nearestAirport) {
       if (nearestAirport.airportCity !== selectedAirportCITY) {
         const updateConfirmation = confirm(
@@ -411,9 +410,8 @@ export class UsersNOCASComponent implements OnInit {
         if (updateConfirmation) {
           this.TopElevationForm.patchValue({
             CITY: nearestAirport.airportCity,
-            elevation: this.isDefaultElevationSelected ? nearestAirport.elevation : this.TopElevationForm.get('Site_Elevation')?.value
+            Site_Elevation: this.getElevationForCity(nearestAirport.airportCity)
           });
-
           this.selectedAirportName = nearestAirport.airportName;
           this.loadNearestAirportGeoJSON(nearestAirport.airportCity, nearestAirport.distance, this.map);
         }
@@ -427,6 +425,7 @@ export class UsersNOCASComponent implements OnInit {
       });
     }
   }
+
   findNearestAirport(lat: number, lng: number, radius: number): { airportCity: string; airportName: string; distance: number; elevation: number } | null {
     const airports = this.airportCoordinatesList;
     let closestAirport = null;
@@ -438,7 +437,7 @@ export class UsersNOCASComponent implements OnInit {
           airportCity,
           airportName,
           distance,
-          elevation: this.getElevationForCity(airportCity)
+          elevation: this.getElevationForCity(this.city)
         };
         minDistance = distance;
       }
@@ -463,12 +462,14 @@ export class UsersNOCASComponent implements OnInit {
   }
   updateNearestAirportData() {
     const nearestAirport = this.findNearestAirport(this.lat, this.long, 30); // 30 km
+    
     if (nearestAirport) {
       this.loadNearestAirportGeoJSON(nearestAirport.airportCity, nearestAirport.distance, this.map);
+
       this.TopElevationForm.patchValue({
         CITY: nearestAirport.airportCity,
         AIRPORT_NAME: nearestAirport.airportName,
-
+        elevation: this.getElevationForCity(nearestAirport.airportCity)
       });
     }
   }
@@ -580,11 +581,7 @@ export class UsersNOCASComponent implements OnInit {
           this.closeModal('airportModal')
         }
       },
-      prefill: {
-        name: this.apiservice.userData.uname,
-        email: this.apiservice.userData.email,
-        contact: this.apiservice.userData.phone_number
-      },
+      
       theme: {
         color: '#528FF0'
       },
@@ -1147,7 +1144,6 @@ export class UsersNOCASComponent implements OnInit {
 
   }
 
-
   async createNocas(subscription_id: string = "") {
     if (this.TopElevationForm.valid) {
       try {
@@ -1373,114 +1369,74 @@ export class UsersNOCASComponent implements OnInit {
     }
     
 
-    this.marker.on('dragend', (e: any) => {
-      const position = this.marker.getLatLng();
-      this.lat = position.lat;
-      this.long = position.lng;
-      this.latitudeDMS = this.convertDDtoDMS(position.lat, true);
-      this.longitudeDMS = this.convertDDtoDMS(position.lng, false);
+    // this.marker.on('dragend', (e: any) => {
+    //   const position = this.marker.getLatLng();
+    //   this.lat = position.lat;
+    //   this.long = position.lng;
+    //   this.latitudeDMS = this.convertDDtoDMS(position.lat, true);
+    //   this.longitudeDMS = this.convertDDtoDMS(position.lng, false);
 
-      const selectionMode = this.TopElevationForm.get('selectionMode')?.value;
-      if (selectionMode === 'manual') {
-        const manualCity = this.TopElevationForm.get('CITY')?.value;
-        const cityLocation = this.getCityLocation(manualCity);
-        if (cityLocation) {
-          const distance = this.calculateDistance(position.lat, position.lng, cityLocation.lat, cityLocation.lng);
-          this.TopElevationForm.patchValue({
-            CITY: manualCity,
-            AIRPORT_NAME: `Nearest city: ${manualCity} (${distance.toFixed(2)} km away)`
-          });
-        }
-      } else {
-        const nearestAirport = this.findNearestAirport(position.lat, position.lng, 30); // 30 km
-        if (nearestAirport) {
-          this.TopElevationForm.patchValue({
-            CITY: nearestAirport.airportCity,
-            AIRPORT_NAME: nearestAirport.airportName
-          });
-        } else {
-          alert('No airport found within 30 km.');
-          if (this.nearestAirportGeoJSONLayer) {
-            this.map.removeLayer(this.nearestAirportGeoJSONLayer);
-            this.nearestAirportGeoJSONLayer = null;
-          }
-          if (this.geojsonLayer) {
-            this.map.removeLayer(this.geojsonLayer);
-            this.geojsonLayer.clearLayers();
-            this.geojsonLayer = null;
-          }
-          if (this.marker2) {
-            this.map.removeLayer(this.marker2);
-            this.marker2 = null;
-          }
-          if (this.nearestAirportGeoJSONLayer) {
-            this.map.removeLayer(this.nearestAirportGeoJSONLayer);
-            this.nearestAirportGeoJSONLayer = null;
-          }
-          this.map.eachLayer((layer: any) => {
-            if (layer instanceof L.GeoJSON) {
-              this.map.removeLayer(layer);
-            }
-          });
+    //   const selectionMode = this.TopElevationForm.get('selectionMode')?.value;
+    //   if (selectionMode === 'manual') {
+    //     const manualCity = this.TopElevationForm.get('CITY')?.value;
+    //     const cityLocation = this.getCityLocation(manualCity);
+    //     if (cityLocation) {
+    //       const distance = this.calculateDistance(position.lat, position.lng, cityLocation.lat, cityLocation.lng);
+    //       this.TopElevationForm.patchValue({
+    //         CITY: manualCity,
+    //         AIRPORT_NAME: `Nearest city: ${manualCity} (${distance.toFixed(2)} km away)`
+    //       });
+    //     }
+    //   } else {
+    //     const nearestAirport = this.findNearestAirport(position.lat, position.lng, 30); // 30 km
+    //     if (nearestAirport) {
+    //       this.TopElevationForm.patchValue({
+    //         CITY: nearestAirport.airportCity,
+    //         AIRPORT_NAME: nearestAirport.airportName
+            
+    //       });
+    //     } else {
+    //       alert('No airport found within 30 km.');
+    //       if (this.nearestAirportGeoJSONLayer) {
+    //         this.map.removeLayer(this.nearestAirportGeoJSONLayer);
+    //         this.nearestAirportGeoJSONLayer = null;
+    //       }
+    //       if (this.geojsonLayer) {
+    //         this.map.removeLayer(this.geojsonLayer);
+    //         this.geojsonLayer.clearLayers();
+    //         this.geojsonLayer = null;
+    //       }
+    //       if (this.marker2) {
+    //         this.map.removeLayer(this.marker2);
+    //         this.marker2 = null;
+    //       }
+    //       if (this.nearestAirportGeoJSONLayer) {
+    //         this.map.removeLayer(this.nearestAirportGeoJSONLayer);
+    //         this.nearestAirportGeoJSONLayer = null;
+    //       }
+    //       this.map.eachLayer((layer: any) => {
+    //         if (layer instanceof L.GeoJSON) {
+    //           this.map.removeLayer(layer);
+    //         }
+    //       });
 
-        }
-      }
+    //     }
+    //   }
 
-      this.TopElevationForm.patchValue({
-        Latitude: this.latitudeDMS,
-        Longitude: this.longitudeDMS
-      });
+    //   this.TopElevationForm.patchValue({
+    //     Latitude: this.latitudeDMS,
+    //     Longitude: this.longitudeDMS
+    //   });
 
-      const popupContent = `Site Location : <br> Site Latitude: ${this.latitudeDMS}, Site Longitude: ${this.longitudeDMS}`;
-      this.marker.bindPopup(popupContent).openPopup();
-    });
+    //   const popupContent = `Site Location : <br> Site Latitude: ${this.latitudeDMS}, Site Longitude: ${this.longitudeDMS}`;
+    //   this.marker.bindPopup(popupContent).openPopup();
+    // });
   }
 
   getCityLocation(cityName: string): { lat: number, lng: number } | null {
     return null;
   }
 
-  updateMarkerPopupContent(lat: number, lng: number) {
-    this.latitudeDMS = this.convertDDtoDMS(lat, true);
-    this.longitudeDMS = this.convertDDtoDMS(lng, false);
-    const popupContent = `Site Location : <br> Site Latitude: ${this.latitudeDMS}, Site Longitude: ${this.longitudeDMS}`;
-    this.marker.bindPopup(popupContent).openPopup();
-    const nearestAirport = this.findNearestAirport(lat, lng, 30); // 30 km
-    if (nearestAirport) {
-      if (nearestAirport.distance <= 30) {
-        if (this.marker2) {
-          this.map.removeLayer(this.marker2);
-          this.marker2 = null;
-        }
-        this.loadNearestAirportGeoJSON(nearestAirport.airportCity, nearestAirport.distance, this.map);
-      } else {
-        if (this.nearestAirportGeoJSONLayer) {
-          this.map.removeLayer(this.nearestAirportGeoJSONLayer);
-          this.nearestAirportGeoJSONLayer = null;
-        }
-        this.map.eachLayer((layer: any) => {
-          if (layer instanceof L.GeoJSON) {
-            this.map.removeLayer(layer);
-          }
-        });
-
-        if (this.geojsonLayer) {
-          this.map.removeLayer(this.geojsonLayer);
-          this.geojsonLayer.clearLayers();
-          this.geojsonLayer = null;
-        }
-        if (this.marker2) {
-          this.map.removeLayer(this.marker2);
-          this.marker2 = null;
-        }
-        if (this.nearestAirportGeoJSONLayer) {
-          this.map.removeLayer(this.nearestAirportGeoJSONLayer);
-          this.nearestAirportGeoJSONLayer = null;
-        }
-
-      }
-    }
-  }
 
   showModal(id: string): void {
     const modal = document.getElementById(id);

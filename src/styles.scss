@@ -9,7 +9,12 @@ body {
     font-family: Roboto, "Helvetica Neue", sans-serif;
 }
  
- 
+
+.toast-top-right {
+  top: 12px;
+  right: 12px;
+}
+
 /* You can add global styles to this file, and also import other style files */
  
 .modal-backdrop {

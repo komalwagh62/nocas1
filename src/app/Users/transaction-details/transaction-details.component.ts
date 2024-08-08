@@ -5,8 +5,9 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { ApiService } from '../Shared/Api/api.service';
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
+
  
 @Component({
   selector: 'app-transaction-details',
@@ -81,43 +82,78 @@ export class TransactionDetailsComponent implements OnInit {
     this.selectedSubscription = subscription;
     this.showReceiptDetails = true;
     const doc = new jsPDF();
-    const data = {
-      applicant_name:this.apiservice.userData.uname,
-      subscriptionId: subscription.subscription_id,
-      status: subscription.subscription_status,
-      expiryDate: subscription.expiry_date,
-      subscriptionType: subscription.subscription_type,
-      price: subscription.price,
-      razorpayPaymentId: subscription.razorpay_payment_id
+  
+    const logo = new Image();
+    logo.src = 'assets/cropped-C_Name.png';
+  
+    logo.onload = () => {
+      // Add the logo to the PDF
+      doc.addImage(logo, 'PNG', 10, 10, 50, 20); // Adjust the coordinates and size as needed
+  
+      // Add the invoice title and other details
+      doc.setFontSize(18);
+      doc.text('Tax Invoice', 75, 40);
+  
+      const invoiceDate = new Date().toLocaleDateString();
+      const createdAt = new Date(subscription.createdAt); // Assuming subscription.createdAt is the creation date
+      const invoiceNumber = `${createdAt.getFullYear()}${('0' + (createdAt.getMonth() + 1)).slice(-2)}${('0' + createdAt.getDate()).slice(-2)}${('0' + createdAt.getHours()).slice(-2)}${('0' + createdAt.getMinutes()).slice(-2)}${('0' + createdAt.getSeconds()).slice(-2)}`;
+  
+      doc.setFontSize(12);
+      doc.text(`Invoice Date: ${invoiceDate}                                    Invoice No: ${invoiceNumber}`, 10, 60);
+      
+      
+      doc.text(`To:`, 10, 80);
+      doc.text(this.apiservice.userData.uname, 10, 90);
+      doc.text(this.apiservice.userData.email, 10, 100);
+  
+      // Add subscription details in a formatted way
+      doc.setFontSize(10);
+      let yPosition = 120; // Initial y-position for the details
+      const labelX = 10; // X position for labels
+      const valueX = 140; // X position for values
+  
+      doc.text('Subscription Details', labelX, yPosition);
+      yPosition += 10;
+      
+      doc.text('Subscription ID', labelX, yPosition);
+      doc.text(subscription.subscription_id, valueX, yPosition);
+      yPosition += 10;
+      doc.text('Status', labelX, yPosition);
+      doc.text(subscription.subscription_status, valueX, yPosition);
+      yPosition += 10;
+      doc.text('Expiry Date', labelX, yPosition);
+      doc.text(subscription.expiry_date, valueX, yPosition);
+      yPosition += 10;
+      doc.text('Subscription Type', labelX, yPosition);
+      doc.text(subscription.subscription_type, valueX, yPosition);
+      yPosition += 10;
+      doc.text('Razorpay Payment ID', labelX, yPosition);
+      doc.text(subscription.razorpay_payment_id, valueX, yPosition);
+  
+      // Additional line before the footer section
+      yPosition += 10; // Adding some space before the footer
+      doc.text('----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------', 10, yPosition); // This is the added line
+  
+      // Add footer or any additional information
+      yPosition += 7; // Adding some space before the payment details
+      
+      doc.text('Total', 150, yPosition);
+      doc.text(subscription.price.toString(), 180, yPosition);
+  
+      yPosition += 10;
+      doc.text('Total charged', 150, yPosition);
+      doc.text(subscription.price.toString(), 180, yPosition);
+      doc.text('Please retain for your records.', 10, doc.internal.pageSize.getHeight() - 60);
+      doc.text('Company Name: Cognitive Navigation Pvt Ltd.', 10, doc.internal.pageSize.getHeight() - 50);
+      doc.text('Company Address', 10, doc.internal.pageSize.getHeight() - 40);
+  
+      // Save the PDF
+      doc.save('receipt.pdf');
     };
- 
-    doc.text('Transaction Details', 10, 10);
-    const headers = [['Detail', 'Value']];
-    const rows = [
-      ['Subscription Price', data.price.toString()],
-      ['Subscription ID', data.subscriptionId.toString()],
-      ['Status', data.status.toString()],
-      ['Expiry Date', data.expiryDate.toString()],
-      ['Subscription Type', data.subscriptionType.toString()],
-      ['Razorpay Payment ID', data.razorpayPaymentId.toString()]
-    ];
-    (doc as any).autoTable({
-      head: headers,
-      body: rows,
-      startY: 20,
-      theme: 'striped',
-      styles: {
-          fontSize: 12,
-          cellPadding: 2,
-          lineColor: [0, 0, 0],
-          lineWidth: 0.1
-      },
-      columnStyles: {
-          0: { cellWidth: 70 },
-          1: { cellWidth: 'auto' }
-      }
-    });
-    doc.save('receipt.pdf');
   }
-}
- 
+  
+  
+  
+  
+  
+}  

@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-forgot-password',
@@ -11,10 +12,15 @@ export class ForgotPasswordComponent {
   email: string = '';
   otp: string = '';
   newPassword: string = '';
-  confirmPassword: string ='';
+  confirmPassword: string = '';
   passwordsMatch: boolean = false;
 
-  constructor(private route: ActivatedRoute, private http: HttpClient, private router: Router) { }
+  constructor(
+    private route: ActivatedRoute,
+    private http: HttpClient,
+    private router: Router,
+    private toastr: ToastrService
+  ) { }
 
   sendOTP() {
     const email = this.email;
@@ -22,16 +28,15 @@ export class ForgotPasswordComponent {
       .subscribe(
         response => {
           console.log(response);
-          alert("An OTP has been sent to your email address. Please check your email.");
+          this.toastr.success("An OTP has been sent to your email address. Please check your email.");
           this.showOTPForm(); // Show the OTP form
         },
         error => {
           console.error('Error sending OTP:', error);
-          alert("Failed to send OTP. Please check your email ID.");
+          this.toastr.error("Failed to send OTP. Please check your email ID.");
         }
       );
   }
-  
 
   submitOTP() {
     console.log("Submitting OTP...");
@@ -40,16 +45,16 @@ export class ForgotPasswordComponent {
         response => {
           console.log(response);
           if (response.valid) {
-            alert("OTP validated successfully. Please set a new password.");
+            this.toastr.success("OTP validated successfully. Please set a new password.");
             this.showPasswordForm();
           } else {
-            alert("Invalid OTP. Please check the OTP and try again.");
+            this.toastr.error("Invalid OTP. Please check the OTP and try again.");
             console.error('Invalid OTP');
           }
         },
         error => {
           console.error('Error validating OTP:', error);
-          alert("Failed to validate OTP. Please try again.");
+          this.toastr.error("Failed to validate OTP. Please try again.");
         }
       );
   }
@@ -67,19 +72,18 @@ export class ForgotPasswordComponent {
         response => {
           console.log(response);
           if (response.success) {
-            alert("Your password has been updated successfully. You will be redirected to the login page.");
+            this.toastr.success("Your password has been updated successfully. You will be redirected to the login page.");
             this.router.navigate(['UsersLogin']);
           } else {
-            alert("Failed to update password. Please try again.");
+            this.toastr.error("Failed to update password. Please try again.");
           }
         },
         error => {
           console.error('Error updating password:', error);
-          alert("Failed to update password. Please try again later.");
+          this.toastr.error("Failed to update password. Please try again later.");
         }
       );
   }
-  
 
   showOTPForm() {
     const emailForm = document.getElementById('emailForm');

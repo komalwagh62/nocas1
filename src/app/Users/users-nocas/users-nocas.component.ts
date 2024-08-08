@@ -386,19 +386,22 @@ export class UsersNOCASComponent implements OnInit {
         missingFields.push(name);
       }
     }
-    alert(`Missing required fields: ${missingFields.join(', ')}`);
+    // alert(`Missing required fields: ${missingFields.join(', ')}`);
     this.toastr.error(`Missing required fields: ${missingFields.join(', ')}`, 'Form Incomplete');
   }
 
   submitForm() {
     if (!this.apiservice.token) {
-      alert('Please Login First');
+      this.toastr.error('Please log in first.');
       this.router.navigate(['UsersLogin']);
       return;
     }
+    
     if (!this.TopElevationForm.valid) {
+      this.toastr.warning('Please fill out all required fields.');
       return;
     }
+
     const selectedAirportCITY = this.TopElevationForm.get('CITY')?.value;
     const nearestAirport = this.findNearestAirport(this.lat, this.long, 30); // 30 km
     if (nearestAirport) {
@@ -543,15 +546,14 @@ export class UsersNOCASComponent implements OnInit {
   }
 
   handlePayment() {
-    const RozarpayOptions = {
+    const RazorpayOptions = {
       key: 'rzp_test_IScA4BP8ntHVNp',
       amount: 50 * 100,
       currency: 'INR',
       name: 'Cognitive Navigation Pvt. Ltd',
-      description: ` Plan Subscription`,
+      description: `Plan Subscription`,
       image: 'https://imgur.com/a/J4UAMhv',
       handler: (response: any) => {
-        this.router.navigate(['TransactionDetails']);
         const paymentDetails = {
           user_id: this.apiservice.userData.id,
           subscription_type: 'OneTime',
@@ -560,30 +562,32 @@ export class UsersNOCASComponent implements OnInit {
           expiry_date: new Date().toISOString(),
         };
         const headers = new HttpHeaders().set("Authorization", `Bearer ${this.apiservice.token}`);
-        this.http.post('http://localhost:3001/api/subscription/addSubscription', paymentDetails, { headers: headers })
+        
+        this.http.post('http://localhost:3001/api/subscription/addSubscription', paymentDetails, { headers })
           .subscribe(
             (result: any) => {
-              this.createNocas(result.subscription_id)
+              this.createNocas(result.subscription_id);
+              this.toastr.success('Payment details saved successfully.');
             },
             (error: any) => {
               console.error('Error storing payment details:', error);
+              this.toastr.error('Error storing payment details.');
             }
           );
-        const confirmation = confirm("Payment Successfully Done. If you want to see payment details, please go to Transaction Details page");
-        if (confirmation) {
-          this.isSubscribed = true
-        }
+        
+        this.toastr.success('Payment Successfully Done.');
+        this.isSubscribed = true;
         this.router.navigate(['C_NOCAS-MAP']);
+        
         const airportCITY = this.TopElevationForm.get('CITY')?.value;
         const latitude = parseFloat(this.TopElevationForm.get('Latitude')?.value);
         const longitude = parseFloat(this.TopElevationForm.get('Longitude')?.value);
         if (airportCITY && !isNaN(latitude) && !isNaN(longitude)) {
           this.updateMarkerPosition();
           this.displayMapData(latitude, longitude, this.airportCoordinates);
-          this.closeModal('airportModal')
+          this.closeModal('airportModal');
         }
       },
-
       theme: {
         color: '#528FF0'
       },
@@ -591,13 +595,15 @@ export class UsersNOCASComponent implements OnInit {
         external: ['upi']
       }
     };
-    const rzp = new Razorpay(RozarpayOptions);
+
+    const rzp = new Razorpay(RazorpayOptions);
     rzp.open();
     rzp.on('payment.success', (response: any) => {
+      // You might want to handle additional logic here
     });
     rzp.on('payment.error', (error: any) => {
-      // console.error('Payment error:', error);
-      alert("Payment Failed");
+      console.error('Payment error:', error);
+      this.toastr.error('Payment Failed');
     });
   }
 
@@ -1136,7 +1142,7 @@ export class UsersNOCASComponent implements OnInit {
         defaultElevation = this.feetToMeters(686);
       }
       this.TopElevationForm.patchValue({ Site_Elevation: defaultElevation });
-      alert("Users shall enter site elevation value received from WGS-84 survey report. Permissible height will be calculated based on site elevation entered by user. In absense of site elevation value from user, ARP (Airport) elevation value will be used as default.")
+      this.toastr.info("Users shall enter site elevation value received from WGS-84 survey report. Permissible height will be calculated based on site elevation entered by user. In absense of site elevation value from user, ARP (Airport) elevation value will be used as default.")
 
     }
     else {
@@ -1182,33 +1188,34 @@ export class UsersNOCASComponent implements OnInit {
             (resultData: any) => {
               if (resultData.isSubscribed || resultData.freeTrialCount > 0 || resultData.isOneTimeSubscription) {
                 this.isSubscribed = true;
+                this.toastr.success('NOCAS request created successfully!');
               } else {
                 this.isSubscribed = false;
+                this.toastr.info('NOCAS request created, but subscription status needs review.');
               }
             },
             (error: any) => {
-              alert("Session Expired.Please Login..");
+              this.toastr.error('Session Expired. Please Login.');
               localStorage.removeItem('userData');
               localStorage.removeItem('token');
               this.router.navigate(['UsersLogin']);
             }
           );
       } catch (error) {
-        // console.error("Error capturing and saving screenshot:", error);
-        alert("Failed to capture and save screenshot. Please try again.");
+        console.error("Error capturing and saving screenshot:", error);
+        this.toastr.error('Failed to capture and save screenshot. Please try again.');
       }
     } else {
-      alert("Please fill out all required fields in the form.");
+      this.toastr.warning('Please fill out all required fields in the form.');
     }
   }
+
 
   displayMapData(lat: number, lng: number, airportCoordinates: [number, number]) {
     const latitudeDD = this.convertDMSToDD(this.lat, true);
     const longitudeDD = this.convertDMSToDD(this.long, false);
     const newDistance = this.calculateDistance(latitudeDD, longitudeDD, airportCoordinates[0], airportCoordinates[1]);
     const clickedFeature = this.geojsonLayer.getLayers().find((layer: any) => {
-      if (layer.getBounds().contains([this.lat, this.long])) {
-      }
       return layer.getBounds().contains([this.lat, this.long]);
     });
     if (clickedFeature) {
@@ -1216,10 +1223,16 @@ export class UsersNOCASComponent implements OnInit {
       const elevation = properties.name;
       const permissibleHeight = parseFloat(properties.name) - parseFloat(this.TopElevationForm.get('Site_Elevation').value);
       if (elevation === 'NOC Required') {
-        alert("The selected location requires a **No Objection Certificate (NOC)** for further processing. Please contact our support team for assistance.");
+        this.toastr.info("The selected location requires a **No Objection Certificate (NOC)** for further processing. Please contact our support team for assistance.");
         return;
       }
-      this.insideMapData = { elevation: elevation, permissibleHeight: permissibleHeight < 0 ? '-' : Math.abs(permissibleHeight).toFixed(2), latitudeDMS: this.latitudeDMS, longitudeDMS: this.longitudeDMS, newDistance: newDistance.toFixed(2) }
+      this.insideMapData = {
+        elevation: elevation,
+        permissibleHeight: permissibleHeight < 0 ? '-' : Math.abs(permissibleHeight).toFixed(2),
+        latitudeDMS: this.latitudeDMS,
+        longitudeDMS: this.longitudeDMS,
+        newDistance: newDistance.toFixed(2)
+      };
       this.showModal('insideMapData');
     } else {
       this.handleAirportModalOK();
@@ -1292,18 +1305,18 @@ export class UsersNOCASComponent implements OnInit {
             Latitude: this.latitudeDMS,
             Longitude: this.longitudeDMS
           });
+          this.toastr.success('Location retrieved successfully.');
         },
         (error) => {
-          // console.error('Error getting user location:', error);
-          alert('Error getting user location. Please make sure location services are enabled and try again.');
+          // Use Toastr to show the error message
+          this.toastr.error('Error getting user location. Please make sure location services are enabled and try again.');
         },
         { enableHighAccuracy: true }
       );
     } else {
-      alert('Geolocation is not supported by this browser.');
+      this.toastr.error('Geolocation is not supported by this browser.');
     }
   }
-
 
   showDefaultMap() {
     const defaultLat = 0.0;
@@ -1477,11 +1490,13 @@ export class UsersNOCASComponent implements OnInit {
       next: (res) => {
         if (res && res.airports) {
           this.airports = res.airports;
+          this.toastr.success('Airports data fetched successfully.');
         } else {
+          this.toastr.warning('No airports data found.');
         }
       },
       error: (err) => {
-        alert('Error fetching data');
+        this.toastr.error('Error fetching data. Please try again later.');
       }
     });
   }

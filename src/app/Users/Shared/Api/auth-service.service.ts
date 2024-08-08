@@ -4,7 +4,16 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class AuthServiceService {
+ 
+  isTokenExpired(): boolean {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      return true;
+    }
 
+    const expiry = (JSON.parse(atob(token.split('.')[1]))).exp;
+    return (Math.floor((new Date).getTime() / 1000)) >= expiry;
+  }
   private readonly AUTH_TOKEN_KEY = '';
   private readonly USER_DATA_KEY = '';
 

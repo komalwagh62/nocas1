@@ -194,17 +194,17 @@
  
   </div>
 </section> -->
-
-
-
-
-
-
-
-
-
-
-
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
 <section>
   <div class="container-fluid">
     <div class="row mt-4">
@@ -270,12 +270,13 @@
 </section>
 <section>
   <div class="container-fluid">
-
+ 
     <mat-form-field *ngIf="showPermissibleDetails">
       <mat-label>Filter User Requests</mat-label>
       <input matInput (keyup)="applyPermissibleFilter($event)" placeholder="Ex. city" #permissibleInput>
+      <mat-icon matSuffix>search</mat-icon>
     </mat-form-field>
-
+ 
     <div *ngIf="showPermissibleDetails">
       <mat-table [dataSource]="permissibleDataSource" matSort class="mat-elevation-z8" multiTemplateDataRows>
         <ng-container matColumnDef="city">
@@ -297,16 +298,16 @@
         <ng-container matColumnDef="download">
           <mat-header-cell *matHeaderCellDef> Download </mat-header-cell>
           <mat-cell *matCellDef="let element">
-            <button mat-icon-button (click)="downloadPDF(element)">
-              <mat-icon>download</mat-icon>
+            <button  mat-mini-fab  color="primary" (click)="downloadPDF(element)">
+              <mat-icon>cloud_download</mat-icon>
             </button>
           </mat-cell>
         </ng-container>
-
+ 
         <mat-header-row *matHeaderRowDef="permissibleDisplayedColumns"></mat-header-row>
         <mat-row *matRowDef="let row; columns: permissibleDisplayedColumns;"
           [class.expanded-row]="expandedElement === row"></mat-row>
-
+ 
         <ng-container matColumnDef="expandedDetail">
           <mat-cell *matCellDef="let element" [attr.colspan]="permissibleDisplayedColumns.length">
             <div *ngIf="expandedElement === element">
@@ -326,21 +327,22 @@
       <mat-paginator #permissiblePaginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
     </div>
   </div>
-
-
+ 
+ 
   <mat-form-field *ngIf="showSubscriptionDetails">
     <mat-label>Filter Subscriptions</mat-label>
     <input matInput (keyup)="applySubscriptionFilter($event)" placeholder="Ex. type" #subscriptionInput>
+    <mat-icon matSuffix>search</mat-icon>
   </mat-form-field>
-
+ 
   <div class="mat-elevation-z8" *ngIf="showSubscriptionDetails">
     <mat-table [dataSource]="subscriptionDataSource" multiTemplateDataRows   matSort>
-
+ 
       <ng-container matColumnDef="subscription_id">
         <mat-header-cell *matHeaderCellDef mat-sort-header> Subscription ID </mat-header-cell>
         <mat-cell *matCellDef="let element"> {{element.subscription_id}} </mat-cell>
       </ng-container>
-
+ 
       <ng-container matColumnDef="subscription_status">
         <mat-header-cell *matHeaderCellDef mat-sort-header> Status </mat-header-cell>
         <mat-cell *matCellDef="let element" [ngClass]="{
@@ -351,27 +353,27 @@
           {{element.subscription_status}}
         </mat-cell>
       </ng-container>
-
+ 
       <ng-container matColumnDef="createdAt">
         <mat-header-cell *matHeaderCellDef mat-sort-header> Active Date </mat-header-cell>
         <mat-cell *matCellDef="let element"> {{element.createdAt}} </mat-cell>
       </ng-container>
-
+ 
       <ng-container matColumnDef="expiry_date">
         <mat-header-cell *matHeaderCellDef mat-sort-header> Expiry Date </mat-header-cell>
         <mat-cell *matCellDef="let element"> {{element.expiry_date}} </mat-cell>
       </ng-container>
-
+ 
       <ng-container matColumnDef="price">
         <mat-header-cell *matHeaderCellDef mat-sort-header> Price </mat-header-cell>
         <mat-cell *matCellDef="let element"> {{element.price}} </mat-cell>
       </ng-container>
-
+ 
       <ng-container matColumnDef="subscription_type">
         <mat-header-cell *matHeaderCellDef mat-sort-header> Type </mat-header-cell>
         <mat-cell *matCellDef="let element"> {{element.subscription_type}} </mat-cell>
       </ng-container>
-
+ 
       <mat-header-row
         *matHeaderRowDef="['subscription_id', 'subscription_status','createdAt','expiry_date','price', 'subscription_type']"></mat-header-row>
       <mat-row
@@ -379,13 +381,14 @@
     </mat-table>
     <mat-paginator #subscriptionPaginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
   </div>
-
+ 
   <mat-form-field *ngIf="showServiceDetails">
     <mat-label>Filter Services</mat-label>
     <input matInput (keyup)="applyServiceFilter($event)" placeholder="Ex. Srvice NAme" #serviceInput>
+    <mat-icon matSuffix>search</mat-icon>
   </mat-form-field>
   <div class="mat-elevation-z8" *ngIf="showServiceDetails">
-
+ 
     <mat-table [dataSource]="serviceDataSource" matSort>
       <ng-container matColumnDef="serviceNames">
         <mat-header-cell *matHeaderCellDef mat-sort-header> Service Names </mat-header-cell>
@@ -398,7 +401,7 @@
           </ul>
         </mat-cell>
       </ng-container>
-
+ 
       <mat-header-row *matHeaderRowDef="['serviceNames']"></mat-header-row>
       <mat-row *matRowDef="let row; columns: ['serviceNames']"></mat-row>
     </mat-table>
@@ -408,5 +411,5 @@
     <mat-paginator #servicePaginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
    
   </div>
-  
+ 
 </section>

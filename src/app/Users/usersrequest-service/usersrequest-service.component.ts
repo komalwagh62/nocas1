@@ -3,22 +3,26 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ApiService } from '../Shared/Api/api.service';
 import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr'; // Import ToastrService
+
 @Component({
   selector: 'app-usersrequest-service',
   templateUrl: './usersrequest-service.component.html',
-  styleUrl: './usersrequest-service.component.scss'
+  styleUrls: ['./usersrequest-service.component.scss']
 })
 export class UsersrequestServiceComponent implements OnInit {
   requestForm!: FormGroup;
   user: any = {};
   updatedUser: any = {};
+
   constructor(
     private formBuilder: FormBuilder,
     private http: HttpClient,
     private apiService: ApiService,
-    private router: Router
+    private router: Router,
+    private toastr: ToastrService // Inject ToastrService
   ) {}
- 
+
   ngOnInit(): void {
     this.requestForm = this.formBuilder.group({
       service1: [false],
@@ -30,7 +34,7 @@ export class UsersrequestServiceComponent implements OnInit {
 
     this.getUserDetails();
   }
- 
+
   createRequest() {
     if (this.requestForm.valid) {
       const requestData = {
@@ -40,33 +44,33 @@ export class UsersrequestServiceComponent implements OnInit {
       this.http.post<any>('http://localhost:3001/api/request/createRequest', requestData)
         .subscribe(
           (result) => {
-            alert("Request created successfully");
+            this.toastr.success("Request created successfully");
           },
           (error) => {
             console.error("Error creating request:", error);
-            alert("Error creating request");
+            this.toastr.error("Error creating request");
           }
         );
     } else {
-      alert('Please select a service.');
+      this.toastr.warning('Please select a service.');
     }
   }
+
   getUserDetails(): void {
     const headers = new HttpHeaders().set("Authorization", `Bearer ${this.apiService.token}`);
     this.http.post<any>('http://localhost:3001/api/user/myProfile', {}, { headers })
       .subscribe(
         response => {
-          this.apiService.userData = JSON.parse(JSON.stringify(response))
-          this.updatedUser = JSON.parse(JSON.stringify(response))
-          this.user = JSON.parse(JSON.stringify(response))
+          this.apiService.userData = JSON.parse(JSON.stringify(response));
+          this.updatedUser = JSON.parse(JSON.stringify(response));
+          this.user = JSON.parse(JSON.stringify(response));
           localStorage.setItem('this.user', JSON.stringify(response.apiservice.userData));
         },
         error => {
           console.error("Failed to fetch user details:", error);
-          alert("Failed to fetch user details. Please log in again.");
+          this.toastr.error("Failed to fetch user details. Please log in again.");
           this.router.navigate(['UsersLogin']);
         }
       );
   }
 }
-

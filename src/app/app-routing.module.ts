@@ -11,22 +11,24 @@ import { UsersrequestServiceComponent } from './Users/usersrequest-service/users
 import { TransactionDetailsComponent } from './Users/transaction-details/transaction-details.component';
 import { FooterComponent } from './Users/Shared/footer/footer.component';
 import { FormsModule } from '@angular/forms';
+import { AuthGuard } from './Users/Shared/Api/auth.guard'; // Import the AuthGuard service
 
 const routes: Routes = [
   { path: '', redirectTo: 'UsersLogin', pathMatch: 'full' }, 
-  { path: 'UsersHome', component: UsersHomeComponent },
+  { path: 'UsersHome', component: UsersHomeComponent, canActivate: [AuthGuard] },
   { path: 'UsersRegister', component: UsersRegisterComponent },
   { path: 'UsersLogin', component: UsersLoginComponent },
-  { path: 'UsersProfile', component: UsersProfileComponent },
-  { path: 'PricingPlans', component: UsersPricingPlansComponent },
-  { path: 'C_NOCAS-MAP', component: UsersNOCASComponent },
+  { path: 'UsersProfile', component: UsersProfileComponent, canActivate: [AuthGuard] },
+  { path: 'PricingPlans', component: UsersPricingPlansComponent, canActivate: [AuthGuard] },
+  { path: 'C_NOCAS-MAP', component: UsersNOCASComponent, canActivate: [AuthGuard] },
   { path: 'forgot-pass', component: ForgotPasswordComponent },
-  { path: 'request-Service', component: UsersrequestServiceComponent },
-  { path: 'TransactionDetails', component: TransactionDetailsComponent },
+  { path: 'request-Service', component: UsersrequestServiceComponent, canActivate: [AuthGuard] },
+  { path: 'TransactionDetails', component: TransactionDetailsComponent, canActivate: [AuthGuard] },
   { path: 'FooterComponent', component: FooterComponent },
 ];
+
 @NgModule({
-  imports: [RouterModule.forRoot(routes),FormsModule],
+  imports: [RouterModule.forRoot(routes), FormsModule],
   exports: [RouterModule]
 })
 export class AppRoutingModule { }

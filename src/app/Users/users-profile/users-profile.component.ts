@@ -2,6 +2,8 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ApiService } from '../Shared/Api/api.service';
+import { ToastrService } from 'ngx-toastr';
+
 @Component({
   selector: 'app-users-profile',
   templateUrl: './users-profile.component.html',
@@ -14,14 +16,24 @@ export class UsersProfileComponent implements OnInit {
   newPassword: string = '';
   confirmPassword: string = '';
   passwordsMatch: boolean = false;
-  constructor(private route: ActivatedRoute, private http: HttpClient, public apiservice: ApiService, private router: Router, private cdr: ChangeDetectorRef) { }
-  ngOnInit(): void {
-    this.getUserDetails();
-  }
   imageUrl: string = '';
   imageName: string = '';
   selectedFile: File | undefined;
   airports: any[] = [];
+
+  constructor(
+    private route: ActivatedRoute, 
+    private http: HttpClient, 
+    public apiservice: ApiService, 
+    private router: Router, 
+    private cdr: ChangeDetectorRef,
+    private toastr: ToastrService  // Inject ToastrService
+  ) { }
+
+  ngOnInit(): void {
+    this.getUserDetails();
+  }
+
   onFileSelected(event: any) {
     const file: File = event.target.files[0];
     this.selectedFile = file;
@@ -32,6 +44,7 @@ export class UsersProfileComponent implements OnInit {
       this.imageUrl = reader.result as string;
     };
   }
+
   saveChanges(): void {
     this.http.put<any>('http://localhost:3001/api/user/updateUser', this.updatedUser)
       .subscribe(
@@ -39,20 +52,23 @@ export class UsersProfileComponent implements OnInit {
           this.apiservice.userData = JSON.parse(JSON.stringify(response.updatedUser))
           this.updatedUser = JSON.parse(JSON.stringify(response.updatedUser))
           this.user = JSON.parse(JSON.stringify(response.updatedUser))
-          alert(response.message)
+          this.toastr.success(response.message);  // Replace alert with Toastr success
         },
         error => {
           console.error('Error updating profile:', error);
-          alert('Failed to update profile. Please try again.');
+          this.toastr.error('Failed to update profile. Please try again.');  // Replace alert with Toastr error
         }
       );
   }
+
   logout() {
     this.router.navigate(['UserLogin']);
   }
+
   navigateToProfile() {
     this.router.navigate(['users-profile']);
   }
+
   getUserDetails(): void {
     const headers = new HttpHeaders().set("Authorization", `Bearer ${this.apiservice.token}`);
     this.http.post<any>('http://localhost:3001/api/user/myProfile', {}, { headers: headers })
@@ -66,7 +82,7 @@ export class UsersProfileComponent implements OnInit {
           localStorage.removeItem('token');
           localStorage.removeItem('userData');
           this.cdr.detectChanges();
-          alert("Failed Login");
+          this.toastr.error("Failed Login");  // Replace alert with Toastr error
           this.router.navigate(['UsersLogin']);
         }
       );
@@ -82,11 +98,11 @@ export class UsersProfileComponent implements OnInit {
     this.http.post<any>('http://localhost:3001/api/user/changePassword', passwordData, { headers: headers })
       .subscribe(
         response => {
-          alert(response.message)
+          this.toastr.success(response.message);  // Replace alert with Toastr success
         },
         error => {
-          alert(error)
+          this.toastr.error(error);  // Replace alert with Toastr error
         }
-      )
+      );
   }
 }

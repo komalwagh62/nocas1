@@ -87,7 +87,10 @@ import { ToastrModule } from 'ngx-toastr';
         MatPaginatorModule,
         MatSortModule,
         MatTableModule,
-        ToastrModule.forRoot()
+        ToastrModule.forRoot({
+            positionClass: 'toast-top-right',
+            preventDuplicates: true
+          }),   
     ],
          providers: [
         provideAnimationsAsync(),
